@@ -32,6 +32,10 @@ function onFormSubmit(data) {
   console.log('form submit', data)
   alert('Submitted! Check the console for the payload.')
 }
+
+function onUnassign() {
+  alert('Unassign clicked!')
+}
 </script>
 
 <template>
@@ -61,6 +65,7 @@ function onFormSubmit(data) {
         name="Wash dishes"
         icon-name="mdi:silverware-clean"
         claimed-by-name="Samuel"
+        claimed-by-photo="https://api.dicebear.com/7.x/avataaars/svg?seed=Samuel"
         disabled
         variant="task"
       />
@@ -71,6 +76,22 @@ function onFormSubmit(data) {
         variant="task"
       />
       <ChoreCard name="Vacuum stairs (missed yesterday)" icon-name="mdi:vacuum" missed />
+      <ChoreCard
+        name="Feed the cat"
+        icon-name="mdi:cat"
+        :deadline="addHours(new Date(), 2)"
+        can-unassign
+        @unassign="onUnassign"
+      />
+      <ChoreCard
+        name="Water plants"
+        icon-name="mdi:flower"
+        claimed-by-name="River"
+        claimed-by-photo="https://api.dicebear.com/7.x/avataaars/svg?seed=River"
+        can-unassign
+        variant="task"
+        @unassign="onUnassign"
+      />
     </section>
 
     <section class="flex flex-col gap-3">

@@ -28,30 +28,35 @@ function closeMenu() {
   menuOpen.value = false
 }
 
-function requestPin(action) {
+function toggleAdminMode() {
   closeMenu()
-  if (action === 'admin' && isAdminMode.value) {
+  if (isAdminMode.value) {
     exitAdminMode()
-    return
+  } else {
+    pinAction.value = 'admin'
   }
-  pinAction.value = action
 }
 
 async function onPinSuccess() {
-  const action = pinAction.value
   pinAction.value = null
-  if (action === 'schedule') router.push('/schedule')
-  else if (action === 'admin') enterAdminMode()
-  else if (action === 'settings') router.push('/settings')
-  else if (action === 'reports') router.push('/reports')
-  else if (action === 'signout') {
-    await signOut()
-    router.replace('/auth')
-  }
+  enterAdminMode()
 }
 
 function onPinCancel() {
   pinAction.value = null
+}
+
+function navigateTo(route) {
+  if (!isAdminMode.value) return
+  closeMenu()
+  router.push(route)
+}
+
+async function doSignOut() {
+  if (!isAdminMode.value) return
+  closeMenu()
+  await signOut()
+  router.replace('/auth')
 }
 </script>
 
@@ -65,21 +70,24 @@ function onPinCancel() {
       <span v-else>{{ initials || '?' }}</span>
     </button>
 
-    <div
-      v-if="menuOpen"
-      @click.self="closeMenu"
-      class="fixed inset-0 z-40"
-    >
-      <div class="absolute right-4 top-20 bg-white rounded-2xl shadow-xl border border-amber-100 py-3 w-72 flex flex-col text-lg">
+    <Teleport to="body">
+      <div
+        v-if="menuOpen"
+        @click="closeMenu"
+        class="fixed inset-0 z-40"
+      >
+        <div @click.stop class="absolute right-4 top-20 bg-white rounded-2xl shadow-xl border border-amber-100 py-3 w-72 flex flex-col text-lg">
         <button
-          @click="requestPin('schedule')"
-          class="text-left px-6 py-4 hover:bg-amber-50 text-amber-900 font-medium"
+          @click="navigateTo('/schedule')"
+          :disabled="!isAdminMode"
+          class="text-left px-6 py-4 font-medium"
+          :class="isAdminMode ? 'hover:bg-amber-50 text-amber-900 cursor-pointer' : 'text-gray-300 cursor-not-allowed'"
         >
           Schedule
         </button>
         <button
-          @click="requestPin('admin')"
-          class="text-left px-6 py-4 hover:bg-amber-50 text-amber-900 font-medium flex items-center justify-between"
+          @click="toggleAdminMode"
+          class="text-left px-6 py-4 hover:bg-amber-50 text-amber-900 font-medium flex items-center justify-between cursor-pointer"
         >
           <span>Admin mode</span>
           <span
@@ -90,26 +98,33 @@ function onPinCancel() {
           </span>
         </button>
         <button
-          @click="requestPin('settings')"
-          class="text-left px-6 py-4 hover:bg-amber-50 text-amber-900 font-medium"
+          @click="navigateTo('/settings')"
+          :disabled="!isAdminMode"
+          class="text-left px-6 py-4 font-medium"
+          :class="isAdminMode ? 'hover:bg-amber-50 text-amber-900 cursor-pointer' : 'text-gray-300 cursor-not-allowed'"
         >
           Settings
         </button>
         <button
-          @click="requestPin('reports')"
-          class="text-left px-6 py-4 hover:bg-amber-50 text-amber-900 font-medium"
+          @click="navigateTo('/reports')"
+          :disabled="!isAdminMode"
+          class="text-left px-6 py-4 font-medium"
+          :class="isAdminMode ? 'hover:bg-amber-50 text-amber-900 cursor-pointer' : 'text-gray-300 cursor-not-allowed'"
         >
           Reports
         </button>
         <hr class="my-2 border-amber-100" />
         <button
-          @click="requestPin('signout')"
-          class="text-left px-6 py-4 hover:bg-amber-50 text-red-600 font-medium"
+          @click="doSignOut"
+          :disabled="!isAdminMode"
+          class="text-left px-6 py-4 font-medium"
+          :class="isAdminMode ? 'hover:bg-amber-50 text-red-600 cursor-pointer' : 'text-gray-300 cursor-not-allowed'"
         >
           Sign out
         </button>
+        </div>
       </div>
-    </div>
+    </Teleport>
 
     <PinDialog
       :open="pinAction !== null"

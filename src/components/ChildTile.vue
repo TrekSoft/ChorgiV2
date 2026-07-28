@@ -15,7 +15,7 @@ const birthdayToday = computed(() => isBirthdayToday(props.child.birthdate))
 const daysUntil = computed(() => daysUntilBirthday(props.child.birthdate))
 
 function open() {
-  if (!isAdminMode.value) router.push(`/child/${props.child.id}`)
+  router.push(`/child/${props.child.id}`)
 }
 
 function onEditClick(event) {

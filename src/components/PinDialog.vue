@@ -73,9 +73,9 @@ async function submit() {
         <p v-if="error" class="text-red-500 text-sm font-medium">Wrong PIN — try again</p>
         <button
           @click="emit('cancel')"
-          class="text-amber-700 font-medium py-2 px-4 rounded-xl hover:bg-amber-50"
+          class="w-full bg-amber-200 hover:bg-amber-300 text-amber-800 text-lg font-bold py-3 rounded-xl"
         >
-          Cancel
+          Go back
         </button>
       </div>
     </div>

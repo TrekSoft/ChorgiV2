@@ -207,7 +207,9 @@ families/{uid}/claims/{yyyy-MM-dd}_{taskId}
 
 ### Phase 6 — Child Chore View `[ ]` *(parallelizable with 5 & 7)*
 - `/child/:id`: two-pane split — left assigned chores (recurring vs one-off styling, sort order per §5), right claimable sections (Extra Chores, then one section per active cleaning-day room)
+- **Tap targets**: whole card body taps to complete/uncomplete (big kid-friendly target); a small separate unassign area on the card lets kids unassign themselves from a chore (no PIN, allowed while period is open)
 - Claim → complete flow; claimed-by-other is locked for kids, reassignable in admin mode
+- **Claimed-by avatar**: when a task is claimed by a child, show that child's profile photo next to their name on the chore card (not just text)
 - Kid undo: tap a completed chore to un-check it (reverses any bonus added); tap a claimed-but-incomplete task to unclaim it — allowed while the period is open, no PIN
 - Confetti on complete, coin confetti + amount toast on bonus, fireworks when all left-pane chores done
 - Countdown labels, overdue state (top-pinned, 'X min/hrs overdue'), photo lightbox, weekly chore support
