@@ -19,8 +19,7 @@ function setTab(next) {
   <div class="min-h-screen bg-amber-50">
     <AppHeader />
     <main class="w-full p-4 sm:p-6 flex flex-col gap-4">
-      <div class="flex items-center gap-4 flex-wrap">
-        <h1 class="text-2xl font-bold text-amber-900">Schedule</h1>
+      <div class="flex items-center gap-4">
         <div class="flex rounded-full border-2 border-amber-200 overflow-hidden">
           <button
             @click="setTab('calendar')"

@@ -104,9 +104,25 @@ function openEdit(entry) {
   <div class="flex flex-col gap-4">
     <!-- week nav -->
     <div class="flex items-center gap-2 flex-wrap">
-      <button @click="prev" class="w-9 h-9 rounded-full hover:bg-amber-100 text-amber-700 font-bold cursor-pointer" aria-label="Previous week">‹</button>
+      <button
+        @click="prev"
+        class="w-12 h-12 rounded-full bg-white border-2 border-amber-200 hover:border-amber-400 text-amber-700 cursor-pointer flex items-center justify-center shrink-0"
+        aria-label="Previous week"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="15 18 9 12 15 6" />
+        </svg>
+      </button>
       <span class="font-bold text-amber-900 text-lg">{{ headerLabel }}</span>
-      <button @click="next" class="w-9 h-9 rounded-full hover:bg-amber-100 text-amber-700 font-bold cursor-pointer" aria-label="Next week">›</button>
+      <button
+        @click="next"
+        class="w-12 h-12 rounded-full bg-white border-2 border-amber-200 hover:border-amber-400 text-amber-700 cursor-pointer flex items-center justify-center shrink-0"
+        aria-label="Next week"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="9 18 15 12 9 6" />
+        </svg>
+      </button>
       <button @click="goToday" class="text-sm text-amber-600 font-medium hover:underline cursor-pointer ml-1">This week</button>
       <div class="flex-1"></div>
       <button
