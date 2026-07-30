@@ -6,7 +6,7 @@ import { occursOn, deadlineFor, startsAt } from '../lib/recurrence'
 import { family } from '../composables/useFamily'
 import { children } from '../composables/useChildren'
 import { chores } from '../composables/useChores'
-import { tasks } from '../composables/useTasks'
+import { tasks, upsertTask } from '../composables/useTasks'
 import { rooms, cleaningDays } from '../composables/useCleaning'
 import {
   completions,
@@ -129,18 +129,34 @@ const claimableChores = computed(() =>
 
 const cleaningSections = computed(() => {
   const day = cleaningDays.value[todayStr.value]
-  if (!day) return []
+  if (!day || !child.value) return []
   return (day.roomIds || [])
     .map((roomId) => ({
       room: rooms.value.find((r) => r.id === roomId),
-      tasks: tasks.value.filter((t) => t.kind === 'cleaning' && t.roomId === roomId),
+      tasks: tasks.value.filter((t) => {
+        if (t.kind !== 'cleaning' || t.roomId !== roomId) return false
+        const ids = t.assigneeIds || []
+        return ids.length === 0 || ids.includes(child.value.id)
+      }),
     }))
     .filter((s) => s.room && s.tasks.length > 0)
 })
 
+function isPreAssigned(task) {
+  return !!(task.assigneeIds || []).length && (task.assigneeIds || []).includes(child.value?.id)
+}
+
 // card state helpers for claimable tasks
 function taskCardProps(task) {
   const claim = claimFor(task)
+  if (!claim && isPreAssigned(task)) {
+    return {
+      completed: false,
+      claimedByName: child.value?.name || null,
+      claimedByPhoto: child.value?.photoURL || null,
+      disabled: false,
+    }
+  }
   const mine = !!(claim && child.value && claim.childId === child.value.id)
   const owner = claim ? claimChild(claim) : null
   return {
@@ -152,6 +168,7 @@ function taskCardProps(task) {
 }
 
 function canUnclaim(task) {
+  if (isPreAssigned(task) && !claimFor(task)) return true
   const claim = claimFor(task)
   if (!claim || claim.completed) return false
   const mine = child.value && claim.childId === child.value.id
@@ -159,6 +176,7 @@ function canUnclaim(task) {
 }
 
 function unclaimLabel(task) {
+  if (isPreAssigned(task) && !claimFor(task)) return 'Remove me'
   const claim = claimFor(task)
   const mine = claim && child.value && claim.childId === child.value.id
   return mine ? 'Remove me' : 'Unassign'
@@ -167,7 +185,13 @@ function unclaimLabel(task) {
 async function onTaskTap(task) {
   const claim = claimFor(task)
   if (!claim) {
-    await claimTask(task, child.value.id, todayStr.value)
+    if (isPreAssigned(task)) {
+      await claimTask(task, child.value.id, todayStr.value)
+      await completeClaim(task, todayStr.value)
+      burst.value?.fire('confetti')
+    } else {
+      await claimTask(task, child.value.id, todayStr.value)
+    }
     return
   }
   const mine = claim.childId === child.value.id
@@ -196,10 +220,21 @@ async function onTaskTap(task) {
 
 async function onTaskUnclaim(task) {
   const claim = claimFor(task)
+  // pre-assigned with no claim yet — remove child from assigneeIds
+  if (!claim && isPreAssigned(task)) {
+    const ids = (task.assigneeIds || []).filter((id) => id !== child.value.id)
+    await upsertTask(task.id, { assigneeIds: ids })
+    return
+  }
   if (!claim || claim.completed) return
   const mine = child.value && claim.childId === child.value.id
   if (mine) {
     await unclaimTask(task, todayStr.value)
+    // also remove from pre-assigned list if applicable
+    if (isPreAssigned(task)) {
+      const ids = (task.assigneeIds || []).filter((id) => id !== child.value.id)
+      await upsertTask(task.id, { assigneeIds: ids })
+    }
   } else if (isAdminMode.value) {
     const owner = claimChild(claim)
     if (confirm(`Release ${owner?.name || 'the other child'}'s claim on "${task.name}"?`)) {
