@@ -216,10 +216,12 @@ async function onTaskUnclaim(task) {
       <div class="flex items-center gap-3">
         <button
           @click="router.push('/')"
-          class="w-14 h-14 rounded-full bg-white border-2 border-amber-200 hover:border-amber-400 text-amber-700 font-bold text-3xl cursor-pointer flex items-center justify-center shrink-0"
+          class="w-14 h-14 rounded-full bg-white border-2 border-amber-200 hover:border-amber-400 text-amber-700 cursor-pointer flex items-center justify-center shrink-0"
           aria-label="Back"
         >
-          ‹
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6" />
+          </svg>
         </button>
         <img
           v-if="child?.photoURL"
