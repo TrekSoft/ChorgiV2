@@ -14,6 +14,8 @@ const props = defineProps({
   bonusCents: { type: Number, default: null },
   // [{ id, name, photoURL? }] — empty means unassigned (claimable)
   assignees: { type: Array, default: () => [] },
+  // true when every child is assigned — renders a single All chip
+  assignedToAll: { type: Boolean, default: false },
   claimable: { type: Boolean, default: false },
 })
 const emit = defineEmits(['click', 'photo-click'])
@@ -74,6 +76,12 @@ const timeLabel = computed(() => {
           class="text-[10px] font-bold uppercase tracking-wide text-sky-600 bg-sky-100 px-1.5 py-0.5 rounded-full"
         >
           Claimable
+        </span>
+        <span
+          v-else-if="assignedToAll"
+          class="text-[10px] font-bold uppercase tracking-wide text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded-full"
+        >
+          All
         </span>
         <template v-else>
           <span

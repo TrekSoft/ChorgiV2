@@ -65,6 +65,8 @@ function entriesFor(day) {
       kind: chore.kind === 'oneoff' ? 'oneoff-chore' : 'recurring-chore',
       item: chore,
       assignees: assigneesFor(chore),
+      assignedToAll:
+        children.value.length > 0 && (chore.assigneeIds || []).length >= children.value.length,
       claimable: chore.kind === 'oneoff' && (chore.assigneeIds || []).length === 0,
       // sort by start time (untimed chores last)
       sortKey: chore.timeWindow?.start || '99:99',
@@ -189,6 +191,7 @@ function openEdit(entry) {
           :oneoff="entry.kind === 'oneoff-chore'"
           :bonus-cents="entry.item.bonusCents || null"
           :assignees="entry.assignees"
+          :assigned-to-all="entry.assignedToAll"
           :claimable="entry.claimable"
           @click="openEdit(entry)"
           @photo-click="lightboxSrc = entry.item.photoURL"
