@@ -192,7 +192,7 @@ const reportData = computed(() => {
       <h1 class="text-2xl font-bold text-amber-900">Reports</h1>
 
       <!-- Date selector -->
-      <div class="flex items-center gap-4 bg-white rounded-2xl shadow p-4">
+      <div class="flex items-center gap-4 bg-white rounded-2xl shadow p-4 max-w-md mx-auto w-full">
         <button
           @click="prevDay"
           class="w-10 h-10 rounded-full bg-amber-100 text-amber-700 font-bold text-xl flex items-center justify-center hover:bg-amber-200 cursor-pointer"
