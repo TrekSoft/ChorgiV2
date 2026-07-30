@@ -19,7 +19,6 @@ import {
   completeClaim,
   uncompleteClaim,
   unclaimTask,
-  declineClaim,
 } from '../composables/useCompletions'
 import { isAdminMode } from '../composables/useAdminMode'
 import AppHeader from '../components/AppHeader.vue'
@@ -130,54 +129,18 @@ const claimableChores = computed(() =>
 
 const cleaningSections = computed(() => {
   const day = cleaningDays.value[todayStr.value]
-  if (!day || !child.value) return []
+  if (!day) return []
   return (day.roomIds || [])
     .map((roomId) => ({
       room: rooms.value.find((r) => r.id === roomId),
-      tasks: tasks.value.filter((t) => {
-        if (t.kind !== 'cleaning' || t.roomId !== roomId) return false
-        if (isDeclinedByMe(t)) return false
-        if (!t.assigneeId) return true
-        if (t.assigneeId === child.value.id) return true
-        return isDeclinedByAssignee(t)
-      }),
+      tasks: tasks.value.filter((t) => t.kind === 'cleaning' && t.roomId === roomId),
     }))
     .filter((s) => s.room && s.tasks.length > 0)
 })
 
-function isPreAssigned(task) {
-  return !!task.assigneeId && task.assigneeId === child.value?.id
-}
-
-function isDeclinedByMe(task) {
-  const claim = claimFor(task)
-  return !!(claim?.declined && claim.childId === child.value?.id)
-}
-
-function isDeclinedByAssignee(task) {
-  const claim = claimFor(task)
-  return !!(claim?.declined && task.assigneeId && claim.childId === task.assigneeId)
-}
-
 // card state helpers for claimable tasks
 function taskCardProps(task) {
   const claim = claimFor(task)
-  if (claim?.declined) {
-    return {
-      completed: false,
-      claimedByName: null,
-      claimedByPhoto: null,
-      disabled: false,
-    }
-  }
-  if (!claim && isPreAssigned(task)) {
-    return {
-      completed: false,
-      claimedByName: child.value?.name || null,
-      claimedByPhoto: child.value?.photoURL || null,
-      disabled: false,
-    }
-  }
   const mine = !!(claim && child.value && claim.childId === child.value.id)
   const owner = claim ? claimChild(claim) : null
   return {
@@ -190,15 +153,12 @@ function taskCardProps(task) {
 
 function canUnclaim(task) {
   const claim = claimFor(task)
-  if (claim?.declined) return false
-  if (!claim && isPreAssigned(task)) return true
   if (!claim || claim.completed) return false
   const mine = child.value && claim.childId === child.value.id
   return !!(mine || isAdminMode.value)
 }
 
 function unclaimLabel(task) {
-  if (isPreAssigned(task) && !claimFor(task)) return 'Remove me'
   const claim = claimFor(task)
   const mine = claim && child.value && claim.childId === child.value.id
   return mine ? 'Remove me' : 'Unassign'
@@ -207,16 +167,6 @@ function unclaimLabel(task) {
 async function onTaskTap(task) {
   const claim = claimFor(task)
   if (!claim) {
-    if (isPreAssigned(task)) {
-      await claimTask(task, child.value.id, todayStr.value)
-      await completeClaim(task, todayStr.value)
-      burst.value?.fire('confetti')
-    } else {
-      await claimTask(task, child.value.id, todayStr.value)
-    }
-    return
-  }
-  if (claim.declined) {
     await claimTask(task, child.value.id, todayStr.value)
     return
   }
@@ -246,20 +196,10 @@ async function onTaskTap(task) {
 
 async function onTaskUnclaim(task) {
   const claim = claimFor(task)
-  // pre-assigned with no claim yet — create declined claim, leave config untouched
-  if (!claim && isPreAssigned(task)) {
-    await declineClaim(task, child.value.id, todayStr.value)
-    return
-  }
   if (!claim || claim.completed) return
   const mine = child.value && claim.childId === child.value.id
   if (mine) {
-    if (isPreAssigned(task)) {
-      await unclaimTask(task, todayStr.value)
-      await declineClaim(task, child.value.id, todayStr.value)
-    } else {
-      await unclaimTask(task, todayStr.value)
-    }
+    await unclaimTask(task, todayStr.value)
   } else if (isAdminMode.value) {
     const owner = claimChild(claim)
     if (confirm(`Release ${owner?.name || 'the other child'}'s claim on "${task.name}"?`)) {
