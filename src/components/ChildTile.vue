@@ -36,6 +36,7 @@ function onMarkRemove(event) {
 
 const editingBalance = ref(false)
 const balanceInput = ref('')
+const showPayoutTooltip = ref(false)
 
 function onBalanceClick(event) {
   event.stopPropagation()
@@ -96,17 +97,36 @@ function onPayoutClick(event) {
 
     <div class="flex items-center gap-2" @click.stop>
       <!-- Admin: payout button -->
-      <button
+      <div
         v-if="isAdminMode && !editingBalance"
-        @click.stop="onPayoutClick"
-        title="Mark as paid"
-        class="w-11 h-11 rounded-full bg-green-100 hover:bg-green-200 text-green-600 flex items-center justify-center cursor-pointer shrink-0"
+        class="relative shrink-0"
+        @mouseenter="showPayoutTooltip = true"
+        @mouseleave="showPayoutTooltip = false"
       >
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="12" y1="2" x2="12" y2="22"/>
-          <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-        </svg>
-      </button>
+        <button
+          @click.stop="onPayoutClick"
+          class="w-11 h-11 rounded-full bg-green-100 hover:bg-green-200 text-green-600 flex items-center justify-center cursor-pointer"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="2" x2="12" y2="22"/>
+            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+          </svg>
+        </button>
+        <Transition
+          enter-active-class="transition-opacity duration-150"
+          leave-active-class="transition-opacity duration-100"
+          enter-from-class="opacity-0"
+          leave-to-class="opacity-0"
+        >
+          <div
+            v-if="showPayoutTooltip"
+            class="absolute -top-9 left-1/2 -translate-x-1/2 bg-amber-900 text-white text-xs font-medium px-3 py-1.5 rounded-lg whitespace-nowrap pointer-events-none z-20"
+          >
+            Mark as paid
+            <div class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-amber-900 rotate-45"></div>
+          </div>
+        </Transition>
+      </div>
 
       <!-- Allowance balance (inline edit in admin mode) -->
       <div
