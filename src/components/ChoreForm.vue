@@ -81,13 +81,24 @@ function submit() {
   }
 
   if (props.kind === 'recurring-chore') {
+    let recurrence = null
+    let timeWindow = null
+    if (recurrenceMode.value !== 'weekly') {
+      recurrence = { type: dailyPatternType.value }
+      if (dailyPatternType.value === 'weekdays') recurrence.days = weekdays.value
+      if (dailyPatternType.value === 'dayOfMonth') recurrence.day = Number(dayOfMonth.value)
+      timeWindow = {}
+      if (timeStart.value) timeWindow.start = timeStart.value
+      if (timeEnd.value) timeWindow.end = timeEnd.value
+      if (Object.keys(timeWindow).length === 0) timeWindow = null
+    }
     emit('submit', {
       ...base,
       kind: 'recurring',
       assigneeIds: assigneeIds.value,
       weekly: recurrenceMode.value === 'weekly',
-      recurrence: recurrenceMode.value === 'weekly' ? null : { type: dailyPatternType.value, days: dailyPatternType.value === 'weekdays' ? weekdays.value : undefined, day: dailyPatternType.value === 'dayOfMonth' ? Number(dayOfMonth.value) : undefined },
-      timeWindow: recurrenceMode.value === 'weekly' ? null : { start: timeStart.value || undefined, end: timeEnd.value || undefined },
+      recurrence,
+      timeWindow,
     })
   } else if (props.kind === 'oneoff-chore') {
     emit('submit', {
