@@ -195,9 +195,7 @@ const reportData = computed(() => {
 <template>
   <div class="min-h-screen bg-amber-50">
     <AppHeader />
-    <main class="p-4 sm:p-6 flex flex-col gap-6">
-      <h1 class="text-2xl font-bold text-amber-900">Reports</h1>
-
+    <main class="p-4 sm:p-6 flex flex-col gap-4">
       <!-- Date selector -->
       <div class="flex items-center gap-4 bg-white rounded-2xl shadow p-4 max-w-md mx-auto w-full">
         <button
