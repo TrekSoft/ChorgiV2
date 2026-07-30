@@ -41,9 +41,9 @@ function tasksFor(roomId) {
 }
 
 function assigneesFor(task) {
-  return (task.assigneeIds || [])
-    .map((id) => children.value.find((c) => c.id === id))
-    .filter(Boolean)
+  if (!task.assigneeId) return []
+  const child = children.value.find((c) => c.id === task.assigneeId)
+  return child ? [child] : []
 }
 
 const lightboxSrc = ref(null)
@@ -113,7 +113,6 @@ function openEditTask(task) {
             :icon-name="task.iconName"
             :photo-url="task.photoURL"
             :assignees="assigneesFor(task)"
-            :assigned-to-all="children.length > 0 && (task.assigneeIds || []).length >= children.length"
             @click="openEditTask(task)"
             @photo-click="lightboxSrc = task.photoURL"
           />

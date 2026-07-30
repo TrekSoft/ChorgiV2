@@ -19,6 +19,7 @@ const name = ref(props.initial?.name || '')
 const iconName = ref(props.initial?.iconName || null)
 const photoFile = ref(null)
 const assigneeIds = ref(props.initial?.assigneeIds || [])
+const assigneeId = ref(props.initial?.assigneeId || null)
 const date = ref(props.initial?.date || '')
 const bonusAmount = ref(props.initial ? String((props.initial.bonusCents || 0) / 100) : '0')
 const roomId = ref(props.initial?.roomId || (props.rooms[0]?.id ?? ''))
@@ -38,9 +39,13 @@ const showRecurrence = computed(() => props.kind === 'recurring-chore')
 const showTimeWindow = computed(() => props.kind === 'recurring-chore' && recurrenceMode.value === 'daily')
 
 function toggleAssignee(id) {
-  assigneeIds.value = assigneeIds.value.includes(id)
-    ? assigneeIds.value.filter((a) => a !== id)
-    : [...assigneeIds.value, id]
+  if (props.kind === 'cleaning-task') {
+    assigneeId.value = assigneeId.value === id ? null : id
+  } else {
+    assigneeIds.value = assigneeIds.value.includes(id)
+      ? assigneeIds.value.filter((a) => a !== id)
+      : [...assigneeIds.value, id]
+  }
 }
 
 const allAssigned = computed(
@@ -120,7 +125,7 @@ function submit() {
     emit('submit', {
       ...base,
       kind: 'cleaning',
-      assigneeIds: assigneeIds.value,
+      assigneeId: assigneeId.value,
       roomId: roomId.value,
     })
   }
@@ -149,10 +154,12 @@ function submit() {
     <div v-if="showAssignees" class="flex flex-col gap-2">
       <span class="text-amber-800 font-medium">
         Assign to
-        <span v-if="kind !== 'recurring-chore'" class="text-amber-500 font-normal">(optional — unassigned tasks can be done by any kid)</span>
+        <span v-if="kind === 'oneoff-chore'" class="text-amber-500 font-normal">(optional — unassigned one-offs can be claimed by any kid)</span>
+        <span v-else-if="kind === 'cleaning-task'" class="text-amber-500 font-normal">(optional — unassigned tasks can be done by any kid)</span>
       </span>
       <div class="flex flex-wrap gap-2">
         <button
+          v-if="kind !== 'cleaning-task'"
           type="button"
           @click="toggleAll"
           class="px-4 py-2 rounded-full border-2 font-bold cursor-pointer transition-colors"
@@ -166,7 +173,7 @@ function submit() {
           type="button"
           @click="toggleAssignee(child.id)"
           class="px-4 py-2 rounded-full border-2 font-medium cursor-pointer transition-colors"
-          :class="assigneeIds.includes(child.id) ? 'border-amber-500 bg-amber-100 text-amber-800' : 'border-amber-200 text-amber-600 hover:bg-amber-50'"
+          :class="(kind === 'cleaning-task' ? assigneeId === child.id : assigneeIds.includes(child.id)) ? 'border-amber-500 bg-amber-100 text-amber-800' : 'border-amber-200 text-amber-600 hover:bg-amber-50'"
         >
           {{ child.name }}
         </button>

@@ -133,3 +133,12 @@ export async function unclaimTask(task, dateStr) {
   await uncompleteClaim(task, dateStr)
   await deleteDoc(doc(db, 'families', familyId.value, 'claims', claimIdFor(task, dateStr)))
 }
+
+export async function declineClaim(task, childId, dateStr) {
+  await setDoc(doc(db, 'families', familyId.value, 'claims', claimIdFor(task, dateStr)), {
+    childId,
+    claimedAt: serverTimestamp(),
+    completed: false,
+    declined: true,
+  })
+}

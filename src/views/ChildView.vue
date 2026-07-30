@@ -6,7 +6,7 @@ import { occursOn, deadlineFor, startsAt } from '../lib/recurrence'
 import { family } from '../composables/useFamily'
 import { children } from '../composables/useChildren'
 import { chores } from '../composables/useChores'
-import { tasks, upsertTask } from '../composables/useTasks'
+import { tasks } from '../composables/useTasks'
 import { rooms, cleaningDays } from '../composables/useCleaning'
 import {
   completions,
@@ -19,6 +19,7 @@ import {
   completeClaim,
   uncompleteClaim,
   unclaimTask,
+  declineClaim,
 } from '../composables/useCompletions'
 import { isAdminMode } from '../composables/useAdminMode'
 import AppHeader from '../components/AppHeader.vue'
@@ -135,20 +136,40 @@ const cleaningSections = computed(() => {
       room: rooms.value.find((r) => r.id === roomId),
       tasks: tasks.value.filter((t) => {
         if (t.kind !== 'cleaning' || t.roomId !== roomId) return false
-        const ids = t.assigneeIds || []
-        return ids.length === 0 || ids.includes(child.value.id)
+        if (isDeclinedByMe(t)) return false
+        if (!t.assigneeId) return true
+        if (t.assigneeId === child.value.id) return true
+        return isDeclinedByAssignee(t)
       }),
     }))
     .filter((s) => s.room && s.tasks.length > 0)
 })
 
 function isPreAssigned(task) {
-  return !!(task.assigneeIds || []).length && (task.assigneeIds || []).includes(child.value?.id)
+  return !!task.assigneeId && task.assigneeId === child.value?.id
+}
+
+function isDeclinedByMe(task) {
+  const claim = claimFor(task)
+  return !!(claim?.declined && claim.childId === child.value?.id)
+}
+
+function isDeclinedByAssignee(task) {
+  const claim = claimFor(task)
+  return !!(claim?.declined && task.assigneeId && claim.childId === task.assigneeId)
 }
 
 // card state helpers for claimable tasks
 function taskCardProps(task) {
   const claim = claimFor(task)
+  if (claim?.declined) {
+    return {
+      completed: false,
+      claimedByName: null,
+      claimedByPhoto: null,
+      disabled: false,
+    }
+  }
   if (!claim && isPreAssigned(task)) {
     return {
       completed: false,
@@ -168,8 +189,9 @@ function taskCardProps(task) {
 }
 
 function canUnclaim(task) {
-  if (isPreAssigned(task) && !claimFor(task)) return true
   const claim = claimFor(task)
+  if (claim?.declined) return false
+  if (!claim && isPreAssigned(task)) return true
   if (!claim || claim.completed) return false
   const mine = child.value && claim.childId === child.value.id
   return !!(mine || isAdminMode.value)
@@ -192,6 +214,10 @@ async function onTaskTap(task) {
     } else {
       await claimTask(task, child.value.id, todayStr.value)
     }
+    return
+  }
+  if (claim.declined) {
+    await claimTask(task, child.value.id, todayStr.value)
     return
   }
   const mine = claim.childId === child.value.id
@@ -220,20 +246,19 @@ async function onTaskTap(task) {
 
 async function onTaskUnclaim(task) {
   const claim = claimFor(task)
-  // pre-assigned with no claim yet — remove child from assigneeIds
+  // pre-assigned with no claim yet — create declined claim, leave config untouched
   if (!claim && isPreAssigned(task)) {
-    const ids = (task.assigneeIds || []).filter((id) => id !== child.value.id)
-    await upsertTask(task.id, { assigneeIds: ids })
+    await declineClaim(task, child.value.id, todayStr.value)
     return
   }
   if (!claim || claim.completed) return
   const mine = child.value && claim.childId === child.value.id
   if (mine) {
-    await unclaimTask(task, todayStr.value)
-    // also remove from pre-assigned list if applicable
     if (isPreAssigned(task)) {
-      const ids = (task.assigneeIds || []).filter((id) => id !== child.value.id)
-      await upsertTask(task.id, { assigneeIds: ids })
+      await unclaimTask(task, todayStr.value)
+      await declineClaim(task, child.value.id, todayStr.value)
+    } else {
+      await unclaimTask(task, todayStr.value)
     }
   } else if (isAdminMode.value) {
     const owner = claimChild(claim)
