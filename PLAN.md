@@ -231,7 +231,7 @@ families/{uid}/claims/{yyyy-MM-dd}_{taskId}
 - Balance display on child tile (always visible) and/or child view header
 - **DoD:** balance accrues daily on first load, marks deduct penalty, admin can override balance, bonuses add, payout resets.
 
-### Phase 8b — Reports `[ ]` *(parallelizable with Phase 8)*
+### Phase 8b — Reports `[x]` *(parallelizable with Phase 8)*
 - `/reports` (PIN-gated, avatar menu): date selector — prev/next arrows + tap date for calendar picker
 - Per child, for the selected date: late completions (after end time), overdue (past end time, still incomplete — today only), missed chores (period ended, never completed), claimed tasks with completed/not-completed status and bonus details
 - Pure read view computed from chores + completions + claims; no new writes
