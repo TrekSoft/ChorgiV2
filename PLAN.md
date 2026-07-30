@@ -197,29 +197,33 @@ families/{uid}/claims/{yyyy-MM-dd}_{taskId}
 - `/dev/components` preview route renders all of them in isolation with dummy data
 - **DoD:** recurrence engine passes tests; components render in isolation. ✅
 
-### Phase 5 — Schedule View: Calendar Tab `[ ]` *(parallelizable with 6 & 7)*
-- `/schedule?tab=calendar`: Today / Week toggle, prev/next arrows, header date label
+### Phase 5 — Schedule View: Calendar Tab `[x]`
+- `/schedule?tab=calendar`: Today / Week toggle, prev/next arrows, header date label — `components/CalendarTab.vue`
 - Child filter (default all)
-- CRUD recurring chores, one-off chores (distinct styling), bonus tasks (with $ amount)
-- Week view: 7 day-columns on laptop; mobile-friendly stacked/scrollable
+- CRUD recurring chores, one-off chores (distinct styling), bonus tasks (with $ amount) via `ChoreFormDialog` (tap card to edit, Delete inside dialog); per-day "+ Chore / + Bonus" buttons prefill the date
+- Week view: 7 day-columns on laptop (`lg:grid-cols-7`), stacked 1–2 col on mobile
 - Cleaning-day badge on days (read-only here; editing in Phase 7)
-- **DoD:** parent can fully manage the schedule from phone and laptop.
+- Data layer: `composables/useChores.js`, `useTasks.js` (live `onSnapshot` queries + CRUD with photo upload)
+- **DoD:** parent can fully manage the schedule from phone and laptop. ✅
 
-### Phase 6 — Child Chore View `[ ]` *(parallelizable with 5 & 7)*
-- `/child/:id`: two-pane split — left assigned chores (recurring vs one-off styling, sort order per §5), right claimable sections (Extra Chores, then one section per active cleaning-day room)
-- **Tap targets**: whole card body taps to complete/uncomplete (big kid-friendly target); a small separate unassign area on the card lets kids unassign themselves from a chore (no PIN, allowed while period is open)
-- Claim → complete flow; claimed-by-other is locked for kids, reassignable in admin mode
-- **Claimed-by avatar**: when a task is claimed by a child, show that child's profile photo next to their name on the chore card (not just text)
-- Kid undo: tap a completed chore to un-check it (reverses any bonus added); tap a claimed-but-incomplete task to unclaim it — allowed while the period is open, no PIN
-- Confetti on complete, coin confetti + amount toast on bonus, fireworks when all left-pane chores done
-- Countdown labels, overdue state (top-pinned, 'X min/hrs overdue'), photo lightbox, weekly chore support
-- **DoD:** a child can use the always-on device end-to-end with zero admin mode.
+### Phase 6 — Child Chore View `[x]`
+- `/child/:id`: two-pane split — left assigned chores (recurring vs one-off styling, sort order per §5: overdue → actionable → completed), right claimable sections (Extra Chores, then one 🧹 section per active cleaning-day room)
+- **Tap targets**: whole card body taps to complete/uncomplete; separate unassign area on the card (no PIN, kid-accessible)
+- Claim → complete flow; claimed-by-other is locked for kids (card disabled), releasable in admin mode (tap or unassign area, with confirm)
+- **Claimed-by avatar**: child's profile photo shown next to their name on claimed cards
+- Kid undo: tap completed chore to un-check (bonus reversed via `increment(-bonusCents)`); unclaim own claimed-but-incomplete tasks — no PIN
+- Confetti on complete, coin confetti + amount toast on bonus, fireworks when all left-pane chores done (only fires on in-session completion, not page load)
+- Countdown labels, overdue state (top-pinned, 'X min/hrs overdue'), photo lightbox, weekly chore support, start-time hiding (15s `now` ticker)
+- Data layer: `composables/useCompletions.js` (completions + claims live maps, complete/uncomplete/claim/unclaim actions with bonus balance adjustment)
+- **DoD:** a child can use the always-on device end-to-end with zero admin mode. ✅
 
-### Phase 7 — Cleaning Day `[ ]` *(parallelizable with 5 & 6)*
-- `/schedule?tab=cleaning`: room CRUD, cleaning task CRUD per room (no date/bonus)
-- Calendar: mark/unmark a day as Cleaning Day with room multi-select; edit rooms later
-- Claimable instances materialize from room selection (computed, not copied)
-- **DoD:** mark tomorrow as cleaning day with 2 rooms → tasks appear claimable on child view.
+### Phase 7 — Cleaning Day `[x]`
+- `/schedule?tab=cleaning`: room CRUD (add inline, rename/delete per card), cleaning task CRUD per room via `ChoreFormDialog` kind `cleaning-task` (no date/bonus) — `components/CleaningTab.vue`
+- Week-strip calendar: tap a day → dialog with room multi-select; empty selection unmarks the day; marked days show 🧹 room-count badge
+- Claimable instances materialize from room selection (computed in ChildView from `cleaningDays` + `tasks`, not copied)
+- Deleting a room deletes its tasks and strips it from any cleaning days (batch)
+- Data layer: `composables/useCleaning.js` (rooms + cleaningDays live queries)
+- **DoD:** mark tomorrow as cleaning day with 2 rooms → tasks appear claimable on child view. ✅
 
 ### Phase 8 — Allowance + Marks `[ ]`
 - Lazy weekly auto-accrual on app load (`allowanceLastAccruedWeek` catch-up loop); NOT tied to chore completion; no automatic penalties
