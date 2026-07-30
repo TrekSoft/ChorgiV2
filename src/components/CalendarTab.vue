@@ -1,12 +1,12 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { format, addDays, addWeeks, startOfWeek, eachDayOfInterval, isToday } from 'date-fns'
-import { occursOn, deadlineFor } from '../lib/recurrence'
+import { occursOn } from '../lib/recurrence'
 import { family } from '../composables/useFamily'
 import { children } from '../composables/useChildren'
 import { chores } from '../composables/useChores'
 import { cleaningDays } from '../composables/useCleaning'
-import ChoreCard from './ChoreCard.vue'
+import ScheduleItem from './ScheduleItem.vue'
 import ChoreFormDialog from './ChoreFormDialog.vue'
 import EmptyState from './EmptyState.vue'
 
@@ -46,6 +46,12 @@ function matchesFilter(chore) {
   return (chore.assigneeIds || []).includes(filterChildId.value)
 }
 
+function assigneesFor(chore) {
+  return (chore.assigneeIds || [])
+    .map((id) => children.value.find((c) => c.id === id))
+    .filter(Boolean)
+}
+
 function entriesFor(day) {
   const entries = []
   for (const chore of chores.value) {
@@ -56,10 +62,13 @@ function entriesFor(day) {
       key: `chore-${chore.id}`,
       kind: chore.kind === 'oneoff' ? 'oneoff-chore' : 'recurring-chore',
       item: chore,
-      deadline: deadlineFor(chore, day, weekStartsOn.value),
+      assignees: assigneesFor(chore),
+      claimable: chore.kind === 'oneoff' && (chore.assigneeIds || []).length === 0,
+      // sort by start time (untimed chores last)
+      sortKey: chore.timeWindow?.start || '99:99',
     })
   }
-  entries.sort((a, b) => (a.deadline?.getTime() ?? Infinity) - (b.deadline?.getTime() ?? Infinity))
+  entries.sort((a, b) => a.sortKey.localeCompare(b.sortKey))
   return entries
 }
 
@@ -167,17 +176,19 @@ function openEdit(entry) {
           </span>
         </div>
 
-        <ChoreCard
+        <ScheduleItem
           v-for="entry in entriesFor(day)"
           :key="entry.key"
           :name="entry.item.name"
           :icon-name="entry.item.iconName"
           :photo-url="entry.item.photoURL"
-          :deadline="entry.deadline"
+          :time-window="entry.item.timeWindow || null"
+          :weekly="!!entry.item.weekly"
           :oneoff="entry.kind === 'oneoff-chore'"
           :bonus-cents="entry.item.bonusCents || null"
-          variant="chore"
-          @toggle="openEdit(entry)"
+          :assignees="entry.assignees"
+          :claimable="entry.claimable"
+          @click="openEdit(entry)"
         />
 
         <div class="flex gap-2 mt-auto pt-1">
