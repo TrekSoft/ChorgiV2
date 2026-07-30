@@ -155,6 +155,7 @@ function openEditTask(task) {
               :icon-name="task.iconName"
               :photo-url="task.photoURL"
               :assignees="assigneesFor(task)"
+              draggable
               @click="openEditTask(task)"
               @photo-click="lightboxSrc = task.photoURL"
             />

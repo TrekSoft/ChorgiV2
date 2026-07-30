@@ -17,6 +17,7 @@ const props = defineProps({
   // true when every child is assigned — renders a single All chip
   assignedToAll: { type: Boolean, default: false },
   claimable: { type: Boolean, default: false },
+  draggable: { type: Boolean, default: false },
 })
 const emit = defineEmits(['click', 'photo-click'])
 
@@ -100,5 +101,6 @@ const timeLabel = computed(() => {
         </template>
       </div>
     </div>
+    <Icon v-if="draggable" icon="mdi:drag-vertical" class="w-5 h-5 text-amber-300 shrink-0" />
   </div>
 </template>
