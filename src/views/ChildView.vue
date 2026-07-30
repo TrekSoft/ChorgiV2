@@ -142,13 +142,12 @@ const cleaningSections = computed(() => {
 function taskCardProps(task) {
   const claim = claimFor(task)
   const mine = !!(claim && child.value && claim.childId === child.value.id)
-  const claimedByOther = !!(claim && !mine)
-  const owner = claimedByOther ? claimChild(claim) : null
+  const owner = claim ? claimChild(claim) : null
   return {
     completed: !!claim?.completed,
-    claimedByName: claimedByOther ? owner?.name || 'someone else' : null,
-    claimedByPhoto: claimedByOther ? owner?.photoURL || null : null,
-    disabled: claimedByOther && !isAdminMode.value,
+    claimedByName: claim ? owner?.name || 'someone else' : null,
+    claimedByPhoto: claim ? owner?.photoURL || null : null,
+    disabled: !!(claim && !mine) && !isAdminMode.value,
   }
 }
 
