@@ -1,5 +1,6 @@
 <script setup>
 import { ref, watch } from 'vue'
+import PhotoLightbox from './PhotoLightbox.vue'
 
 const props = defineProps({
   modelValue: { type: File, default: null },
@@ -12,6 +13,7 @@ const emit = defineEmits(['update:modelValue'])
 const inputEl = ref(null)
 const localPreview = ref(props.previewUrl)
 const dragOver = ref(false)
+const lightboxOpen = ref(false)
 
 watch(
   () => props.previewUrl,
@@ -52,7 +54,7 @@ function clear(event) {
       {{ label }} <span v-if="optional" class="text-amber-500 font-normal">(optional)</span>
     </span>
     <div
-      @click="pick"
+      @click="localPreview ? (lightboxOpen = true) : pick()"
       @dragover.prevent="dragOver = true"
       @dragleave.prevent="dragOver = false"
       @drop.prevent="onDrop"
@@ -78,5 +80,6 @@ function clear(event) {
       </button>
     </div>
     <input ref="inputEl" type="file" accept="image/*" class="hidden" @change="onChange" />
+    <PhotoLightbox :open="lightboxOpen" :src="localPreview" @close="lightboxOpen = false" />
   </label>
 </template>
