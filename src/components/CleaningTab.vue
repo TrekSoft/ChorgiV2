@@ -2,7 +2,8 @@
 import { ref } from 'vue'
 import { rooms, upsertRoom, removeRoom } from '../composables/useCleaning'
 import { tasks, removeTask } from '../composables/useTasks'
-import ChoreCard from './ChoreCard.vue'
+import ScheduleItem from './ScheduleItem.vue'
+import PhotoLightbox from './PhotoLightbox.vue'
 import ChoreFormDialog from './ChoreFormDialog.vue'
 import EmptyState from './EmptyState.vue'
 
@@ -37,6 +38,8 @@ async function deleteRoom(room) {
 function tasksFor(roomId) {
   return tasks.value.filter((t) => t.kind === 'cleaning' && t.roomId === roomId)
 }
+
+const lightboxSrc = ref(null)
 
 // --- task dialog ---
 const taskDialogOpen = ref(false)
@@ -96,14 +99,14 @@ function openEditTask(task) {
             </div>
           </div>
 
-          <ChoreCard
+          <ScheduleItem
             v-for="task in tasksFor(room.id)"
             :key="task.id"
             :name="task.name"
             :icon-name="task.iconName"
             :photo-url="task.photoURL"
-            variant="task"
-            @toggle="openEditTask(task)"
+            @click="openEditTask(task)"
+            @photo-click="lightboxSrc = task.photoURL"
           />
 
           <button
@@ -127,5 +130,6 @@ function openEditTask(task) {
       @close="taskDialogOpen = false"
     />
 
+    <PhotoLightbox :open="!!lightboxSrc" :src="lightboxSrc" @close="lightboxSrc = null" />
   </div>
 </template>
