@@ -56,7 +56,7 @@ function clear(event) {
       @dragover.prevent="dragOver = true"
       @dragleave.prevent="dragOver = false"
       @drop.prevent="onDrop"
-      class="relative aspect-video rounded-2xl border-2 border-dashed flex items-center justify-center cursor-pointer transition-colors overflow-hidden"
+      class="relative aspect-video w-1/2 rounded-2xl border-2 border-dashed flex items-center justify-center cursor-pointer transition-colors overflow-hidden"
       :class="dragOver ? 'border-amber-500 bg-amber-100' : 'border-amber-300 bg-amber-50 hover:bg-amber-100'"
     >
       <img v-if="localPreview" :src="localPreview" alt="Preview" class="w-full h-full object-cover" />
