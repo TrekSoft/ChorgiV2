@@ -62,27 +62,34 @@ const reportData = computed(() => {
       return true
     })
 
-    const choreEntries = assignedChores.map((chore) => {
-      const compId = completionIdFor(chore, child.id, date, ws)
-      const completion = completions.value[compId]
-      const deadline = deadlineFor(chore, date, ws)
-      const completed = !!completion
-      const late = !!completion?.late
-      const overdue = !completed && isToday.value && now > deadline
-      const missed = !completed && isPast && date < deadline
-      return {
-        id: chore.id,
-        name: chore.name,
-        iconName: chore.iconName,
-        kind: 'chore',
-        completed,
-        late,
-        overdue,
-        missed,
-        bonusCents: chore.bonusCents || null,
-        deadline,
-      }
-    })
+    const choreEntries = assignedChores
+      .map((chore) => {
+        const compId = completionIdFor(chore, child.id, date, ws)
+        const completion = completions.value[compId]
+        const deadline = deadlineFor(chore, date, ws)
+        const completed = !!completion
+        const late = !!completion?.late
+        const overdue = !completed && isToday.value && now > deadline
+        const missed = !completed && isPast && now > deadline
+        return {
+          id: chore.id,
+          name: chore.name,
+          iconName: chore.iconName,
+          kind: 'chore',
+          completed,
+          late,
+          overdue,
+          missed,
+          bonusCents: chore.bonusCents || null,
+          deadline,
+          isWeekly: chore.kind === 'recurring' && chore.weekly,
+        }
+      })
+      .filter((e) => {
+        // Hide incomplete weekly chores on past days where the deadline hasn't passed
+        if (e.isWeekly && !e.completed && isPast && !e.missed) return false
+        return true
+      })
 
     const lateCount = choreEntries.filter((e) => e.late).length
     const overdueCount = choreEntries.filter((e) => e.overdue).length
