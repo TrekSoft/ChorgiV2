@@ -99,5 +99,6 @@ export async function setAllowanceBalance(childId, cents) {
 export async function payoutChild(childId) {
   await updateDoc(doc(db, 'families', familyId.value, 'children', childId), {
     allowanceBalanceCents: 0,
+    marksCount: 0,
   })
 }
