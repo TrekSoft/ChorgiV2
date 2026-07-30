@@ -99,7 +99,7 @@ function onPayoutClick(event) {
     </div>
 
     <!-- Admin: marks controls + payout -->
-    <div v-if="isAdminMode" class="flex items-center gap-3 mt-1" @click.stop @pointerdown.stop>
+    <div v-if="isAdminMode" class="flex items-center gap-3 mt-1" @click.stop>
       <div class="flex items-center gap-2 bg-red-50 rounded-full px-3 py-1">
         <button
           @click.stop="onMarkRemove"
