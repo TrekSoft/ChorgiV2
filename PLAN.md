@@ -29,13 +29,11 @@ This file is the resume anchor. At the start of each session, read this file, fi
 | **PIN** | 4-digit code set by the parent at signup; gates Schedule view, Admin mode, and sign-out. Client-side UX gate, NOT a security boundary (Firestore rules enforce real security via auth uid). |
 | **Child** | A profile on the home grid: name, birthdate, optional photo, weekly allowance amount, allowance balance. |
 | **Admin Mode** | A toggle (PIN-gated) that unlocks edit buttons on child tiles, marks +/-, allowance payout, and task reassignment. Auto-exits after **30 min** of inactivity (any interaction resets the timer). |
-| **Chore** | Anything pre-assigned to one or more children. Two subtypes: |
+| **Chore** | A dated or repeating unit of work. Two subtypes: |
 | — **Recurring Chore** | Repeats. Either **Daily-pattern** (every day / specific weekdays / odd days / even days / a chosen day of the month), optionally with a **time window** — or **Weekly** (do it any time before end of week, no pattern options). |
 | **Time Window** | Optional on daily-pattern chores. **Start** (optional): chore is hidden from kids until start time. **End** (optional, can be set without a start): after end time the chore stays completable but moves to the TOP of the list labeled 'X min/hrs overdue', and its completion is recorded as **late**. |
-| — **One-off Chore** | Assigned to a specific date + child(ren), no recurrence. Visually distinguished from recurring chores. |
-| **Task** | Anything *unassigned* that children can claim. Two subtypes: |
-| — **Bonus Task** | One-off, tied to a specific date, optional monetary bonus added to allowance on completion. |
-| — **Cleaning Task** | Belongs to a **Room** in the Cleaning Day Config; no date, no bonus. Becomes claimable on days marked as a Cleaning Day that include its room. |
+| — **One-off Chore** | Tied to a specific date, no recurrence. Assignees are **optional** — an unassigned one-off is claimable by any kid (shows in the right column of the child view). Optional monetary **bonus** added to allowance on completion. Visually distinguished from recurring chores. |
+| **Cleaning Task** | Anything *unassigned* that children can claim, belonging to a **Room** in the Cleaning Day Config; no date, no bonus. Becomes claimable on days marked as a Cleaning Day that include its room. |
 | **Room** | A named section in the Cleaning Day Config holding Cleaning Tasks. |
 | **Cleaning Day** | A date marked by the parent + a selected subset of Rooms. All Cleaning Tasks in those rooms become claimable that day. |
 | **Completion** | A record that a specific child completed a specific chore/task for a specific period (day or week). |
@@ -99,10 +97,10 @@ families/{uid}/children/{childId}
   marksCount: number              # standalone demerit counter, +/- by parent
   order: number
 
-families/{uid}/chores/{choreId}   # assigned chores
+families/{uid}/chores/{choreId}   # chores (assigned or claimable)
   kind: 'recurring' | 'oneoff'
   name, iconName?, photoURL?
-  assigneeIds: string[]
+  assigneeIds: string[]           # recurring: required; oneoff: may be empty = claimable by any kid
   # recurring only:
   weekly?: boolean                # true = any time this week
   recurrence?: { type: 'daily'|'weekdays'|'oddDays'|'evenDays'|'dayOfMonth',
@@ -110,14 +108,13 @@ families/{uid}/chores/{choreId}   # assigned chores
   timeWindow?: { start?: 'HH:mm', end?: 'HH:mm' } | null  # both optional; start hides chore until then; end triggers overdue state
   # oneoff only:
   date?: 'yyyy-MM-dd'
+  bonusCents?: number             # oneoff only, optional; paid to completer/claimer, reversed on undo
   createdAt, active: boolean
 
-families/{uid}/tasks/{taskId}     # claimable tasks
-  kind: 'bonus' | 'cleaning'
+families/{uid}/tasks/{taskId}     # claimable cleaning tasks
+  kind: 'cleaning'
   name, iconName?, photoURL?
-  date?: 'yyyy-MM-dd'             # bonus only
-  bonusCents?: number             # bonus only
-  roomId?: string                 # cleaning only
+  roomId: string
   order: number
   # per-day claim state lives on instance docs, not here (see below)
 
@@ -128,11 +125,12 @@ families/{uid}/cleaningDays/{yyyy-MM-dd}
   roomIds: string[]
 
 families/{uid}/completions/{periodKey}_{choreId}_{childId}
-  # periodKey = 'yyyy-MM-dd' for daily/oneoff/bonus/cleaning, 'yyyy-Www' for weekly chores
+  # periodKey = 'yyyy-MM-dd' for daily/oneoff/cleaning, 'yyyy-Www' for weekly chores
   completedAt: timestamp
   late: boolean                   # true if completed after timeWindow.end
 
 families/{uid}/claims/{yyyy-MM-dd}_{taskId}
+  # taskId = unassigned oneoff chore id OR cleaning task id
   childId, claimedAt, completed: boolean, completedAt?
 ```
 
@@ -200,14 +198,14 @@ families/{uid}/claims/{yyyy-MM-dd}_{taskId}
 ### Phase 5 — Schedule View: Calendar Tab `[x]`
 - `/schedule?tab=calendar`: Today / Week toggle, prev/next arrows, header date label — `components/CalendarTab.vue`
 - Child filter (default all)
-- CRUD recurring chores, one-off chores (distinct styling), bonus tasks (with $ amount) via `ChoreFormDialog` (tap card to edit, Delete inside dialog); per-day "+ Chore / + Bonus" buttons prefill the date
+- CRUD recurring chores + one-off chores (optional assignees = claimable, optional $ bonus) via `ChoreFormDialog` (tap card to edit, Delete inside dialog); per-day "+ One-off chore" button prefills the date
 - Week view: 7 day-columns on laptop (`lg:grid-cols-7`), stacked 1–2 col on mobile
 - Cleaning-day badge on days (read-only here; editing in Phase 7)
 - Data layer: `composables/useChores.js`, `useTasks.js` (live `onSnapshot` queries + CRUD with photo upload)
 - **DoD:** parent can fully manage the schedule from phone and laptop. ✅
 
 ### Phase 6 — Child Chore View `[x]`
-- `/child/:id`: two-pane split — left assigned chores (recurring vs one-off styling, sort order per §5: overdue → actionable → completed), right claimable sections (Extra Chores, then one 🧹 section per active cleaning-day room)
+- `/child/:id`: two-pane split — left assigned chores (recurring vs one-off styling, sort order per §5: overdue → actionable → completed), right claimable sections (Extra Chores = unassigned one-offs for today, then one 🧹 section per active cleaning-day room)
 - **Tap targets**: whole card body taps to complete/uncomplete; separate unassign area on the card (no PIN, kid-accessible)
 - Claim → complete flow; claimed-by-other is locked for kids (card disabled), releasable in admin mode (tap or unassign area, with confirm)
 - **Claimed-by avatar**: child's profile photo shown next to their name on claimed cards

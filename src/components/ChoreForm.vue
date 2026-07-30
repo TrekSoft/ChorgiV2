@@ -4,7 +4,7 @@ import IconPicker from './IconPicker.vue'
 import PhotoUpload from './PhotoUpload.vue'
 
 const props = defineProps({
-  // 'recurring-chore' | 'oneoff-chore' | 'bonus-task' | 'cleaning-task'
+  // 'recurring-chore' | 'oneoff-chore' | 'cleaning-task'
   kind: { type: String, required: true },
   initial: { type: Object, default: null },
   children: { type: Array, default: () => [] }, // [{id, name}]
@@ -31,8 +31,8 @@ const timeStart = ref(props.initial?.timeWindow?.start || '')
 const timeEnd = ref(props.initial?.timeWindow?.end || '')
 
 const showAssignees = computed(() => props.kind === 'recurring-chore' || props.kind === 'oneoff-chore')
-const showDate = computed(() => props.kind === 'oneoff-chore' || props.kind === 'bonus-task')
-const showBonus = computed(() => props.kind === 'bonus-task')
+const showDate = computed(() => props.kind === 'oneoff-chore')
+const showBonus = computed(() => props.kind === 'oneoff-chore')
 const showRoom = computed(() => props.kind === 'cleaning-task')
 const showRecurrence = computed(() => props.kind === 'recurring-chore')
 const showTimeWindow = computed(() => props.kind === 'recurring-chore' && recurrenceMode.value === 'daily')
@@ -58,7 +58,8 @@ watch(recurrenceMode, (mode) => {
 
 const valid = computed(() => {
   if (!name.value.trim()) return false
-  if (showAssignees.value && assigneeIds.value.length === 0) return false
+  // recurring chores must be assigned; one-off chores may be left unassigned (claimable)
+  if (props.kind === 'recurring-chore' && assigneeIds.value.length === 0) return false
   if (showDate.value && !date.value) return false
   if (showRoom.value && !roomId.value) return false
   if (showRecurrence.value && recurrenceMode.value === 'daily' && dailyPatternType.value === 'weekdays' && weekdays.value.length === 0) {
@@ -94,12 +95,6 @@ function submit() {
       kind: 'oneoff',
       assigneeIds: assigneeIds.value,
       date: date.value,
-    })
-  } else if (props.kind === 'bonus-task') {
-    emit('submit', {
-      ...base,
-      kind: 'bonus',
-      date: date.value,
       bonusCents: Math.round(parseFloat(bonusAmount.value || '0') * 100),
     })
   } else if (props.kind === 'cleaning-task') {
@@ -131,7 +126,10 @@ function submit() {
     <PhotoUpload v-model="photoFile" label="Photo" :preview-url="initial?.photoURL" />
 
     <div v-if="showAssignees" class="flex flex-col gap-2">
-      <span class="text-amber-800 font-medium">Assign to</span>
+      <span class="text-amber-800 font-medium">
+        Assign to
+        <span v-if="kind === 'oneoff-chore'" class="text-amber-500 font-normal">(optional — unassigned one-offs can be claimed by any kid)</span>
+      </span>
       <div class="flex flex-wrap gap-2">
         <button
           v-for="child in children"
@@ -255,7 +253,7 @@ function submit() {
     </label>
 
     <label v-if="showBonus" class="flex flex-col gap-1">
-      <span class="text-amber-800 font-medium">Bonus amount ($)</span>
+      <span class="text-amber-800 font-medium">Bonus amount ($) <span class="text-amber-500 font-normal">(optional)</span></span>
       <input
         v-model="bonusAmount"
         type="number"

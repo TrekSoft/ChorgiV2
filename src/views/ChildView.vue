@@ -91,7 +91,12 @@ async function toggleChore(entry) {
   } else {
     await completeChore(entry.chore, child.value.id, now.value, weekStartsOn.value)
     completedThisSession = true
-    burst.value?.fire('confetti')
+    if (entry.chore.bonusCents) {
+      burst.value?.fire('coins')
+      showToast(`+ $${(entry.chore.bonusCents / 100).toFixed(2)} bonus!`)
+    } else {
+      burst.value?.fire('confetti')
+    }
   }
 }
 
@@ -115,8 +120,15 @@ function claimChild(claim) {
   return children.value.find((c) => c.id === claim?.childId) || null
 }
 
-const bonusTasks = computed(() =>
-  tasks.value.filter((t) => t.kind === 'bonus' && t.date === todayStr.value),
+// unassigned one-off chores for today are claimable by any kid
+const claimableChores = computed(() =>
+  chores.value.filter(
+    (c) =>
+      c.kind === 'oneoff' &&
+      c.active !== false &&
+      (c.assigneeIds || []).length === 0 &&
+      c.date === todayStr.value,
+  ),
 )
 
 const cleaningSections = computed(() => {
@@ -237,6 +249,7 @@ async function onTaskUnclaim(task) {
             :late="entry.late"
             :overdue="entry.overdue"
             :oneoff="entry.chore.kind === 'oneoff'"
+            :bonus-cents="entry.chore.bonusCents || null"
             variant="chore"
             can-unassign
             @toggle="toggleChore(entry)"
@@ -247,15 +260,16 @@ async function onTaskUnclaim(task) {
 
         <!-- right: claimable tasks -->
         <section class="flex flex-col gap-6">
-          <div v-if="bonusTasks.length > 0" class="flex flex-col gap-3">
+          <div v-if="claimableChores.length > 0" class="flex flex-col gap-3">
             <h2 class="text-lg font-bold text-amber-800">Extra chores</h2>
             <ChoreCard
-              v-for="task in bonusTasks"
+              v-for="task in claimableChores"
               :key="task.id"
               :name="task.name"
               :icon-name="task.iconName"
               :photo-url="task.photoURL"
-              :bonus-cents="task.bonusCents"
+              :bonus-cents="task.bonusCents || null"
+              oneoff
               variant="task"
               v-bind="taskCardProps(task)"
               :can-unassign="canUnclaim(task)"
@@ -283,9 +297,9 @@ async function onTaskUnclaim(task) {
           </div>
 
           <EmptyState
-            v-if="bonusTasks.length === 0 && cleaningSections.length === 0"
+            v-if="claimableChores.length === 0 && cleaningSections.length === 0"
             title="Nothing to claim right now"
-            subtitle="Bonus chores and cleaning-day tasks will show up here."
+            subtitle="Extra one-off chores and cleaning-day tasks will show up here."
           />
         </section>
       </div>

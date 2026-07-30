@@ -141,7 +141,7 @@ function onUnassign() {
       <h2 class="text-xl font-bold text-amber-800">ChoreForm</h2>
       <div class="flex gap-2 flex-wrap">
         <button
-          v-for="k in ['recurring-chore', 'oneoff-chore', 'bonus-task', 'cleaning-task']"
+          v-for="k in ['recurring-chore', 'oneoff-chore', 'cleaning-task']"
           :key="k"
           @click="formKind = k"
           class="px-3 py-1.5 rounded-full border-2 font-medium cursor-pointer"

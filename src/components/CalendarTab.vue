@@ -5,7 +5,6 @@ import { occursOn, deadlineFor } from '../lib/recurrence'
 import { family } from '../composables/useFamily'
 import { children } from '../composables/useChildren'
 import { chores } from '../composables/useChores'
-import { tasks } from '../composables/useTasks'
 import { cleaningDays } from '../composables/useCleaning'
 import ChoreCard from './ChoreCard.vue'
 import ChoreFormDialog from './ChoreFormDialog.vue'
@@ -41,11 +40,13 @@ function goToday() {
 }
 
 function matchesFilter(chore) {
-  return !filterChildId.value || (chore.assigneeIds || []).includes(filterChildId.value)
+  if (!filterChildId.value) return true
+  // unassigned one-off chores are claimable by any kid, so they show under every filter
+  if (chore.kind === 'oneoff' && (chore.assigneeIds || []).length === 0) return true
+  return (chore.assigneeIds || []).includes(filterChildId.value)
 }
 
 function entriesFor(day) {
-  const dayStr = format(day, 'yyyy-MM-dd')
   const entries = []
   for (const chore of chores.value) {
     if (chore.active === false) continue
@@ -56,15 +57,6 @@ function entriesFor(day) {
       kind: chore.kind === 'oneoff' ? 'oneoff-chore' : 'recurring-chore',
       item: chore,
       deadline: deadlineFor(chore, day, weekStartsOn.value),
-    })
-  }
-  for (const task of tasks.value) {
-    if (task.kind !== 'bonus' || task.date !== dayStr) continue
-    entries.push({
-      key: `bonus-${task.id}`,
-      kind: 'bonus-task',
-      item: task,
-      deadline: null,
     })
   }
   entries.sort((a, b) => (a.deadline?.getTime() ?? Infinity) - (b.deadline?.getTime() ?? Infinity))
@@ -183,8 +175,8 @@ function openEdit(entry) {
           :photo-url="entry.item.photoURL"
           :deadline="entry.deadline"
           :oneoff="entry.kind === 'oneoff-chore'"
-          :bonus-cents="entry.kind === 'bonus-task' ? entry.item.bonusCents : null"
-          :variant="entry.kind === 'bonus-task' ? 'task' : 'chore'"
+          :bonus-cents="entry.item.bonusCents || null"
+          variant="chore"
           @toggle="openEdit(entry)"
         />
 
@@ -193,22 +185,16 @@ function openEdit(entry) {
             @click="openAdd('oneoff-chore', day)"
             class="flex-1 text-xs font-bold text-amber-600 border-2 border-dashed border-amber-200 rounded-xl py-2 hover:bg-amber-50 cursor-pointer"
           >
-            + Chore
-          </button>
-          <button
-            @click="openAdd('bonus-task', day)"
-            class="flex-1 text-xs font-bold text-amber-600 border-2 border-dashed border-amber-200 rounded-xl py-2 hover:bg-amber-50 cursor-pointer"
-          >
-            + Bonus
+            + One-off chore
           </button>
         </div>
       </div>
     </div>
 
     <EmptyState
-      v-if="chores.length === 0 && tasks.filter((t) => t.kind === 'bonus').length === 0"
+      v-if="chores.length === 0"
       title="No chores yet"
-      subtitle="Add a recurring chore, or use the + buttons on a day for one-off chores and bonus tasks."
+      subtitle="Add a recurring chore, or use the + button on a day for a one-off chore (optionally with a bonus)."
     />
 
     <ChoreFormDialog

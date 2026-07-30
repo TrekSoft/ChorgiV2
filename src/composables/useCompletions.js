@@ -74,11 +74,22 @@ export async function completeChore(chore, childId, date, weekStartsOn = 0) {
     completedAt: serverTimestamp(),
     late,
   })
+  if (chore.bonusCents) {
+    await updateDoc(doc(db, 'families', familyId.value, 'children', childId), {
+      allowanceBalanceCents: increment(chore.bonusCents),
+    })
+  }
 }
 
 export async function uncompleteChore(chore, childId, date, weekStartsOn = 0) {
   const id = completionIdFor(chore, childId, date, weekStartsOn)
+  const wasCompleted = !!completions.value[id]
   await deleteDoc(doc(db, 'families', familyId.value, 'completions', id))
+  if (wasCompleted && chore.bonusCents) {
+    await updateDoc(doc(db, 'families', familyId.value, 'children', childId), {
+      allowanceBalanceCents: increment(-chore.bonusCents),
+    })
+  }
 }
 
 export async function claimTask(task, childId, dateStr) {

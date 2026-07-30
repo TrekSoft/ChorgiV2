@@ -8,7 +8,7 @@ import { upsertTask, removeTask } from '../composables/useTasks'
 
 const props = defineProps({
   open: Boolean,
-  // 'recurring-chore' | 'oneoff-chore' | 'bonus-task' | 'cleaning-task'
+  // 'recurring-chore' | 'oneoff-chore' | 'cleaning-task'
   kind: { type: String, required: true },
   // existing chore/task doc when editing; null when adding
   item: { type: Object, default: null },
@@ -22,7 +22,6 @@ const saving = ref(false)
 const TITLES = {
   'recurring-chore': 'Recurring chore',
   'oneoff-chore': 'One-off chore',
-  'bonus-task': 'Bonus task',
   'cleaning-task': 'Cleaning task',
 }
 const title = computed(() => `${props.item ? 'Edit' : 'Add'} ${TITLES[props.kind]}`)
