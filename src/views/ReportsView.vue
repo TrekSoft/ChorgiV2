@@ -88,13 +88,14 @@ const reportData = computed(() => {
       .filter((e) => {
         // Hide incomplete weekly chores on past days where the deadline hasn't passed
         if (e.isWeekly && !e.completed && isPast && !e.missed) return false
+        // Hide chores completed on time (only show late, overdue, missed)
+        if (e.completed && !e.late) return false
         return true
       })
 
     const lateCount = choreEntries.filter((e) => e.late).length
     const overdueCount = choreEntries.filter((e) => e.overdue).length
     const missedCount = choreEntries.filter((e) => e.missed).length
-    const completedCount = choreEntries.filter((e) => e.completed).length
 
     // --- Claimable one-off chores ---
     const claimableOneoffs = chores.value.filter((chore) => {
@@ -184,7 +185,6 @@ const reportData = computed(() => {
       lateCount,
       overdueCount,
       missedCount,
-      completedCount,
       totalChores: choreEntries.length,
       bonusEarned,
     }
@@ -248,9 +248,6 @@ const reportData = computed(() => {
           </div>
           <h2 class="text-xl font-bold text-amber-900">{{ report.child.name }}</h2>
           <div class="ml-auto flex items-center gap-2 flex-wrap">
-            <span v-if="report.completedCount > 0" class="text-sm font-bold text-green-600 bg-green-100 rounded-full px-3 py-1">
-              ✓ {{ report.completedCount }} done
-            </span>
             <span v-if="report.lateCount > 0" class="text-sm font-bold text-orange-600 bg-orange-100 rounded-full px-3 py-1">
               {{ report.lateCount }} late
             </span>
