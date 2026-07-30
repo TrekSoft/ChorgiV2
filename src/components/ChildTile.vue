@@ -97,7 +97,7 @@ function onPayoutClick(event) {
     <div class="flex items-center gap-2" @click.stop>
       <!-- Admin: payout button -->
       <button
-        v-if="isAdminMode"
+        v-if="isAdminMode && !editingBalance"
         @click.stop="onPayoutClick"
         title="Mark as paid"
         class="w-11 h-11 rounded-full bg-green-100 hover:bg-green-200 text-green-600 flex items-center justify-center cursor-pointer shrink-0"
@@ -143,14 +143,14 @@ function onPayoutClick(event) {
 
       <!-- Marks: minus (admin) + count + plus (admin) -->
       <button
-        v-if="isAdminMode"
+        v-if="isAdminMode && !editingBalance"
         @click.stop="onMarkRemove"
         :disabled="(child.marksCount || 0) === 0"
         title="Remove mark"
         class="w-9 h-9 rounded-full bg-red-200 text-red-700 font-bold text-lg flex items-center justify-center disabled:opacity-40 cursor-pointer shrink-0"
       >−</button>
       <div
-        v-if="(child.marksCount || 0) > 0 || isAdminMode"
+        v-if="((child.marksCount || 0) > 0 || isAdminMode) && !editingBalance"
         class="flex items-center justify-center rounded-full text-white text-2xl font-bold shrink-0"
         :class="[
           (child.marksCount || 0) > 0 ? 'bg-red-500 w-11 h-11' : 'bg-red-300 w-9 h-9 text-lg',
@@ -159,7 +159,7 @@ function onPayoutClick(event) {
         {{ child.marksCount || 0 }}
       </div>
       <button
-        v-if="isAdminMode"
+        v-if="isAdminMode && !editingBalance"
         @click.stop="onMarkAdd"
         title="Add mark"
         class="w-9 h-9 rounded-full bg-red-200 text-red-700 font-bold text-lg flex items-center justify-center cursor-pointer shrink-0"
