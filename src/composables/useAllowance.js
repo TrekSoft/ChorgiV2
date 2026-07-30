@@ -41,14 +41,14 @@ export async function accrueDailyAllowance() {
 
     const dailyCents = Math.round(weeklyCents / 7)
 
-    // Calculate days missed (capped at 7)
+    // Calculate days missed since last accrual
     let daysMissed = 1
     if (lastDate) {
       const last = new Date(lastDate + 'T00:00:00')
       const today = new Date(todayStr + 'T00:00:00')
       const diffMs = today - last
       const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
-      daysMissed = Math.min(Math.max(diffDays, 0), 7)
+      daysMissed = Math.max(diffDays, 0)
     }
 
     if (daysMissed > 0) {
