@@ -226,6 +226,7 @@ const reportData = computed(() => {
         <p class="text-amber-600 text-lg">No children to report on.</p>
       </div>
 
+      <div class="grid gap-4 [grid-template-columns:repeat(auto-fit,minmax(22rem,1fr))]">
       <div v-for="report in reportData" :key="report.child.id" class="bg-white rounded-2xl shadow p-5 flex flex-col gap-4">
         <!-- Child header -->
         <div class="flex items-center gap-3">
@@ -325,6 +326,7 @@ const reportData = computed(() => {
         >
           <p class="text-amber-400 text-sm">Nothing assigned or claimable on this day.</p>
         </div>
+      </div>
       </div>
     </main>
   </div>
