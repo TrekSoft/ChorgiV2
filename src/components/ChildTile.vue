@@ -3,6 +3,7 @@ import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { daysUntilBirthday, isBirthdayToday } from '../lib/birthday'
 import { isAdminMode } from '../composables/useAdminMode'
+import { addMark, removeMark, setAllowanceBalance, payoutChild } from '../composables/useAllowance'
 
 const props = defineProps({
   child: { type: Object, required: true },
@@ -21,6 +22,33 @@ function open() {
 function onEditClick(event) {
   event.stopPropagation()
   emit('edit', props.child)
+}
+
+function onMarkAdd(event) {
+  event.stopPropagation()
+  addMark(props.child.id)
+}
+
+function onMarkRemove(event) {
+  event.stopPropagation()
+  removeMark(props.child.id)
+}
+
+function onBalanceClick(event) {
+  event.stopPropagation()
+  if (!isAdminMode.value) return
+  const current = ((props.child.allowanceBalanceCents || 0) / 100).toFixed(2)
+  const input = prompt(`Set ${props.child.name}'s allowance balance ($):`, current)
+  if (input === null) return
+  const cents = Math.round(parseFloat(input) * 100)
+  if (isNaN(cents)) return
+  setAllowanceBalance(props.child.id, cents)
+}
+
+function onPayoutClick(event) {
+  event.stopPropagation()
+  if (!confirm(`Mark ${props.child.name} as paid? This resets their balance to $0.00.`)) return
+  payoutChild(props.child.id)
 }
 </script>
 
@@ -53,9 +81,33 @@ function onEditClick(event) {
     <div v-if="birthdayToday" class="text-pink-600 font-bold text-2xl text-center">🎉 Happy Birthday! 🎉</div>
     <div v-else class="text-xl text-amber-500">{{ daysUntil }} day{{ daysUntil === 1 ? '' : 's' }} until birthday</div>
 
-    <div class="flex items-center gap-2 bg-amber-50 rounded-full px-5 py-2">
+    <div
+      class="flex items-center gap-2 bg-amber-50 rounded-full px-5 py-2"
+      :class="isAdminMode ? 'cursor-pointer hover:bg-amber-100' : ''"
+      @click="onBalanceClick"
+    >
       <span class="text-3xl">🪙</span>
       <span class="text-2xl font-bold text-amber-700">${{ ((child.allowanceBalanceCents || 0) / 100).toFixed(2) }}</span>
+    </div>
+
+    <!-- Admin: marks controls + payout -->
+    <div v-if="isAdminMode" class="flex items-center gap-3 mt-1">
+      <div class="flex items-center gap-2 bg-red-50 rounded-full px-3 py-1">
+        <button
+          @click="onMarkRemove"
+          :disabled="(child.marksCount || 0) === 0"
+          class="w-7 h-7 rounded-full bg-red-200 text-red-700 font-bold flex items-center justify-center disabled:opacity-40 cursor-pointer"
+        >−</button>
+        <span class="text-sm font-bold text-red-600">{{ child.marksCount || 0 }} mark{{ (child.marksCount || 0) === 1 ? '' : 's' }}</span>
+        <button
+          @click="onMarkAdd"
+          class="w-7 h-7 rounded-full bg-red-200 text-red-700 font-bold flex items-center justify-center cursor-pointer"
+        >+</button>
+      </div>
+      <button
+        @click="onPayoutClick"
+        class="text-sm font-bold text-green-600 bg-green-100 rounded-full px-3 py-1 hover:bg-green-200 cursor-pointer"
+      >Mark Paid</button>
     </div>
   </div>
 </template>

@@ -1,7 +1,6 @@
 <script setup>
 import { useRouter } from 'vue-router'
 import { connectionError, clearConnectionError } from '../composables/useFamily'
-import logo from '../assets/logo.png'
 
 const router = useRouter()
 
@@ -15,7 +14,6 @@ function retry() {
 <template>
   <main class="min-h-screen bg-amber-50 flex items-center justify-center p-6">
     <div class="bg-white rounded-2xl shadow-lg p-8 w-full max-w-sm flex flex-col items-center gap-6 text-center">
-      <img :src="logo" alt="Chorgi logo" class="w-32 h-32" />
       <h1 class="text-3xl font-bold text-amber-900">Trouble connecting</h1>
       <p class="text-amber-700">
         We can't reach the server right now. Check your internet connection and try again.

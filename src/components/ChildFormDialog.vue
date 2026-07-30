@@ -43,7 +43,7 @@ async function save() {
       photoURL,
       weeklyAllowanceCents: Math.round(parseFloat(weeklyAllowance.value || '0') * 100),
       allowanceBalanceCents: props.child?.allowanceBalanceCents || 0,
-      allowanceLastAccruedWeek: props.child?.allowanceLastAccruedWeek || null,
+      allowanceLastAccruedDate: props.child?.allowanceLastAccruedDate || null,
       marksCount: props.child?.marksCount || 0,
       order: props.child?.order ?? children.value.length,
     })

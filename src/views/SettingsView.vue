@@ -3,12 +3,14 @@ import { ref, watch } from 'vue'
 import {
   member,
   familyId,
+  family,
   updateOwnProfile,
   changeFamilyPin,
   inviteParent,
   revokeInvite,
   removeAuthorizedParent,
 } from '../composables/useFamily'
+import { updateMarkPenaltyCents } from '../composables/useAllowance'
 import { currentUser } from '../composables/useAuth'
 import { familyMembers } from '../composables/useFamilyMembers'
 import { pendingInvites } from '../composables/usePendingInvites'
@@ -76,6 +78,31 @@ const inviteEmail = ref('')
 const inviting = ref(false)
 const inviteSent = ref('')
 const inviteError = ref('')
+
+const markPenalty = ref('0.50')
+const markPenaltySaving = ref(false)
+const markPenaltySaved = ref(false)
+
+watch(
+  family,
+  (f) => {
+    if (f) {
+      markPenalty.value = String((f.markPenaltyCents ?? 50) / 100)
+    }
+  },
+  { immediate: true },
+)
+
+async function saveMarkPenalty() {
+  markPenaltySaving.value = true
+  markPenaltySaved.value = false
+  try {
+    await updateMarkPenaltyCents(Math.round(parseFloat(markPenalty.value || '0') * 100))
+    markPenaltySaved.value = true
+  } finally {
+    markPenaltySaving.value = false
+  }
+}
 
 async function sendInvite() {
   if (!inviteEmail.value.trim()) return
@@ -163,6 +190,29 @@ async function sendInvite() {
           {{ pinSaving ? 'Saving…' : 'Change PIN' }}
         </button>
         <p v-if="pinSaved" class="text-green-600 text-sm font-medium">PIN updated!</p>
+      </section>
+
+      <section class="bg-white rounded-2xl shadow p-6 flex flex-col gap-4">
+        <h2 class="text-lg font-bold text-amber-800">Mark penalty</h2>
+        <p class="text-amber-600 text-sm">Each mark deducts this amount from a child's allowance balance.</p>
+        <label class="flex flex-col gap-1">
+          <span class="text-amber-800 font-medium">Penalty per mark ($)</span>
+          <input
+            v-model="markPenalty"
+            type="number"
+            min="0"
+            step="0.25"
+            class="border-2 border-amber-200 rounded-xl px-4 py-3 focus:outline-none focus:border-amber-500"
+          />
+        </label>
+        <button
+          @click="saveMarkPenalty"
+          :disabled="markPenaltySaving"
+          class="self-start bg-amber-500 hover:bg-amber-600 text-white font-bold py-2 px-5 rounded-xl disabled:opacity-50"
+        >
+          {{ markPenaltySaving ? 'Saving…' : 'Save penalty' }}
+        </button>
+        <p v-if="markPenaltySaved" class="text-green-600 text-sm font-medium">Saved!</p>
       </section>
 
       <section class="bg-white rounded-2xl shadow p-6 flex flex-col gap-4">

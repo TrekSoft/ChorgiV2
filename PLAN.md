@@ -224,11 +224,12 @@ families/{uid}/claims/{yyyy-MM-dd}_{taskId}
 - **DoD:** mark tomorrow as cleaning day with 2 rooms → tasks appear claimable on child view. ✅
 
 ### Phase 8 — Allowance + Marks `[ ]`
-- Lazy weekly auto-accrual on app load (`allowanceLastAccruedWeek` catch-up loop); NOT tied to chore completion; no automatic penalties
+- **Daily accrual**: on first app load for a given day, each child gets `weeklyAllowanceCents / 7` added to balance; catch-up loop handles missed days (capped at 7); tracked via `allowanceLastAccruedDate` (yyyy-MM-dd)
+- **Mark penalties**: each mark deducts a configurable `markPenaltyCents` (family-level, default 50¢, configurable from Settings page) from the child's balance; marks +/- buttons on child tile (admin mode); count shown on tile
+- **Admin balance override**: in admin mode, parents can tap the allowance balance on a child's card to set it to any amount
 - Bonus completion adds to balance; "Mark Paid" (admin mode, child tile) resets to 0
-- Marks +/- buttons on child tile (admin mode); count shown on tile; writes `marks` audit record (no monetary value)
-- Balance display on child tile (admin mode) and/or child view header
-- **DoD:** balance accrues weekly, bonuses add, marks +/- works, payout resets.
+- Balance display on child tile (always visible) and/or child view header
+- **DoD:** balance accrues daily on first load, marks deduct penalty, admin can override balance, bonuses add, payout resets.
 
 ### Phase 8b — Reports `[ ]` *(parallelizable with Phase 8)*
 - `/reports` (PIN-gated, avatar menu): date selector — prev/next arrows + tap date for calendar picker
