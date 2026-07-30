@@ -159,6 +159,12 @@ function canUnclaim(task) {
   return !!(mine || isAdminMode.value)
 }
 
+function unclaimLabel(task) {
+  const claim = claimFor(task)
+  const mine = claim && child.value && claim.childId === child.value.id
+  return mine ? 'Remove me' : 'Unassign'
+}
+
 async function onTaskTap(task) {
   const claim = claimFor(task)
   if (!claim) {
@@ -267,6 +273,7 @@ async function onTaskUnclaim(task) {
               variant="task"
               v-bind="taskCardProps(task)"
               :can-unassign="canUnclaim(task)"
+              :unassign-label="unclaimLabel(task)"
               @toggle="onTaskTap(task)"
               @photo-click="lightboxSrc = task.photoURL"
               @unassign="onTaskUnclaim(task)"
@@ -284,6 +291,7 @@ async function onTaskUnclaim(task) {
               variant="task"
               v-bind="taskCardProps(task)"
               :can-unassign="canUnclaim(task)"
+              :unassign-label="unclaimLabel(task)"
               @toggle="onTaskTap(task)"
               @photo-click="lightboxSrc = task.photoURL"
               @unassign="onTaskUnclaim(task)"

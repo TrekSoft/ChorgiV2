@@ -20,6 +20,8 @@ const props = defineProps({
   variant: { type: String, default: 'chore' },
   // show the unassign button (kid-accessible, no PIN)
   canUnassign: { type: Boolean, default: false },
+  // label for the unassign button (e.g. 'Remove me' for own claims, 'Unassign' for admin override)
+  unassignLabel: { type: String, default: 'Remove me' },
 })
 const emit = defineEmits(['toggle', 'photo-click', 'unassign'])
 
@@ -52,14 +54,14 @@ function onUnassignClick() {
       @click="onUnassignClick"
       class="flex flex-col items-center justify-center gap-1 px-3 shrink-0 cursor-pointer transition-colors"
       :class="completed ? 'bg-green-100 hover:bg-green-200 text-red-500' : overdue ? 'bg-red-100 hover:bg-red-200 text-red-600' : 'bg-amber-50 hover:bg-amber-100 text-red-500'"
-      title="Unassign me"
+      :title="unassignLabel"
     >
       <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
         <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
         <polyline points="16 17 21 12 16 7" />
         <line x1="21" y1="12" x2="9" y2="12" />
       </svg>
-      <span class="text-xs font-bold">Remove me</span>
+      <span class="text-xs font-bold">{{ unassignLabel }}</span>
     </button>
 
     <!-- Main card section (right) -->
