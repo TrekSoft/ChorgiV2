@@ -7,12 +7,14 @@ import { children } from '../composables/useChildren'
 import { chores } from '../composables/useChores'
 import { cleaningDays } from '../composables/useCleaning'
 import ScheduleItem from './ScheduleItem.vue'
+import PhotoLightbox from './PhotoLightbox.vue'
 import ChoreFormDialog from './ChoreFormDialog.vue'
 import EmptyState from './EmptyState.vue'
 
 const mode = ref('today') // 'today' | 'week'
 const anchor = ref(new Date())
 const filterChildId = ref(null)
+const lightboxSrc = ref(null)
 
 const weekStartsOn = computed(() => family.value?.weekStartsOn ?? 0)
 
@@ -189,6 +191,7 @@ function openEdit(entry) {
           :assignees="entry.assignees"
           :claimable="entry.claimable"
           @click="openEdit(entry)"
+          @photo-click="lightboxSrc = entry.item.photoURL"
         />
 
         <div class="flex gap-2 mt-auto pt-1">
@@ -215,5 +218,7 @@ function openEdit(entry) {
       :prefill="prefill"
       @close="dialogOpen = false"
     />
+
+    <PhotoLightbox :open="!!lightboxSrc" :src="lightboxSrc" @close="lightboxSrc = null" />
   </div>
 </template>

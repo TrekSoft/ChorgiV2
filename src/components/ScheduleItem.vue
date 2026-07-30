@@ -16,7 +16,12 @@ const props = defineProps({
   assignees: { type: Array, default: () => [] },
   claimable: { type: Boolean, default: false },
 })
-const emit = defineEmits(['click'])
+const emit = defineEmits(['click', 'photo-click'])
+
+function onPhotoClick(event) {
+  event.stopPropagation()
+  emit('photo-click')
+}
 
 function formatTime(hhmm) {
   return format(parse(hhmm, 'HH:mm', new Date()), 'h:mm a')
@@ -37,9 +42,14 @@ const timeLabel = computed(() => {
     @click="emit('click')"
     class="flex items-center gap-2 rounded-xl border-2 border-amber-200 bg-white p-2 cursor-pointer hover:border-amber-400 transition-colors select-none"
   >
-    <div v-if="photoURL" class="w-10 h-10 rounded-lg overflow-hidden border border-amber-200 shrink-0">
+    <button
+      v-if="photoURL"
+      type="button"
+      @click="onPhotoClick"
+      class="w-10 h-10 rounded-lg overflow-hidden border border-amber-200 shrink-0 cursor-zoom-in"
+    >
       <img :src="photoURL" alt="" class="w-full h-full object-cover" />
-    </div>
+    </button>
     <div v-else-if="iconName" class="w-10 h-10 rounded-lg bg-amber-100 flex items-center justify-center shrink-0">
       <Icon :icon="iconName" class="w-6 h-6 text-amber-600" />
     </div>
