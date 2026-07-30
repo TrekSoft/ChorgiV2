@@ -49,7 +49,7 @@ function clear(event) {
 </script>
 
 <template>
-  <label class="flex flex-col gap-1">
+  <div class="flex flex-col gap-1">
     <span class="text-amber-800 font-medium">
       {{ label }} <span v-if="optional" class="text-amber-500 font-normal">(optional)</span>
     </span>
@@ -81,5 +81,5 @@ function clear(event) {
     </div>
     <input ref="inputEl" type="file" accept="image/*" class="hidden" @change="onChange" />
     <PhotoLightbox :open="lightboxOpen" :src="localPreview" @close="lightboxOpen = false" />
-  </label>
+  </div>
 </template>
