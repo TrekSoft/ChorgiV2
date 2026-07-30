@@ -30,7 +30,7 @@ const dayOfMonth = ref(props.initial?.recurrence?.day || 1)
 const timeStart = ref(props.initial?.timeWindow?.start || '')
 const timeEnd = ref(props.initial?.timeWindow?.end || '')
 
-const showAssignees = computed(() => props.kind === 'recurring-chore' || props.kind === 'oneoff-chore')
+const showAssignees = computed(() => true)
 const showDate = computed(() => props.kind === 'oneoff-chore')
 const showBonus = computed(() => props.kind === 'oneoff-chore')
 const showRoom = computed(() => props.kind === 'cleaning-task')
@@ -120,6 +120,7 @@ function submit() {
     emit('submit', {
       ...base,
       kind: 'cleaning',
+      assigneeIds: assigneeIds.value,
       roomId: roomId.value,
     })
   }
@@ -148,7 +149,7 @@ function submit() {
     <div v-if="showAssignees" class="flex flex-col gap-2">
       <span class="text-amber-800 font-medium">
         Assign to
-        <span v-if="kind === 'oneoff-chore'" class="text-amber-500 font-normal">(optional — unassigned one-offs can be claimed by any kid)</span>
+        <span v-if="kind !== 'recurring-chore'" class="text-amber-500 font-normal">(optional — unassigned tasks can be done by any kid)</span>
       </span>
       <div class="flex flex-wrap gap-2">
         <button

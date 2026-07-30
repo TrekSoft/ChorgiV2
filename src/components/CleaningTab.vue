@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 import { rooms, upsertRoom, removeRoom } from '../composables/useCleaning'
 import { tasks, removeTask } from '../composables/useTasks'
+import { children } from '../composables/useChildren'
 import ScheduleItem from './ScheduleItem.vue'
 import PhotoLightbox from './PhotoLightbox.vue'
 import ChoreFormDialog from './ChoreFormDialog.vue'
@@ -37,6 +38,12 @@ async function deleteRoom(room) {
 
 function tasksFor(roomId) {
   return tasks.value.filter((t) => t.kind === 'cleaning' && t.roomId === roomId)
+}
+
+function assigneesFor(task) {
+  return (task.assigneeIds || [])
+    .map((id) => children.value.find((c) => c.id === id))
+    .filter(Boolean)
 }
 
 const lightboxSrc = ref(null)
@@ -105,6 +112,8 @@ function openEditTask(task) {
             :name="task.name"
             :icon-name="task.iconName"
             :photo-url="task.photoURL"
+            :assignees="assigneesFor(task)"
+            :assigned-to-all="children.length > 0 && (task.assigneeIds || []).length >= children.length"
             @click="openEditTask(task)"
             @photo-click="lightboxSrc = task.photoURL"
           />
