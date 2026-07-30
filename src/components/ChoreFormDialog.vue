@@ -39,6 +39,9 @@ async function onSubmit(data) {
       await upsertTask(props.item?.id || null, payload)
     }
     emit('close')
+  } catch (e) {
+    console.error('Failed to save', e)
+    alert(`Failed to save: ${e.message}`)
   } finally {
     saving.value = false
   }

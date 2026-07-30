@@ -5,7 +5,7 @@ import { format } from 'date-fns'
 import { occursOn, deadlineFor, startsAt } from '../lib/recurrence'
 import { family } from '../composables/useFamily'
 import { children } from '../composables/useChildren'
-import { chores, unassignChild } from '../composables/useChores'
+import { chores } from '../composables/useChores'
 import { tasks } from '../composables/useTasks'
 import { rooms, cleaningDays } from '../composables/useCleaning'
 import {
@@ -106,10 +106,6 @@ const allAssignedDone = computed(
 watch(allAssignedDone, (done) => {
   if (done && completedThisSession) burst.value?.fire('fireworks')
 })
-
-async function unassign(entry) {
-  await unassignChild(entry.chore.id, child.value.id)
-}
 
 // --- right pane: claimable tasks ---
 function claimFor(task) {
@@ -251,10 +247,8 @@ async function onTaskUnclaim(task) {
             :oneoff="entry.chore.kind === 'oneoff'"
             :bonus-cents="entry.chore.bonusCents || null"
             variant="chore"
-            can-unassign
             @toggle="toggleChore(entry)"
             @photo-click="lightboxSrc = entry.chore.photoURL"
-            @unassign="unassign(entry)"
           />
         </section>
 
