@@ -6,7 +6,7 @@ import { format, parse } from 'date-fns'
 const props = defineProps({
   name: { type: String, required: true },
   iconName: { type: String, default: null },
-  photoURL: { type: String, default: null },
+  photoUrl: { type: String, default: null },
   // { start?: 'HH:mm', end?: 'HH:mm' } | null
   timeWindow: { type: Object, default: null },
   weekly: { type: Boolean, default: false },
@@ -43,12 +43,12 @@ const timeLabel = computed(() => {
     class="flex items-center gap-2 rounded-xl border-2 border-amber-200 bg-white p-2 cursor-pointer hover:border-amber-400 transition-colors select-none"
   >
     <button
-      v-if="photoURL"
+      v-if="photoUrl"
       type="button"
       @click="onPhotoClick"
       class="w-10 h-10 rounded-lg overflow-hidden border border-amber-200 shrink-0 cursor-zoom-in"
     >
-      <img :src="photoURL" alt="" class="w-full h-full object-cover" />
+      <img :src="photoUrl" alt="" class="w-full h-full object-cover" />
     </button>
     <div v-else-if="iconName" class="w-10 h-10 rounded-lg bg-amber-100 flex items-center justify-center shrink-0">
       <Icon :icon="iconName" class="w-6 h-6 text-amber-600" />

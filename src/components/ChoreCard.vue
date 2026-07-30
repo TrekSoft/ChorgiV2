@@ -5,7 +5,7 @@ import CountdownLabel from './CountdownLabel.vue'
 const props = defineProps({
   name: { type: String, required: true },
   iconName: { type: String, default: null },
-  photoURL: { type: String, default: null },
+  photoUrl: { type: String, default: null },
   deadline: { type: Date, default: null },
   completed: { type: Boolean, default: false },
   late: { type: Boolean, default: false },
@@ -72,12 +72,12 @@ function onUnassignClick() {
       ]"
     >
       <button
-        v-if="photoURL"
+        v-if="photoUrl"
         type="button"
         @click="onPhotoClick"
         class="w-14 h-14 rounded-xl overflow-hidden border-2 border-amber-200 shrink-0 cursor-pointer"
       >
-        <img :src="photoURL" alt="" class="w-full h-full object-cover" />
+        <img :src="photoUrl" alt="" class="w-full h-full object-cover" />
       </button>
       <div
         v-else-if="iconName"
