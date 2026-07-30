@@ -43,6 +43,14 @@ function toggleAssignee(id) {
     : [...assigneeIds.value, id]
 }
 
+const allAssigned = computed(
+  () => props.children.length > 0 && assigneeIds.value.length === props.children.length,
+)
+
+function toggleAll() {
+  assigneeIds.value = allAssigned.value ? [] : props.children.map((c) => c.id)
+}
+
 function toggleWeekday(day) {
   weekdays.value = weekdays.value.includes(day)
     ? weekdays.value.filter((d) => d !== day)
@@ -142,6 +150,14 @@ function submit() {
         <span v-if="kind === 'oneoff-chore'" class="text-amber-500 font-normal">(optional — unassigned one-offs can be claimed by any kid)</span>
       </span>
       <div class="flex flex-wrap gap-2">
+        <button
+          type="button"
+          @click="toggleAll"
+          class="px-4 py-2 rounded-full border-2 font-bold cursor-pointer transition-colors"
+          :class="allAssigned ? 'border-amber-500 bg-amber-100 text-amber-800' : 'border-amber-200 text-amber-600 hover:bg-amber-50'"
+        >
+          All
+        </button>
         <button
           v-for="child in children"
           :key="child.id"
