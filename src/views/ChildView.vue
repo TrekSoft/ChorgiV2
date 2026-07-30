@@ -129,17 +129,34 @@ const claimableChores = computed(() =>
 
 const cleaningSections = computed(() => {
   const day = cleaningDays.value[todayStr.value]
-  if (!day) return []
+  if (!day || !child.value) return []
   return (day.roomIds || [])
     .map((roomId) => ({
       room: rooms.value.find((r) => r.id === roomId),
-      tasks: tasks.value.filter((t) => t.kind === 'cleaning' && t.roomId === roomId),
+      tasks: tasks.value.filter((t) => {
+        if (t.kind !== 'cleaning' || t.roomId !== roomId) return false
+        if (t.assigneeId) return t.assigneeId === child.value.id
+        return true
+      }),
     }))
     .filter((s) => s.room && s.tasks.length > 0)
 })
 
+function isPreAssigned(task) {
+  return !!task.assigneeId && task.assigneeId === child.value?.id
+}
+
 // card state helpers for claimable tasks
 function taskCardProps(task) {
+  if (isPreAssigned(task)) {
+    const claim = claimFor(task)
+    return {
+      completed: !!claim?.completed,
+      claimedByName: child.value?.name || null,
+      claimedByPhoto: child.value?.photoURL || null,
+      disabled: false,
+    }
+  }
   const claim = claimFor(task)
   const mine = !!(claim && child.value && claim.childId === child.value.id)
   const owner = claim ? claimChild(claim) : null
@@ -152,6 +169,7 @@ function taskCardProps(task) {
 }
 
 function canUnclaim(task) {
+  if (isPreAssigned(task)) return false
   const claim = claimFor(task)
   if (!claim || claim.completed) return false
   const mine = child.value && claim.childId === child.value.id
@@ -165,6 +183,22 @@ function unclaimLabel(task) {
 }
 
 async function onTaskTap(task) {
+  if (isPreAssigned(task)) {
+    const claim = claimFor(task)
+    if (!claim) {
+      await claimTask(task, child.value.id, todayStr.value)
+      await completeClaim(task, todayStr.value)
+      burst.value?.fire('confetti')
+      return
+    }
+    if (claim.completed) {
+      await uncompleteClaim(task, todayStr.value)
+    } else {
+      await completeClaim(task, todayStr.value)
+      burst.value?.fire('confetti')
+    }
+    return
+  }
   const claim = claimFor(task)
   if (!claim) {
     await claimTask(task, child.value.id, todayStr.value)
