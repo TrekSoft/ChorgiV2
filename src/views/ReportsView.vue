@@ -188,7 +188,7 @@ const reportData = computed(() => {
 <template>
   <div class="min-h-screen bg-amber-50">
     <AppHeader />
-    <main class="max-w-5xl mx-auto p-4 sm:p-6 flex flex-col gap-6">
+    <main class="p-4 sm:p-6 flex flex-col gap-6">
       <h1 class="text-2xl font-bold text-amber-900">Reports</h1>
 
       <!-- Date selector -->
