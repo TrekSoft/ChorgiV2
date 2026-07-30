@@ -133,11 +133,7 @@ const cleaningSections = computed(() => {
   return (day.roomIds || [])
     .map((roomId) => ({
       room: rooms.value.find((r) => r.id === roomId),
-      tasks: tasks.value.filter((t) => {
-        if (t.kind !== 'cleaning' || t.roomId !== roomId) return false
-        if (t.assigneeId) return t.assigneeId === child.value.id
-        return true
-      }),
+      tasks: tasks.value.filter((t) => t.kind === 'cleaning' && t.roomId === roomId),
     }))
     .filter((s) => s.room && s.tasks.length > 0)
 })
@@ -146,15 +142,25 @@ function isPreAssigned(task) {
   return !!task.assigneeId && task.assigneeId === child.value?.id
 }
 
+function isAssignedToOther(task) {
+  return !!task.assigneeId && task.assigneeId !== child.value?.id
+}
+
+function assignedChild(task) {
+  return children.value.find((c) => c.id === task.assigneeId) || null
+}
+
 // card state helpers for claimable tasks
 function taskCardProps(task) {
-  if (isPreAssigned(task)) {
+  if (task.assigneeId) {
     const claim = claimFor(task)
+    const child_ = assignedChild(task)
+    const mine = isPreAssigned(task)
     return {
       completed: !!claim?.completed,
-      claimedByName: child.value?.name || null,
-      claimedByPhoto: child.value?.photoURL || null,
-      disabled: false,
+      claimedByName: child_?.name || null,
+      claimedByPhoto: child_?.photoURL || null,
+      disabled: !mine && !isAdminMode.value,
     }
   }
   const claim = claimFor(task)
@@ -183,6 +189,10 @@ function unclaimLabel(task) {
 }
 
 async function onTaskTap(task) {
+  if (isAssignedToOther(task)) {
+    if (!isAdminMode.value) return
+    return
+  }
   if (isPreAssigned(task)) {
     const claim = claimFor(task)
     if (!claim) {
