@@ -42,6 +42,10 @@ onMounted(() => {
 })
 onUnmounted(() => clearInterval(nowTimer))
 
+watch(() => route.params.id, () => {
+  initialOrder = []
+})
+
 const todayStr = computed(() => format(now.value, 'yyyy-MM-dd'))
 
 const burst = ref(null)
@@ -58,6 +62,18 @@ function showToast(message) {
 const lightboxSrc = ref(null)
 
 // --- left pane: assigned chores ---
+// Snapshot the initial order on mount so completing a chore doesn't reshuffle
+let initialOrder = []
+
+function snapshotOrder(list) {
+  initialOrder = list.map((e) => e.chore.id)
+}
+
+function orderIndex(choreId) {
+  const idx = initialOrder.indexOf(choreId)
+  return idx === -1 ? Infinity : idx
+}
+
 const assigned = computed(() => {
   if (!child.value) return []
   const list = []
@@ -78,9 +94,14 @@ const assigned = computed(() => {
       deadline,
     })
   }
-  // overdue first (soonest deadline), then actionable (soonest deadline), then completed
-  const rank = (e) => (e.overdue ? 0 : e.completed ? 2 : 1)
-  return list.sort((a, b) => rank(a) - rank(b) || a.deadline - b.deadline)
+  // On first load, snapshot the natural order (overdue, then actionable, then completed by deadline)
+  if (initialOrder.length === 0 && list.length > 0) {
+    const rank = (e) => (e.overdue ? 0 : e.completed ? 2 : 1)
+    const sorted = [...list].sort((a, b) => rank(a) - rank(b) || a.deadline - b.deadline)
+    snapshotOrder(sorted)
+  }
+  // Keep the initial order stable; new chores (not in snapshot) go to the end
+  return list.sort((a, b) => orderIndex(a.chore.id) - orderIndex(b.chore.id))
 })
 
 let completedThisSession = false
