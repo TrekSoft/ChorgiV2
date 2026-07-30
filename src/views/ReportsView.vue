@@ -98,22 +98,24 @@ const reportData = computed(() => {
       return true
     })
 
-    const oneoffEntries = claimableOneoffs.map((chore) => {
-      const claimId = claimIdFor(chore, dateStr)
-      const claim = claims.value[claimId]
-      const isMine = claim?.childId === child.id
-      return {
-        id: chore.id,
-        name: chore.name,
-        iconName: chore.iconName,
-        kind: 'oneoff',
-        claimed: !!claim,
-        claimedByMe: isMine,
-        claimedByName: claim ? childName(claim.childId) : null,
-        completed: isMine ? !!claim?.completed : null,
-        bonusCents: chore.bonusCents || null,
-      }
-    })
+    const oneoffEntries = claimableOneoffs
+      .map((chore) => {
+        const claimId = claimIdFor(chore, dateStr)
+        const claim = claims.value[claimId]
+        const isMine = claim?.childId === child.id
+        return {
+          id: chore.id,
+          name: chore.name,
+          iconName: chore.iconName,
+          kind: 'oneoff',
+          claimed: !!claim,
+          claimedByMe: isMine,
+          claimedByName: claim ? childName(claim.childId) : null,
+          completed: isMine ? !!claim?.completed : null,
+          bonusCents: chore.bonusCents || null,
+        }
+      })
+      .filter((e) => e.claimedByMe)
 
     // --- Cleaning tasks ---
     const day = cleaningDays.value[dateStr]
@@ -126,7 +128,6 @@ const reportData = computed(() => {
           const claimId = claimIdFor(task, dateStr)
           const claim = claims.value[claimId]
           const isMine = claim?.childId === child.id
-          // Pre-assigned cleaning tasks
           if (task.assigneeId) {
             return {
               id: task.id,
@@ -153,7 +154,8 @@ const reportData = computed(() => {
             completed: isMine ? !!claim?.completed : null,
             bonusCents: task.bonusCents || null,
           }
-        }),
+        })
+        .filter((e) => e.claimedByMe),
     )
 
     const bonusEarned =
@@ -262,7 +264,7 @@ const reportData = computed(() => {
           <div v-for="entry in report.choreEntries" :key="entry.id" class="flex items-center gap-3 bg-amber-50 rounded-xl px-4 py-2">
             <span
               class="w-6 h-6 rounded-full flex items-center justify-center text-sm font-bold shrink-0"
-              :class="entry.completed ? 'bg-green-500 text-white' : entry.overdue ? 'bg-red-400 text-white' : entry.missed ? 'bg-red-600 text-white' : 'border-2 border-amber-300 text-transparent'"
+              :class="entry.completed ? 'bg-green-500 text-white' : entry.missed ? 'bg-red-600 text-white' : 'border-2 border-amber-300 text-transparent'"
             >✓</span>
             <span class="font-medium text-amber-900 flex-1">{{ entry.name }}</span>
             <span v-if="entry.late" class="text-xs font-bold text-orange-600 bg-orange-100 rounded-full px-2 py-0.5">late</span>
