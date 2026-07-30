@@ -12,7 +12,6 @@ import ChoreFormDialog from './ChoreFormDialog.vue'
 import CleaningDayDialog from './CleaningDayDialog.vue'
 import EmptyState from './EmptyState.vue'
 
-const mode = ref('today') // 'today' | 'week'
 const anchor = ref(new Date())
 const filterChildId = ref(null)
 const lightboxSrc = ref(null)
@@ -29,23 +28,17 @@ function openCleaningDialog(day) {
 const weekStartsOn = computed(() => family.value?.weekStartsOn ?? 0)
 
 const days = computed(() => {
-  if (mode.value === 'today') return [anchor.value]
   const start = startOfWeek(anchor.value, { weekStartsOn: weekStartsOn.value })
   return eachDayOfInterval({ start, end: addDays(start, 6) })
 })
 
-const headerLabel = computed(() => {
-  if (mode.value === 'today') return format(anchor.value, 'EEEE, MMM d')
-  const start = days.value[0]
-  const end = days.value[6]
-  return `${format(start, 'MMM d')} – ${format(end, 'MMM d')}`
-})
+const headerLabel = computed(() => `${format(days.value[0], 'MMM d')} – ${format(days.value[6], 'MMM d')}`)
 
-function goBack() {
-  anchor.value = mode.value === 'today' ? addDays(anchor.value, -1) : addWeeks(anchor.value, -1)
+function prev() {
+  anchor.value = addWeeks(anchor.value, -1)
 }
-function goForward() {
-  anchor.value = mode.value === 'today' ? addDays(anchor.value, 1) : addWeeks(anchor.value, 1)
+function next() {
+  anchor.value = addWeeks(anchor.value, 1)
 }
 function goToday() {
   anchor.value = new Date()
@@ -109,34 +102,13 @@ function openEdit(entry) {
 
 <template>
   <div class="flex flex-col gap-4">
-    <!-- toolbar -->
+    <!-- week nav -->
     <div class="flex items-center gap-2 flex-wrap">
-      <div class="flex rounded-full border-2 border-amber-200 overflow-hidden">
-        <button
-          @click="mode = 'today'"
-          class="px-4 py-2 font-medium cursor-pointer"
-          :class="mode === 'today' ? 'bg-amber-500 text-white' : 'text-amber-700 hover:bg-amber-50'"
-        >
-          Today
-        </button>
-        <button
-          @click="mode = 'week'"
-          class="px-4 py-2 font-medium cursor-pointer"
-          :class="mode === 'week' ? 'bg-amber-500 text-white' : 'text-amber-700 hover:bg-amber-50'"
-        >
-          Week
-        </button>
-      </div>
-
-      <div class="flex items-center gap-1">
-        <button @click="goBack" class="w-9 h-9 rounded-full hover:bg-amber-100 text-amber-700 font-bold cursor-pointer" aria-label="Previous">‹</button>
-        <span class="font-bold text-amber-900 min-w-40 text-center">{{ headerLabel }}</span>
-        <button @click="goForward" class="w-9 h-9 rounded-full hover:bg-amber-100 text-amber-700 font-bold cursor-pointer" aria-label="Next">›</button>
-        <button @click="goToday" class="text-sm text-amber-600 font-medium hover:underline cursor-pointer ml-1">Today</button>
-      </div>
-
+      <button @click="prev" class="w-9 h-9 rounded-full hover:bg-amber-100 text-amber-700 font-bold cursor-pointer" aria-label="Previous week">‹</button>
+      <span class="font-bold text-amber-900 text-lg">{{ headerLabel }}</span>
+      <button @click="next" class="w-9 h-9 rounded-full hover:bg-amber-100 text-amber-700 font-bold cursor-pointer" aria-label="Next week">›</button>
+      <button @click="goToday" class="text-sm text-amber-600 font-medium hover:underline cursor-pointer ml-1">This week</button>
       <div class="flex-1"></div>
-
       <button
         @click="openAdd('recurring-chore')"
         class="bg-amber-500 hover:bg-amber-600 text-white font-bold py-2 px-4 rounded-xl cursor-pointer"
@@ -166,10 +138,7 @@ function openEdit(entry) {
     </div>
 
     <!-- day columns -->
-    <div
-      class="grid gap-3"
-      :class="mode === 'week' ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-7' : 'grid-cols-1 max-w-2xl'"
-    >
+    <div class="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-7">
       <div
         v-for="day in days"
         :key="day.toISOString()"
