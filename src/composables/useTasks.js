@@ -1,5 +1,13 @@
 import { ref, watch } from 'vue'
-import { collection, onSnapshot, doc, setDoc, deleteDoc, serverTimestamp } from 'firebase/firestore'
+import {
+  collection,
+  onSnapshot,
+  doc,
+  setDoc,
+  deleteDoc,
+  serverTimestamp,
+  writeBatch
+} from 'firebase/firestore'
 import { db } from '../lib/firebase'
 import { familyId } from './useFamily'
 import { uploadFamilyPhoto } from '../lib/photo'
@@ -20,7 +28,9 @@ watch(
     }
     tasksLoading.value = true
     unsubscribe = onSnapshot(collection(db, 'families', id, 'tasks'), (snap) => {
-      tasks.value = snap.docs.map((d) => ({ id: d.id, ...d.data() }))
+      tasks.value = snap.docs
+        .map((d) => ({ id: d.id, ...d.data() }))
+        .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
       tasksLoading.value = false
     })
   },
@@ -34,12 +44,21 @@ export async function upsertTask(taskId, data) {
   if (photoFile) {
     photoURL = await uploadFamilyPhoto(familyId.value, `tasks/${id}`, photoFile)
   }
+  const order = rest.order ?? tasks.value.length
   await setDoc(
     doc(db, 'families', familyId.value, 'tasks', id),
-    { ...rest, photoURL, updatedAt: serverTimestamp() },
+    { ...rest, photoURL, order, updatedAt: serverTimestamp() },
     { merge: true },
   )
   return id
+}
+
+export async function reorderTasks(taskIds) {
+  const batch = writeBatch(db)
+  taskIds.forEach((id, index) => {
+    batch.update(doc(db, 'families', familyId.value, 'tasks', id), { order: index })
+  })
+  await batch.commit()
 }
 
 export async function removeTask(taskId) {

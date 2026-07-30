@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from 'vue'
 import { rooms, upsertRoom, removeRoom } from '../composables/useCleaning'
-import { tasks, removeTask } from '../composables/useTasks'
+import { tasks, removeTask, reorderTasks } from '../composables/useTasks'
 import { children } from '../composables/useChildren'
 import ScheduleItem from './ScheduleItem.vue'
 import PhotoLightbox from './PhotoLightbox.vue'
@@ -38,6 +38,40 @@ async function deleteRoom(room) {
 
 function tasksFor(roomId) {
   return tasks.value.filter((t) => t.kind === 'cleaning' && t.roomId === roomId)
+}
+
+const dragTaskId = ref(null)
+const dragOverTaskId = ref(null)
+
+function onDragStart(taskId) {
+  dragTaskId.value = taskId
+}
+
+function onDragOver(taskId) {
+  if (dragTaskId.value === null) return
+  if (taskId !== dragOverTaskId.value) dragOverTaskId.value = taskId
+}
+
+function onDragLeave() {
+  dragOverTaskId.value = null
+}
+
+async function onDrop(roomId) {
+  if (dragTaskId.value === null) return
+  const roomTasks = tasksFor(roomId)
+  const fromIdx = roomTasks.findIndex((t) => t.id === dragTaskId.value)
+  const toIdx = roomTasks.findIndex((t) => t.id === dragOverTaskId.value)
+  if (fromIdx === -1 || toIdx === -1 || fromIdx === toIdx) {
+    dragTaskId.value = null
+    dragOverTaskId.value = null
+    return
+  }
+  const reordered = [...roomTasks]
+  const [moved] = reordered.splice(fromIdx, 1)
+  reordered.splice(toIdx, 0, moved)
+  await reorderTasks(reordered.map((t) => t.id))
+  dragTaskId.value = null
+  dragOverTaskId.value = null
 }
 
 function assigneesFor(task) {
@@ -106,16 +140,25 @@ function openEditTask(task) {
             </div>
           </div>
 
-          <ScheduleItem
+          <div
             v-for="task in tasksFor(room.id)"
             :key="task.id"
-            :name="task.name"
-            :icon-name="task.iconName"
-            :photo-url="task.photoURL"
-            :assignees="assigneesFor(task)"
-            @click="openEditTask(task)"
-            @photo-click="lightboxSrc = task.photoURL"
-          />
+            draggable="true"
+            @dragstart="onDragStart(task.id)"
+            @dragover.prevent="onDragOver(task.id)"
+            @dragleave="onDragLeave"
+            @drop.prevent="onDrop(room.id)"
+            :class="dragOverTaskId === task.id && dragTaskId !== task.id ? 'ring-2 ring-amber-400 rounded-xl' : ''"
+          >
+            <ScheduleItem
+              :name="task.name"
+              :icon-name="task.iconName"
+              :photo-url="task.photoURL"
+              :assignees="assigneesFor(task)"
+              @click="openEditTask(task)"
+              @photo-click="lightboxSrc = task.photoURL"
+            />
+          </div>
 
           <button
             @click="openAddTask(room.id)"
