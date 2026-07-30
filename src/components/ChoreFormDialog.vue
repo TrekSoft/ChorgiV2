@@ -59,9 +59,9 @@ async function onDelete() {
 <template>
   <Teleport to="body">
     <div v-if="open" class="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
-      <div class="bg-white rounded-2xl shadow-xl w-full max-w-md flex flex-col max-h-[90vh] overflow-hidden">
+      <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg flex flex-col max-h-[90vh] overflow-hidden">
         <!-- dialog grows to fill available height; inner form handles scrolling -->
-        <div class="p-6 pb-0 flex items-center justify-between shrink-0">
+        <div class="px-6 py-4 flex items-center justify-between shrink-0 border-b border-amber-100">
           <h2 class="text-xl font-bold text-amber-900">{{ title }}</h2>
           <button
             v-if="item"

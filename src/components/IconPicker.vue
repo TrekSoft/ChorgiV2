@@ -42,12 +42,21 @@ watch(query, (term) => {
 
 function select(iconName) {
   emit('update:modelValue', iconName)
+  query.value = ''
+  results.value = []
+}
+
+function clear() {
+  emit('update:modelValue', null)
+  query.value = ''
+  results.value = []
 }
 </script>
 
 <template>
   <div class="flex flex-col gap-3">
     <input
+      v-if="!modelValue"
       v-model="query"
       type="text"
       placeholder="Search icons (e.g. broom, star, dishes)…"
@@ -57,15 +66,15 @@ function select(iconName) {
     <div v-if="modelValue" class="flex items-center gap-2 text-amber-700">
       <span class="text-sm">Selected:</span>
       <Icon :icon="modelValue" class="w-8 h-8" />
-      <button type="button" @click="emit('update:modelValue', null)" class="text-red-500 text-sm hover:underline">
+      <button type="button" @click="clear" class="text-red-500 text-sm hover:underline">
         Clear
       </button>
     </div>
 
-    <p v-if="loading" class="text-amber-500 text-sm">Searching…</p>
-    <p v-if="error" class="text-red-500 text-sm">Could not load icons. Check your connection.</p>
+    <p v-if="!modelValue && loading" class="text-amber-500 text-sm">Searching…</p>
+    <p v-if="!modelValue && error" class="text-red-500 text-sm">Could not load icons. Check your connection.</p>
 
-    <div v-if="results.length" class="grid grid-cols-6 sm:grid-cols-8 gap-2 max-h-64 overflow-y-auto p-1">
+    <div v-if="!modelValue && results.length" class="grid grid-cols-6 sm:grid-cols-8 gap-2 max-h-64 overflow-y-auto p-1">
       <button
         v-for="iconName in results"
         :key="iconName"
