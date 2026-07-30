@@ -81,41 +81,48 @@ function onPayoutClick(event) {
     <div v-if="birthdayToday" class="text-pink-600 font-bold text-2xl text-center">🎉 Happy Birthday! 🎉</div>
     <div v-else class="text-xl text-amber-500">{{ daysUntil }} day{{ daysUntil === 1 ? '' : 's' }} until birthday</div>
 
-    <div class="flex items-center gap-2">
+    <div class="flex items-center gap-2" @click.stop>
+      <!-- Admin: payout button -->
+      <button
+        v-if="isAdminMode"
+        @click.stop="onPayoutClick"
+        title="Mark as paid"
+        class="w-11 h-11 rounded-full bg-green-100 hover:bg-green-200 text-green-600 font-bold flex items-center justify-center cursor-pointer shrink-0"
+      >$</button>
+
+      <!-- Allowance balance -->
       <div
         class="flex items-center gap-2 bg-amber-50 rounded-full px-5 py-2"
         :class="isAdminMode ? 'cursor-pointer hover:bg-amber-100' : ''"
-        @click="onBalanceClick"
+        @click.stop="onBalanceClick"
       >
         <span class="text-3xl">🪙</span>
         <span class="text-2xl font-bold text-amber-700">${{ ((child.allowanceBalanceCents || 0) / 100).toFixed(2) }}</span>
       </div>
-      <div
-        v-if="(child.marksCount || 0) > 0"
-        class="flex items-center justify-center w-11 h-11 rounded-full bg-red-500 text-white text-2xl font-bold"
-      >
-        {{ child.marksCount }}
-      </div>
-    </div>
 
-    <!-- Admin: marks controls + payout -->
-    <div v-if="isAdminMode" class="flex items-center gap-3 mt-1" @click.stop>
-      <div class="flex items-center gap-2 bg-red-50 rounded-full px-3 py-1">
-        <button
-          @click.stop="onMarkRemove"
-          :disabled="(child.marksCount || 0) === 0"
-          class="w-9 h-9 rounded-full bg-red-200 text-red-700 font-bold text-lg flex items-center justify-center disabled:opacity-40 cursor-pointer"
-        >−</button>
-        <span class="text-sm font-bold text-red-600 min-w-16 text-center">{{ child.marksCount || 0 }} mark{{ (child.marksCount || 0) === 1 ? '' : 's' }}</span>
-        <button
-          @click.stop="onMarkAdd"
-          class="w-9 h-9 rounded-full bg-red-200 text-red-700 font-bold text-lg flex items-center justify-center cursor-pointer"
-        >+</button>
+      <!-- Marks: minus (admin) + count + plus (admin) -->
+      <button
+        v-if="isAdminMode"
+        @click.stop="onMarkRemove"
+        :disabled="(child.marksCount || 0) === 0"
+        title="Remove mark"
+        class="w-9 h-9 rounded-full bg-red-200 text-red-700 font-bold text-lg flex items-center justify-center disabled:opacity-40 cursor-pointer shrink-0"
+      >−</button>
+      <div
+        v-if="(child.marksCount || 0) > 0 || isAdminMode"
+        class="flex items-center justify-center rounded-full text-white text-2xl font-bold shrink-0"
+        :class="[
+          (child.marksCount || 0) > 0 ? 'bg-red-500 w-11 h-11' : 'bg-red-300 w-9 h-9 text-lg',
+        ]"
+      >
+        {{ child.marksCount || 0 }}
       </div>
       <button
-        @click.stop="onPayoutClick"
-        class="text-sm font-bold text-green-600 bg-green-100 rounded-full px-3 py-1.5 hover:bg-green-200 cursor-pointer"
-      >Mark Paid</button>
+        v-if="isAdminMode"
+        @click.stop="onMarkAdd"
+        title="Add mark"
+        class="w-9 h-9 rounded-full bg-red-200 text-red-700 font-bold text-lg flex items-center justify-center cursor-pointer shrink-0"
+      >+</button>
     </div>
   </div>
 </template>
