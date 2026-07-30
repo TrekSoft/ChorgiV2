@@ -59,8 +59,9 @@ async function onDelete() {
 <template>
   <Teleport to="body">
     <div v-if="open" class="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
-      <div class="bg-white rounded-2xl shadow-xl p-6 w-full max-w-md flex flex-col gap-4 max-h-[90vh] overflow-y-auto">
-        <div class="flex items-center justify-between">
+      <div class="bg-white rounded-2xl shadow-xl w-full max-w-md flex flex-col max-h-[90vh] overflow-hidden">
+        <!-- dialog grows to fill available height; inner form handles scrolling -->
+        <div class="p-6 pb-0 flex items-center justify-between shrink-0">
           <h2 class="text-xl font-bold text-amber-900">{{ title }}</h2>
           <button
             v-if="item"
@@ -70,15 +71,17 @@ async function onDelete() {
             Delete
           </button>
         </div>
-        <ChoreForm
-          :kind="kind"
-          :initial="initial"
-          :children="children"
-          :rooms="rooms"
-          :saving="saving"
-          @submit="onSubmit"
-          @cancel="emit('close')"
-        />
+        <div class="px-6 pb-6 flex-1 min-h-0 flex flex-col overflow-hidden">
+          <ChoreForm
+            :kind="kind"
+            :initial="initial"
+            :children="children"
+            :rooms="rooms"
+            :saving="saving"
+            @submit="onSubmit"
+            @cancel="emit('close')"
+          />
+        </div>
       </div>
     </div>
   </Teleport>

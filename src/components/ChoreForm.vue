@@ -127,7 +127,8 @@ function submit() {
 </script>
 
 <template>
-  <form @submit.prevent="submit" class="flex flex-col gap-4">
+  <form @submit.prevent="submit" class="flex flex-col flex-1 min-h-0 gap-4">
+    <div class="flex flex-col gap-4 overflow-y-auto flex-1 min-h-0">
     <label class="flex flex-col gap-1">
       <span class="text-amber-800 font-medium">Name</span>
       <input
@@ -290,7 +291,8 @@ function submit() {
       />
     </label>
 
-    <div class="flex justify-end gap-2 pt-2">
+    </div>
+    <div class="flex justify-end gap-2 pt-3 shrink-0 border-t border-amber-100">
       <button
         type="button"
         @click="emit('cancel')"

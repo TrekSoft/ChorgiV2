@@ -21,6 +21,11 @@ export const member = ref(null)
 export const familyLoading = ref(true)
 export const needsOnboarding = ref(false)
 export const pendingInvite = ref(null)
+export const connectionError = ref(false)
+
+export function clearConnectionError() {
+  connectionError.value = false
+}
 
 export function waitForFamilyReady() {
   if (!familyLoading.value) return Promise.resolve()
@@ -47,7 +52,8 @@ function resetFamilyState() {
   member.value = null
   pendingInvite.value = null
   needsOnboarding.value = false
-  familyLoading.value = true
+  connectionError.value = false
+  familyLoading.value = false
 }
 
 function bindFamily(id) {
@@ -78,7 +84,7 @@ async function loadFamily(user) {
     needsOnboarding.value = true
   } catch (e) {
     console.error('Failed to load family for user', e)
-    needsOnboarding.value = true
+    connectionError.value = true
   } finally {
     if (!familyId.value) familyLoading.value = false
   }

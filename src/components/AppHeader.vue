@@ -1,9 +1,30 @@
 <script setup>
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import AvatarMenu from './AvatarMenu.vue'
+import PinDialog from './PinDialog.vue'
 import logo from '../assets/logo.png'
+import { isAdminMode, enterAdminMode, exitAdminMode } from '../composables/useAdminMode'
 
 const router = useRouter()
+const showPin = ref(false)
+
+function toggleAdmin() {
+  if (isAdminMode.value) {
+    exitAdminMode()
+  } else {
+    showPin.value = true
+  }
+}
+
+function onPinSuccess() {
+  showPin.value = false
+  enterAdminMode()
+}
+
+function onPinCancel() {
+  showPin.value = false
+}
 </script>
 
 <template>
@@ -12,6 +33,32 @@ const router = useRouter()
       <img :src="logo" alt="Chorgi" class="w-16 h-16" />
       <span class="text-3xl font-bold text-amber-900">Chorgi</span>
     </button>
-    <AvatarMenu />
+    <div class="flex items-center gap-3">
+      <button
+        @click="toggleAdmin"
+        class="flex items-center gap-2 cursor-pointer select-none"
+        role="switch"
+        :aria-checked="isAdminMode"
+        aria-label="Toggle admin mode"
+      >
+        <span class="text-sm font-bold" :class="isAdminMode ? 'text-amber-700' : 'text-amber-400'">Admin</span>
+        <span
+          class="relative w-12 h-7 rounded-full transition-colors duration-200"
+          :class="isAdminMode ? 'bg-amber-500' : 'bg-amber-200'"
+        >
+          <span
+            class="absolute top-0.5 left-0.5 w-6 h-6 rounded-full bg-white shadow transition-transform duration-200"
+            :class="isAdminMode ? 'translate-x-5' : ''"
+          ></span>
+        </span>
+      </button>
+      <AvatarMenu />
+    </div>
+    <PinDialog
+      :open="showPin"
+      title="Enter PIN"
+      @success="onPinSuccess"
+      @cancel="onPinCancel"
+    />
   </header>
 </template>

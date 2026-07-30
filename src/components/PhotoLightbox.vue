@@ -21,7 +21,7 @@ const emit = defineEmits(['close'])
       >
         ×
       </button>
-      <img :src="src" :alt="alt" class="w-full h-full object-contain rounded-xl" @click.stop />
+      <img :src="src" :alt="alt" class="max-w-full max-h-full object-contain rounded-xl" @click.stop />
     </div>
   </Teleport>
 </template>

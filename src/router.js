@@ -8,8 +8,9 @@ import ScheduleView from './views/ScheduleView.vue'
 import ReportsView from './views/ReportsView.vue'
 import ChildView from './views/ChildView.vue'
 import ComponentPreviewView from './views/ComponentPreviewView.vue'
+import ConnectionErrorView from './views/ConnectionErrorView.vue'
 import { currentUser, authReadyPromise } from './composables/useAuth'
-import { needsOnboarding, waitForFamilyReady } from './composables/useFamily'
+import { needsOnboarding, waitForFamilyReady, connectionError } from './composables/useFamily'
 
 const routes = [
   { path: '/', name: 'home', component: HomeView },
@@ -21,6 +22,7 @@ const routes = [
   { path: '/reports', name: 'reports', component: ReportsView },
   { path: '/child/:id', name: 'child', component: ChildView },
   { path: '/dev/components', name: 'dev-components', component: ComponentPreviewView },
+  { path: '/connection-error', name: 'connection-error', component: ConnectionErrorView },
 ]
 
 const router = createRouter({
@@ -31,8 +33,10 @@ const router = createRouter({
 router.beforeEach(async (to) => {
   await authReadyPromise
   if (to.path.startsWith('/auth')) return true
+  if (to.path === '/connection-error') return true
   if (!currentUser.value) return { path: '/auth' }
   await waitForFamilyReady()
+  if (connectionError.value && to.path !== '/connection-error') return { path: '/connection-error' }
   if (needsOnboarding.value && to.path !== '/onboarding') return { path: '/onboarding' }
   if (!needsOnboarding.value && to.path === '/onboarding') return { path: '/' }
   return true

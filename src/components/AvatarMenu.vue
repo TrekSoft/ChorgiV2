@@ -3,12 +3,10 @@ import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { member } from '../composables/useFamily'
 import { signOut } from '../composables/useAuth'
-import { isAdminMode, enterAdminMode, exitAdminMode } from '../composables/useAdminMode'
-import PinDialog from './PinDialog.vue'
+import { isAdminMode } from '../composables/useAdminMode'
 
 const router = useRouter()
 const menuOpen = ref(false)
-const pinAction = ref(null) // 'schedule' | 'admin' | 'settings' | 'reports' | 'signout' | null
 
 const initials = computed(() => {
   const name = member.value?.name || ''
@@ -26,24 +24,6 @@ function toggleMenu() {
 
 function closeMenu() {
   menuOpen.value = false
-}
-
-function toggleAdminMode() {
-  closeMenu()
-  if (isAdminMode.value) {
-    exitAdminMode()
-  } else {
-    pinAction.value = 'admin'
-  }
-}
-
-async function onPinSuccess() {
-  pinAction.value = null
-  enterAdminMode()
-}
-
-function onPinCancel() {
-  pinAction.value = null
 }
 
 function navigateTo(route) {
@@ -86,18 +66,6 @@ async function doSignOut() {
           Schedule
         </button>
         <button
-          @click="toggleAdminMode"
-          class="text-left px-6 py-4 hover:bg-amber-50 text-amber-900 font-medium flex items-center justify-between cursor-pointer"
-        >
-          <span>Admin mode</span>
-          <span
-            class="text-sm font-bold px-3 py-1 rounded-full"
-            :class="isAdminMode ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-600'"
-          >
-            {{ isAdminMode ? 'ON' : 'OFF' }}
-          </span>
-        </button>
-        <button
           @click="navigateTo('/settings')"
           :disabled="!isAdminMode"
           class="text-left px-6 py-4 font-medium"
@@ -126,11 +94,5 @@ async function doSignOut() {
       </div>
     </Teleport>
 
-    <PinDialog
-      :open="pinAction !== null"
-      title="Enter PIN"
-      @success="onPinSuccess"
-      @cancel="onPinCancel"
-    />
   </div>
 </template>
