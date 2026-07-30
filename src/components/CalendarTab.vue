@@ -9,12 +9,22 @@ import { cleaningDays } from '../composables/useCleaning'
 import ScheduleItem from './ScheduleItem.vue'
 import PhotoLightbox from './PhotoLightbox.vue'
 import ChoreFormDialog from './ChoreFormDialog.vue'
+import CleaningDayDialog from './CleaningDayDialog.vue'
 import EmptyState from './EmptyState.vue'
 
 const mode = ref('today') // 'today' | 'week'
 const anchor = ref(new Date())
 const filterChildId = ref(null)
 const lightboxSrc = ref(null)
+
+// --- cleaning day dialog ---
+const cleaningDialogOpen = ref(false)
+const cleaningDialogDate = ref(null)
+
+function openCleaningDialog(day) {
+  cleaningDialogDate.value = day
+  cleaningDialogOpen.value = true
+}
 
 const weekStartsOn = computed(() => family.value?.weekStartsOn ?? 0)
 
@@ -171,13 +181,16 @@ function openEdit(entry) {
             {{ format(day, 'EEE') }}
             <span class="font-medium text-amber-600">{{ format(day, 'MMM d') }}</span>
           </div>
-          <span
-            v-if="cleaningDays[format(day, 'yyyy-MM-dd')]"
-            class="text-xs font-bold uppercase tracking-wide text-sky-600 bg-sky-100 px-2 py-0.5 rounded-full"
-            title="Cleaning day"
+          <button
+            @click="openCleaningDialog(day)"
+            class="text-xs font-bold uppercase tracking-wide px-2 py-0.5 rounded-full cursor-pointer transition-colors"
+            :class="cleaningDays[format(day, 'yyyy-MM-dd')]
+              ? 'text-sky-600 bg-sky-100 hover:bg-sky-200'
+              : 'text-amber-400 bg-amber-50 hover:bg-amber-100 border border-dashed border-amber-300 normal-case font-medium'"
+            :title="cleaningDays[format(day, 'yyyy-MM-dd')] ? 'Edit cleaning day' : 'Mark as cleaning day'"
           >
-            🧹 cleaning
-          </span>
+            {{ cleaningDays[format(day, 'yyyy-MM-dd')] ? '🧹 cleaning' : '+ 🧹' }}
+          </button>
         </div>
 
         <ScheduleItem
@@ -223,5 +236,12 @@ function openEdit(entry) {
     />
 
     <PhotoLightbox :open="!!lightboxSrc" :src="lightboxSrc" @close="lightboxSrc = null" />
+
+    <CleaningDayDialog
+      :open="cleaningDialogOpen"
+      :date="cleaningDialogDate"
+      :initial-room-ids="cleaningDialogDate ? (cleaningDays[format(cleaningDialogDate, 'yyyy-MM-dd')]?.roomIds || []) : []"
+      @close="cleaningDialogOpen = false"
+    />
   </div>
 </template>
