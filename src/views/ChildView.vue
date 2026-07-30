@@ -216,7 +216,7 @@ async function onTaskUnclaim(task) {
       <div class="flex items-center gap-3">
         <button
           @click="router.push('/')"
-          class="w-10 h-10 rounded-full hover:bg-amber-100 text-amber-700 font-bold text-xl cursor-pointer"
+          class="w-14 h-14 rounded-full bg-white border-2 border-amber-200 hover:border-amber-400 text-amber-700 font-bold text-3xl cursor-pointer flex items-center justify-center shrink-0"
           aria-label="Back"
         >
           ‹
