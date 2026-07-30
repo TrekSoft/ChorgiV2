@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { daysUntilBirthday, isBirthdayToday } from '../lib/birthday'
 import { isAdminMode } from '../composables/useAdminMode'
@@ -34,15 +34,28 @@ function onMarkRemove(event) {
   removeMark(props.child.id)
 }
 
+const editingBalance = ref(false)
+const balanceInput = ref('')
+
 function onBalanceClick(event) {
   event.stopPropagation()
   if (!isAdminMode.value) return
-  const current = ((props.child.allowanceBalanceCents || 0) / 100).toFixed(2)
-  const input = prompt(`Set ${props.child.name}'s allowance balance ($):`, current)
-  if (input === null) return
-  const cents = Math.round(parseFloat(input) * 100)
-  if (isNaN(cents)) return
-  setAllowanceBalance(props.child.id, cents)
+  balanceInput.value = ((props.child.allowanceBalanceCents || 0) / 100).toFixed(2)
+  editingBalance.value = true
+}
+
+function saveBalance(event) {
+  event.stopPropagation()
+  const cents = Math.round(parseFloat(balanceInput.value) * 100)
+  if (!isNaN(cents)) {
+    setAllowanceBalance(props.child.id, cents)
+  }
+  editingBalance.value = false
+}
+
+function cancelBalance(event) {
+  event.stopPropagation()
+  editingBalance.value = false
 }
 
 function onPayoutClick(event) {
@@ -95,14 +108,37 @@ function onPayoutClick(event) {
         </svg>
       </button>
 
-      <!-- Allowance balance -->
+      <!-- Allowance balance (inline edit in admin mode) -->
       <div
+        v-if="!editingBalance"
         class="flex items-center gap-2 bg-amber-50 rounded-full px-5 py-2"
         :class="isAdminMode ? 'cursor-pointer hover:bg-amber-100' : ''"
         @click.stop="onBalanceClick"
       >
         <span class="text-3xl">🪙</span>
         <span class="text-2xl font-bold text-amber-700">${{ ((child.allowanceBalanceCents || 0) / 100).toFixed(2) }}</span>
+      </div>
+      <div v-else class="flex items-center gap-1 bg-amber-50 rounded-full px-3 py-1">
+        <span class="text-2xl font-bold text-amber-500">$</span>
+        <input
+          v-model="balanceInput"
+          type="number"
+          min="0"
+          step="0.01"
+          @click.stop
+          @keydown.enter="saveBalance"
+          @keydown.escape="cancelBalance"
+          class="w-20 text-2xl font-bold text-amber-700 bg-transparent border-b-2 border-amber-300 focus:outline-none focus:border-amber-500 text-center"
+          autofocus
+        />
+        <button
+          @click.stop="saveBalance"
+          class="w-8 h-8 rounded-full bg-green-200 text-green-700 font-bold flex items-center justify-center cursor-pointer shrink-0 ml-1"
+        >✓</button>
+        <button
+          @click.stop="cancelBalance"
+          class="w-8 h-8 rounded-full bg-amber-200 text-amber-700 font-bold flex items-center justify-center cursor-pointer shrink-0"
+        >✕</button>
       </div>
 
       <!-- Marks: minus (admin) + count + plus (admin) -->
