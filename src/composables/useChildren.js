@@ -27,7 +27,7 @@ watch(
       return
     }
     childrenLoading.value = true
-    const q = query(collection(db, 'families', id, 'children'), orderBy('order', 'asc'))
+    const q = query(collection(db, 'families', id, 'children'), orderBy('birthdate', 'asc'))
     unsubscribe = onSnapshot(q, (snap) => {
       children.value = snap.docs.map((d) => ({ id: d.id, ...d.data() }))
       childrenLoading.value = false
