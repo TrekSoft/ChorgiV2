@@ -270,7 +270,7 @@ const reportData = computed(() => {
             <span
               class="w-6 h-6 rounded-full flex items-center justify-center text-sm font-bold shrink-0"
               :class="entry.completed ? 'bg-green-500 text-white' : entry.missed ? 'bg-red-600 text-white' : 'border-2 border-amber-300 text-transparent'"
-            >✓</span>
+            >{{ entry.missed ? '✕' : '✓' }}</span>
             <span class="font-medium text-amber-900 flex-1">{{ entry.name }}</span>
             <span v-if="entry.late" class="text-xs font-bold text-orange-600 bg-orange-100 rounded-full px-2 py-0.5">late</span>
             <span v-else-if="entry.overdue" class="text-xs font-bold text-red-600 bg-red-100 rounded-full px-2 py-0.5">overdue</span>
