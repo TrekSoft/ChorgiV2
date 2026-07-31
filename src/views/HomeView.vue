@@ -27,7 +27,7 @@ function closeDialog() {
 </script>
 
 <template>
-  <div class="min-h-screen bg-amber-50">
+  <div class="page-bg">
     <AppHeader />
     <main class="p-4 sm:p-6">
       <EmptyState

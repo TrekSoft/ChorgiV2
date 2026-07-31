@@ -14,13 +14,15 @@ import {
   claimIdFor,
 } from '../composables/useCompletions'
 import { occursOn, deadlineFor, startsAt } from '../lib/recurrence'
+import { CHORE_KIND, WEEK_START_SUNDAY } from '../lib/constants'
+import { DATE_FORMAT, formatCents } from '../lib/format'
 
-const weekStartsOn = computed(() => family.value?.weekStartsOn ?? 0)
+const weekStartsOn = computed(() => family.value?.weekStartsOn ?? WEEK_START_SUNDAY)
 const now = new Date()
 const selectedDate = ref(now)
 
-const selectedDateStr = computed(() => format(selectedDate.value, 'yyyy-MM-dd'))
-const isToday = computed(() => selectedDateStr.value === format(now, 'yyyy-MM-dd'))
+const selectedDateStr = computed(() => format(selectedDate.value, DATE_FORMAT))
+const isToday = computed(() => selectedDateStr.value === format(now, DATE_FORMAT))
 const isFuture = computed(() => selectedDate.value > now)
 
 function prevDay() {
@@ -75,14 +77,14 @@ const reportData = computed(() => {
           id: chore.id,
           name: chore.name,
           iconName: chore.iconName,
-          kind: 'chore',
+          kind: CHORE_KIND.CHORE,
           completed,
           late,
           overdue,
           missed,
           bonusCents: chore.bonusCents || null,
           deadline,
-          isWeekly: chore.kind === 'recurring' && chore.weekly,
+          isWeekly: chore.kind === CHORE_KIND.RECURRING && chore.weekly,
         }
       })
       .filter((e) => {
@@ -99,7 +101,7 @@ const reportData = computed(() => {
 
     // --- Claimable one-off chores ---
     const claimableOneoffs = chores.value.filter((chore) => {
-      if (chore.kind !== 'oneoff') return false
+      if (chore.kind !== CHORE_KIND.ONEOFF) return false
       if (chore.active === false) return false
       if ((chore.assigneeIds || []).length > 0) return false
       if (chore.date !== dateStr) return false
@@ -115,7 +117,7 @@ const reportData = computed(() => {
           id: chore.id,
           name: chore.name,
           iconName: chore.iconName,
-          kind: 'oneoff',
+          kind: CHORE_KIND.ONEOFF,
           claimed: !!claim,
           claimedByMe: isMine,
           claimedByName: claim ? childName(claim.childId) : null,
@@ -130,7 +132,7 @@ const reportData = computed(() => {
     const roomIds = day?.roomIds || []
     const cleaningTasks = roomIds.flatMap((roomId) =>
       tasks.value
-        .filter((t) => t.kind === 'cleaning' && t.roomId === roomId)
+        .filter((t) => t.kind === CHORE_KIND.CLEANING && t.roomId === roomId)
         .map((task) => {
           const room = rooms.value.find((r) => r.id === roomId)
           const claimId = claimIdFor(task, dateStr)
@@ -141,7 +143,7 @@ const reportData = computed(() => {
               id: task.id,
               name: task.name,
               iconName: task.iconName,
-              kind: 'cleaning',
+              kind: CHORE_KIND.CLEANING,
               roomName: room?.name || '',
               claimed: true,
               claimedByMe: task.assigneeId === child.id,
@@ -154,7 +156,7 @@ const reportData = computed(() => {
             id: task.id,
             name: task.name,
             iconName: task.iconName,
-            kind: 'cleaning',
+            kind: CHORE_KIND.CLEANING,
             roomName: room?.name || '',
             claimed: !!claim,
             claimedByMe: isMine,
@@ -193,7 +195,7 @@ const reportData = computed(() => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-amber-50">
+  <div class="page-bg">
     <AppHeader />
     <main class="p-4 sm:p-6 flex flex-col gap-4">
       <!-- Date selector -->
@@ -255,8 +257,8 @@ const reportData = computed(() => {
             <span v-if="report.missedCount > 0" class="text-sm font-bold text-red-700 bg-red-200 rounded-full px-3 py-1">
               {{ report.missedCount }} missed
             </span>
-            <span v-if="report.bonusEarned > 0" class="text-sm font-bold text-amber-700 bg-amber-100 rounded-full px-3 py-1">
-              + ${{ (report.bonusEarned / 100).toFixed(2) }}
+            <span v-if="report.bonusEarned > 0" class="badge-sm text-amber-700 bg-amber-100">
+              + ${{ formatCents(report.bonusEarned) }}
             </span>
           </div>
         </div>
@@ -274,8 +276,8 @@ const reportData = computed(() => {
             <span v-else-if="entry.overdue" class="text-xs font-bold text-red-600 bg-red-100 rounded-full px-2 py-0.5">overdue</span>
             <span v-else-if="entry.missed" class="text-xs font-bold text-red-700 bg-red-200 rounded-full px-2 py-0.5">missed</span>
             <span v-else-if="entry.completed" class="text-xs font-bold text-green-600 bg-green-100 rounded-full px-2 py-0.5">done</span>
-            <span v-if="entry.bonusCents" class="text-xs font-bold text-amber-700 bg-amber-100 rounded-full px-2 py-0.5">
-              + ${{ (entry.bonusCents / 100).toFixed(2) }}
+            <span v-if="entry.bonusCents" class="badge-sm text-amber-700 bg-amber-100">
+              + ${{ formatCents(entry.bonusCents) }}
             </span>
           </div>
         </div>
@@ -293,8 +295,8 @@ const reportData = computed(() => {
             <span v-else-if="!entry.claimedByMe" class="text-xs font-bold text-stone-500 bg-stone-100 rounded-full px-2 py-0.5">{{ entry.claimedByName }}</span>
             <span v-else-if="entry.completed" class="text-xs font-bold text-green-600 bg-green-100 rounded-full px-2 py-0.5">done</span>
             <span v-else class="text-xs font-bold text-amber-600 bg-amber-100 rounded-full px-2 py-0.5">claimed</span>
-            <span v-if="entry.bonusCents" class="text-xs font-bold text-amber-700 bg-amber-100 rounded-full px-2 py-0.5">
-              + ${{ (entry.bonusCents / 100).toFixed(2) }}
+            <span v-if="entry.bonusCents" class="badge-sm text-amber-700 bg-amber-100">
+              + ${{ formatCents(entry.bonusCents) }}
             </span>
           </div>
         </div>
@@ -315,8 +317,8 @@ const reportData = computed(() => {
             <span v-else-if="!entry.claimedByMe" class="text-xs font-bold text-stone-500 bg-stone-100 rounded-full px-2 py-0.5">{{ entry.claimedByName }}</span>
             <span v-else-if="entry.completed" class="text-xs font-bold text-green-600 bg-green-100 rounded-full px-2 py-0.5">done</span>
             <span v-else class="text-xs font-bold text-amber-600 bg-amber-100 rounded-full px-2 py-0.5">claimed</span>
-            <span v-if="entry.bonusCents" class="text-xs font-bold text-amber-700 bg-amber-100 rounded-full px-2 py-0.5">
-              + ${{ (entry.bonusCents / 100).toFixed(2) }}
+            <span v-if="entry.bonusCents" class="badge-sm text-amber-700 bg-amber-100">
+              + ${{ formatCents(entry.bonusCents) }}
             </span>
           </div>
         </div>

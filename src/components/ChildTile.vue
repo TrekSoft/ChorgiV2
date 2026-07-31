@@ -1,9 +1,11 @@
 <script setup>
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { Icon } from '@iconify/vue'
 import { daysUntilBirthday, isBirthdayToday } from '../lib/birthday'
 import { isAdminMode } from '../composables/useAdminMode'
 import { addMark, removeMark, setAllowanceBalance, payoutChild } from '../composables/useAllowance'
+import { formatCents, dollarsToCents } from '../lib/format'
 import Tooltip from './Tooltip.vue'
 
 const props = defineProps({
@@ -41,13 +43,13 @@ const balanceInput = ref('')
 function onBalanceClick(event) {
   event.stopPropagation()
   if (!isAdminMode.value) return
-  balanceInput.value = ((props.child.allowanceBalanceCents || 0) / 100).toFixed(2)
+  balanceInput.value = formatCents(props.child.allowanceBalanceCents)
   editingBalance.value = true
 }
 
 function saveBalance(event) {
   event.stopPropagation()
-  const cents = Math.round(parseFloat(balanceInput.value) * 100)
+  const cents = dollarsToCents(balanceInput.value)
   if (!isNaN(cents)) {
     setAllowanceBalance(props.child.id, cents)
   }
@@ -105,10 +107,7 @@ function onPayoutClick(event) {
           @click.stop="onPayoutClick"
           class="w-11 h-11 rounded-full bg-green-100 hover:bg-green-200 text-green-600 flex items-center justify-center cursor-pointer shrink-0"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="12" y1="2" x2="12" y2="22"/>
-            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-          </svg>
+          <Icon icon="mdi:currency-usd" class="w-6 h-6" />
         </button>
       </Tooltip>
 
@@ -120,7 +119,7 @@ function onPayoutClick(event) {
         @click.stop="onBalanceClick"
       >
         <span class="text-3xl">🪙</span>
-        <span class="text-2xl font-bold text-amber-700">${{ ((child.allowanceBalanceCents || 0) / 100).toFixed(2) }}</span>
+        <span class="text-2xl font-bold text-amber-700">${{ formatCents(child.allowanceBalanceCents) }}</span>
       </div>
       <div v-else class="flex items-center gap-1 bg-amber-50 rounded-full px-3 py-1">
         <span class="text-2xl font-bold text-amber-500">$</span>

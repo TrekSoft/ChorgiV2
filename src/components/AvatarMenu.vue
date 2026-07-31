@@ -1,6 +1,7 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { Icon } from '@iconify/vue'
 import { member } from '../composables/useFamily'
 import { signOut } from '../composables/useAuth'
 import { isAdminMode } from '../composables/useAdminMode'
@@ -60,34 +61,38 @@ async function doSignOut() {
         <button
           @click="navigateTo('/schedule')"
           :disabled="!isAdminMode"
-          class="text-left px-6 py-4 font-medium"
+          class="text-left px-6 py-4 font-medium flex items-center gap-3"
           :class="isAdminMode ? 'hover:bg-amber-50 text-amber-900 cursor-pointer' : 'text-gray-300 cursor-not-allowed'"
         >
+          <Icon icon="mdi:calendar-month" class="w-5 h-5" />
           Schedule
         </button>
         <button
           @click="navigateTo('/settings')"
           :disabled="!isAdminMode"
-          class="text-left px-6 py-4 font-medium"
+          class="text-left px-6 py-4 font-medium flex items-center gap-3"
           :class="isAdminMode ? 'hover:bg-amber-50 text-amber-900 cursor-pointer' : 'text-gray-300 cursor-not-allowed'"
         >
+          <Icon icon="mdi:cog" class="w-5 h-5" />
           Settings
         </button>
         <button
           @click="navigateTo('/reports')"
           :disabled="!isAdminMode"
-          class="text-left px-6 py-4 font-medium"
+          class="text-left px-6 py-4 font-medium flex items-center gap-3"
           :class="isAdminMode ? 'hover:bg-amber-50 text-amber-900 cursor-pointer' : 'text-gray-300 cursor-not-allowed'"
         >
+          <Icon icon="mdi:chart-box" class="w-5 h-5" />
           Reports
         </button>
         <hr class="my-2 border-amber-100" />
         <button
           @click="doSignOut"
           :disabled="!isAdminMode"
-          class="text-left px-6 py-4 font-medium"
+          class="text-left px-6 py-4 font-medium flex items-center gap-3"
           :class="isAdminMode ? 'hover:bg-amber-50 text-red-600 cursor-pointer' : 'text-gray-300 cursor-not-allowed'"
         >
+          <Icon icon="mdi:logout" class="w-5 h-5" />
           Sign out
         </button>
         </div>

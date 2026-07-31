@@ -52,8 +52,8 @@ async function submit() {
 
 <template>
   <Teleport to="body">
-    <div v-if="open" class="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
-      <div class="bg-white rounded-2xl shadow-xl p-8 w-full max-w-xs flex flex-col items-center gap-6">
+    <div v-if="open" class="dialog-overlay">
+      <div class="dialog-container p-8 w-full max-w-xs flex flex-col items-center gap-6">
         <h2 class="text-xl font-bold text-amber-900">{{ title }}</h2>
         <div class="flex gap-3">
           <input

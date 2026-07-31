@@ -4,7 +4,8 @@ import { db } from '../lib/firebase'
 import { familyId, family } from './useFamily'
 import { children } from './useChildren'
 
-const DEFAULT_MARK_PENALTY_CENTS = 50
+import { DEFAULT_MARK_PENALTY_CENTS } from '../lib/constants'
+import { DATE_FORMAT } from '../lib/format'
 
 export function markPenaltyCents() {
   return family.value?.markPenaltyCents ?? DEFAULT_MARK_PENALTY_CENTS
@@ -24,7 +25,7 @@ export async function updateMarkPenaltyCents(cents) {
 export async function accrueDailyAllowance() {
   if (!familyId.value || children.value.length === 0) return
 
-  const todayStr = format(new Date(), 'yyyy-MM-dd')
+  const todayStr = format(new Date(), DATE_FORMAT)
 
   for (const child of children.value) {
     const lastDate = child.allowanceLastAccruedDate

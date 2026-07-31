@@ -23,8 +23,8 @@ async function submit() {
 </script>
 
 <template>
-  <main class="min-h-screen bg-amber-50 flex items-center justify-center p-6">
-    <div class="bg-white rounded-2xl shadow-lg p-8 w-full max-w-sm flex flex-col items-center gap-6">
+  <main class="page-bg flex items-center justify-center p-6">
+    <div class="card-base p-8 w-full max-w-sm flex flex-col items-center gap-6">
       <img :src="logo" alt="Chorgi logo" class="w-32 h-32" />
       <h1 class="text-4xl font-bold text-amber-900">Chorgi</h1>
 
@@ -38,17 +38,17 @@ async function submit() {
             type="email"
             required
             placeholder="you@example.com"
-            class="w-full border-2 border-amber-200 rounded-xl px-4 py-3 text-lg focus:outline-none focus:border-amber-500"
+            class="input-field text-lg"
           />
           <button
             type="submit"
             :disabled="sending"
-            class="w-full bg-amber-500 hover:bg-amber-600 text-white text-lg font-bold py-3 rounded-xl disabled:opacity-50"
+            class="btn-primary w-full text-lg py-3"
           >
             {{ sending ? 'Sending…' : 'Email me a sign-in link' }}
           </button>
         </form>
-        <p v-if="error" class="text-red-500 text-sm text-center">{{ error }}</p>
+        <p v-if="error" class="text-error text-sm text-center">{{ error }}</p>
       </template>
 
       <template v-else>

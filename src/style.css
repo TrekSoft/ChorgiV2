@@ -1,1 +1,114 @@
 @import 'tailwindcss';
+
+@layer components {
+  /* Buttons */
+  .btn-primary {
+    @apply bg-amber-500 hover:bg-amber-600 text-white font-bold py-2 px-5 rounded-xl disabled:opacity-50 cursor-pointer;
+  }
+
+  .btn-primary-lg {
+    @apply bg-amber-500 hover:bg-amber-600 text-white text-lg font-bold py-3 rounded-xl disabled:opacity-50 cursor-pointer;
+  }
+
+  .btn-cancel {
+    @apply text-amber-700 font-medium py-2 px-4 rounded-xl hover:bg-amber-50 cursor-pointer;
+  }
+
+  .btn-danger-text {
+    @apply text-red-500 font-medium text-sm hover:underline cursor-pointer;
+  }
+
+  /* Inputs */
+  .input-field {
+    @apply border-2 border-amber-200 rounded-xl px-4 py-3 focus:outline-none focus:border-amber-500;
+  }
+
+  .input-field-lg {
+    @apply border-2 border-amber-200 rounded-xl px-4 py-3 text-lg focus:outline-none focus:border-amber-500;
+  }
+
+  /* Labels */
+  .form-label {
+    @apply text-amber-800 font-medium;
+  }
+
+  .form-hint {
+    @apply text-amber-500 font-normal text-sm;
+  }
+
+  /* Headings */
+  .heading-page {
+    @apply text-2xl font-bold text-amber-900;
+  }
+
+  .heading-section {
+    @apply text-lg font-bold text-amber-800;
+  }
+
+  /* Layout */
+  .page-bg {
+    @apply min-h-screen bg-amber-50;
+  }
+
+  .card {
+    @apply bg-white rounded-2xl border-2 border-amber-200;
+  }
+
+  .card-shadow {
+    @apply bg-white rounded-2xl shadow;
+  }
+
+  /* Dialog */
+  .dialog-overlay {
+    @apply fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4;
+  }
+
+  .dialog-container {
+    @apply bg-white rounded-2xl shadow-xl;
+  }
+
+  /* Pill toggle (assignee chips, filter buttons, weekday buttons) */
+  .pill {
+    @apply px-4 py-2 rounded-full border-2 font-medium cursor-pointer transition-colors;
+  }
+
+  .pill-selected {
+    @apply border-amber-500 bg-amber-100 text-amber-800;
+  }
+
+  .pill-unselected {
+    @apply border-amber-200 text-amber-600 hover:bg-amber-50;
+  }
+
+  /* Badge (status chips: one-off, late, weekly, claimable, bonus) */
+  .badge {
+    @apply text-xs font-bold uppercase tracking-wide px-2 py-0.5 rounded-full;
+  }
+
+  .badge-sm {
+    @apply text-[10px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded-full;
+  }
+
+  /* Avatar */
+  .avatar {
+    @apply rounded-full object-cover border-2 border-amber-200;
+  }
+
+  .avatar-placeholder {
+    @apply rounded-full bg-amber-100 flex items-center justify-center font-bold text-amber-500;
+  }
+
+  /* Feedback text */
+  .text-success {
+    @apply text-green-600 text-sm font-medium;
+  }
+
+  .text-error {
+    @apply text-red-500 text-sm;
+  }
+
+  /* Photo upload drop zone */
+  .drop-zone {
+    @apply border-2 border-dashed rounded-2xl cursor-pointer transition-colors;
+  }
+}

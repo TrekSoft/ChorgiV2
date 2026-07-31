@@ -8,13 +8,15 @@ import {
   deleteDoc,
   serverTimestamp,
   increment,
+  writeBatch,
 } from 'firebase/firestore'
 import { db } from '../lib/firebase'
 import { familyId } from './useFamily'
 import { periodKeyFor, deadlineFor } from '../lib/recurrence'
+import { WEEK_START_SUNDAY } from '../lib/constants'
 
 export const completions = ref({}) // map `${periodKey}_${choreId}_${childId}` -> data
-export const claims = ref({}) // map `${yyyy-MM-dd}_${taskId}` -> data
+export const claims = ref({}) // map `${dateStr}_${taskId}` -> data
 export const completionsLoading = ref(true)
 
 let unsubscribeCompletions = null
@@ -59,7 +61,7 @@ watch(
   { immediate: true },
 )
 
-export function completionIdFor(chore, childId, date, weekStartsOn = 0) {
+export function completionIdFor(chore, childId, date, weekStartsOn = WEEK_START_SUNDAY) {
   return `${periodKeyFor(chore, date, weekStartsOn)}_${chore.id}_${childId}`
 }
 
@@ -67,7 +69,7 @@ export function claimIdFor(task, dateStr) {
   return `${dateStr}_${task.id}`
 }
 
-export async function completeChore(chore, childId, date, weekStartsOn = 0) {
+export async function completeChore(chore, childId, date, weekStartsOn = WEEK_START_SUNDAY) {
   const id = completionIdFor(chore, childId, date, weekStartsOn)
   const late = new Date() > deadlineFor(chore, date, weekStartsOn)
   await setDoc(doc(db, 'families', familyId.value, 'completions', id), {
@@ -81,7 +83,7 @@ export async function completeChore(chore, childId, date, weekStartsOn = 0) {
   }
 }
 
-export async function uncompleteChore(chore, childId, date, weekStartsOn = 0) {
+export async function uncompleteChore(chore, childId, date, weekStartsOn = WEEK_START_SUNDAY) {
   const id = completionIdFor(chore, childId, date, weekStartsOn)
   const wasCompleted = !!completions.value[id]
   await deleteDoc(doc(db, 'families', familyId.value, 'completions', id))
@@ -129,7 +131,22 @@ export async function uncompleteClaim(task, dateStr) {
 }
 
 export async function unclaimTask(task, dateStr) {
-  // if the claim was completed with a bonus, reverse the bonus first
-  await uncompleteClaim(task, dateStr)
-  await deleteDoc(doc(db, 'families', familyId.value, 'claims', claimIdFor(task, dateStr)))
+  const claim = claims.value[claimIdFor(task, dateStr)]
+  if (!claim) return
+  const batch = writeBatch(db)
+  const claimRef = doc(db, 'families', familyId.value, 'claims', claimIdFor(task, dateStr))
+  // if the claim was completed with a bonus, reverse the bonus in the same batch
+  if (claim.completed) {
+    batch.update(claimRef, { completed: false, completedAt: null })
+    if (task.bonusCents) {
+      batch.update(doc(db, 'families', familyId.value, 'children', claim.childId), {
+        allowanceBalanceCents: increment(-task.bonusCents),
+      })
+    }
+    await batch.commit()
+    // now delete in a second step (batch doesn't support mixed update + delete on same doc)
+    await deleteDoc(claimRef)
+  } else {
+    await deleteDoc(claimRef)
+  }
 }

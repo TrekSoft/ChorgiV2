@@ -2,7 +2,10 @@
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { format } from 'date-fns'
+import { Icon } from '@iconify/vue'
 import { occursOn, deadlineFor, startsAt } from '../lib/recurrence'
+import { CHORE_KIND, CARD_VARIANT, CONFETTI_MODE, NOW_TICK_INTERVAL_MS, TOAST_DURATION_MS, WEEK_START_SUNDAY } from '../lib/constants'
+import { DATE_FORMAT, formatCents } from '../lib/format'
 import { family } from '../composables/useFamily'
 import { children } from '../composables/useChildren'
 import { chores } from '../composables/useChores'
@@ -31,14 +34,14 @@ const route = useRoute()
 const router = useRouter()
 const child = computed(() => children.value.find((c) => c.id === route.params.id))
 
-const weekStartsOn = computed(() => family.value?.weekStartsOn ?? 0)
+const weekStartsOn = computed(() => family.value?.weekStartsOn ?? WEEK_START_SUNDAY)
 
 const now = ref(new Date())
 let nowTimer = null
 onMounted(() => {
   nowTimer = setInterval(() => {
     now.value = new Date()
-  }, 15_000)
+  }, NOW_TICK_INTERVAL_MS)
 })
 onUnmounted(() => clearInterval(nowTimer))
 
@@ -46,7 +49,7 @@ watch(() => route.params.id, () => {
   initialOrder = []
 })
 
-const todayStr = computed(() => format(now.value, 'yyyy-MM-dd'))
+const todayStr = computed(() => format(now.value, DATE_FORMAT))
 
 const burst = ref(null)
 const toast = ref(null)
@@ -56,7 +59,7 @@ function showToast(message) {
   clearTimeout(toastTimer)
   toastTimer = setTimeout(() => {
     toast.value = null
-  }, 3000)
+  }, TOAST_DURATION_MS)
 }
 
 const lightboxSrc = ref(null)
@@ -113,10 +116,10 @@ async function toggleChore(entry) {
     await completeChore(entry.chore, child.value.id, now.value, weekStartsOn.value)
     completedThisSession = true
     if (entry.chore.bonusCents) {
-      burst.value?.fire('coins')
-      showToast(`+ $${(entry.chore.bonusCents / 100).toFixed(2)} bonus!`)
+      burst.value?.fire(CONFETTI_MODE.COINS)
+      showToast(`+ $${formatCents(entry.chore.bonusCents)} bonus!`)
     } else {
-      burst.value?.fire('confetti')
+      burst.value?.fire(CONFETTI_MODE.CONFETTI)
     }
   }
 }
@@ -125,7 +128,7 @@ const allAssignedDone = computed(
   () => assigned.value.length > 0 && assigned.value.every((e) => e.completed),
 )
 watch(allAssignedDone, (done) => {
-  if (done && completedThisSession) burst.value?.fire('fireworks')
+  if (done && completedThisSession) burst.value?.fire(CONFETTI_MODE.FIREWORKS)
 })
 
 // --- right pane: claimable tasks ---
@@ -141,7 +144,7 @@ function claimChild(claim) {
 const claimableChores = computed(() =>
   chores.value.filter(
     (c) =>
-      c.kind === 'oneoff' &&
+      c.kind === CHORE_KIND.ONEOFF &&
       c.active !== false &&
       (c.assigneeIds || []).length === 0 &&
       c.date === todayStr.value,
@@ -154,7 +157,7 @@ const cleaningSections = computed(() => {
   return (day.roomIds || [])
     .map((roomId) => ({
       room: rooms.value.find((r) => r.id === roomId),
-      tasks: tasks.value.filter((t) => t.kind === 'cleaning' && t.roomId === roomId),
+      tasks: tasks.value.filter((t) => t.kind === CHORE_KIND.CLEANING && t.roomId === roomId),
     }))
     .filter((s) => s.room && s.tasks.length > 0)
 })
@@ -219,14 +222,14 @@ async function onTaskTap(task) {
     if (!claim) {
       await claimTask(task, child.value.id, todayStr.value)
       await completeClaim(task, todayStr.value)
-      burst.value?.fire('confetti')
+      burst.value?.fire(CONFETTI_MODE.CONFETTI)
       return
     }
     if (claim.completed) {
       await uncompleteClaim(task, todayStr.value)
     } else {
       await completeClaim(task, todayStr.value)
-      burst.value?.fire('confetti')
+      burst.value?.fire(CONFETTI_MODE.CONFETTI)
     }
     return
   }
@@ -242,10 +245,10 @@ async function onTaskTap(task) {
     } else {
       await completeClaim(task, todayStr.value)
       if (task.bonusCents) {
-        burst.value?.fire('coins')
-        showToast(`+ $${(task.bonusCents / 100).toFixed(2)} bonus!`)
+        burst.value?.fire(CONFETTI_MODE.COINS)
+        showToast(`+ $${formatCents(task.bonusCents)} bonus!`)
       } else {
-        burst.value?.fire('confetti')
+        burst.value?.fire(CONFETTI_MODE.CONFETTI)
       }
     }
     return
@@ -275,7 +278,7 @@ async function onTaskUnclaim(task) {
 </script>
 
 <template>
-  <div class="min-h-screen bg-amber-50">
+  <div class="page-bg">
     <AppHeader />
     <main class="max-w-6xl mx-auto p-4 sm:p-6 flex flex-col gap-4">
       <div class="flex items-center gap-3">
@@ -284,9 +287,7 @@ async function onTaskUnclaim(task) {
           class="w-14 h-14 rounded-full bg-white border-2 border-amber-200 hover:border-amber-400 text-amber-700 cursor-pointer flex items-center justify-center shrink-0"
           aria-label="Back"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="15 18 9 12 15 6" />
-          </svg>
+          <Icon icon="mdi:chevron-left" class="w-7 h-7" />
         </button>
         <img
           v-if="child?.photoURL"
@@ -294,13 +295,13 @@ async function onTaskUnclaim(task) {
           alt=""
           class="w-12 h-12 rounded-full object-cover border-2 border-amber-200"
         />
-        <h1 class="text-2xl font-bold text-amber-900">{{ child?.name || 'Loading…' }}</h1>
+        <h1 class="heading-page">{{ child?.name || 'Loading…' }}</h1>
       </div>
 
       <div class="grid gap-6 lg:grid-cols-2">
         <!-- left: assigned chores -->
         <section class="flex flex-col gap-3">
-          <h2 class="text-lg font-bold text-amber-800">My chores</h2>
+          <h2 class="heading-section">My chores</h2>
           <EmptyState
             v-if="assigned.length === 0"
             title="No chores right now"
@@ -316,9 +317,9 @@ async function onTaskUnclaim(task) {
             :completed="entry.completed"
             :late="entry.late"
             :overdue="entry.overdue"
-            :oneoff="entry.chore.kind === 'oneoff'"
+            :oneoff="entry.chore.kind === CHORE_KIND.ONEOFF"
             :bonus-cents="entry.chore.bonusCents || null"
-            variant="chore"
+            :variant="CARD_VARIANT.CHORE"
             @toggle="toggleChore(entry)"
             @photo-click="lightboxSrc = entry.chore.photoURL"
           />
@@ -327,7 +328,7 @@ async function onTaskUnclaim(task) {
         <!-- right: claimable tasks -->
         <section class="flex flex-col gap-6">
           <div v-if="claimableChores.length > 0" class="flex flex-col gap-3">
-            <h2 class="text-lg font-bold text-amber-800">Extra chores</h2>
+            <h2 class="heading-section">Extra chores</h2>
             <ChoreCard
               v-for="task in claimableChores"
               :key="task.id"
@@ -336,7 +337,7 @@ async function onTaskUnclaim(task) {
               :photo-url="task.photoURL"
               :bonus-cents="task.bonusCents || null"
               oneoff
-              variant="task"
+              :variant="CARD_VARIANT.TASK"
               v-bind="taskCardProps(task)"
               :can-unassign="canUnclaim(task)"
               :unassign-label="unclaimLabel(task)"
@@ -354,7 +355,7 @@ async function onTaskUnclaim(task) {
               :name="task.name"
               :icon-name="task.iconName"
               :photo-url="task.photoURL"
-              variant="task"
+              :variant="CARD_VARIANT.TASK"
               v-bind="taskCardProps(task)"
               :can-unassign="canUnclaim(task)"
               :unassign-label="unclaimLabel(task)"

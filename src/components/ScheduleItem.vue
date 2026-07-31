@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { Icon } from '@iconify/vue'
 import { format, parse } from 'date-fns'
+import { formatCents } from '../lib/format'
 
 const props = defineProps({
   name: { type: String, required: true },
@@ -60,27 +61,27 @@ const timeLabel = computed(() => {
     <div class="flex-1 min-w-0">
       <div class="flex items-center gap-1.5 flex-wrap">
         <span class="font-bold text-amber-900 text-sm truncate">{{ name }}</span>
-        <span v-if="oneoff" class="text-[10px] font-bold uppercase tracking-wide text-purple-500 bg-purple-100 px-1.5 py-0.5 rounded-full">
+        <span v-if="oneoff" class="badge-sm text-purple-500 bg-purple-100">
           one-off
         </span>
-        <span v-if="weekly" class="text-[10px] font-bold uppercase tracking-wide text-teal-600 bg-teal-100 px-1.5 py-0.5 rounded-full">
+        <span v-if="weekly" class="badge-sm text-teal-600 bg-teal-100">
           weekly
         </span>
-        <span v-if="bonusCents" class="text-[10px] font-bold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded-full">
-          + ${{ (bonusCents / 100).toFixed(2) }}
+        <span v-if="bonusCents" class="badge-sm text-amber-700 bg-amber-100">
+          + ${{ formatCents(bonusCents) }}
         </span>
       </div>
       <div v-if="timeLabel" class="text-xs text-amber-600">{{ timeLabel }}</div>
       <div class="flex items-center gap-1 mt-0.5 flex-wrap">
         <span
           v-if="claimable"
-          class="text-[10px] font-bold uppercase tracking-wide text-sky-600 bg-sky-100 px-1.5 py-0.5 rounded-full"
+          class="badge-sm text-sky-600 bg-sky-100"
         >
           Claimable
         </span>
         <span
           v-else-if="assignedToAll"
-          class="text-[10px] font-bold uppercase tracking-wide text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded-full"
+          class="badge-sm text-amber-700 bg-amber-100"
         >
           All
         </span>

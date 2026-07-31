@@ -1,6 +1,7 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { differenceInSeconds, differenceInMinutes, differenceInHours, differenceInDays } from 'date-fns'
+import { COUNTDOWN_TICK_INTERVAL_MS } from '../lib/constants'
 
 const props = defineProps({
   deadline: { type: Date, required: true },
@@ -15,7 +16,7 @@ let timer = null
 onMounted(() => {
   timer = setInterval(() => {
     now.value = new Date()
-  }, 30_000)
+  }, COUNTDOWN_TICK_INTERVAL_MS)
 })
 onUnmounted(() => clearInterval(timer))
 

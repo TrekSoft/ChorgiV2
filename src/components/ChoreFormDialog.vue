@@ -5,29 +5,22 @@ import { children } from '../composables/useChildren'
 import { rooms } from '../composables/useCleaning'
 import { upsertChore, removeChore } from '../composables/useChores'
 import { upsertTask, removeTask } from '../composables/useTasks'
+import { FORM_KIND, FORM_TITLES } from '../lib/constants'
 
 const props = defineProps({
   open: Boolean,
-  // 'recurring-chore' | 'oneoff-chore' | 'cleaning-task'
   kind: { type: String, required: true },
-  // existing chore/task doc when editing; null when adding
   item: { type: Object, default: null },
-  // prefill for new items (e.g. { date: 'yyyy-MM-dd' } or { roomId })
   prefill: { type: Object, default: null },
 })
 const emit = defineEmits(['close'])
 
 const saving = ref(false)
 
-const TITLES = {
-  'recurring-chore': 'Recurring chore',
-  'oneoff-chore': 'One-off chore',
-  'cleaning-task': 'Cleaning task',
-}
-const title = computed(() => `${props.item ? 'Edit' : 'Add'} ${TITLES[props.kind]}`)
+const title = computed(() => `${props.item ? 'Edit' : 'Add'} ${FORM_TITLES[props.kind]}`)
 const initial = computed(() => props.item || props.prefill || null)
 
-const isChore = computed(() => props.kind === 'recurring-chore' || props.kind === 'oneoff-chore')
+const isChore = computed(() => props.kind === FORM_KIND.RECURRING_CHORE || props.kind === FORM_KIND.ONEOFF_CHORE)
 
 async function onSubmit(data) {
   saving.value = true
@@ -58,15 +51,15 @@ async function onDelete() {
 
 <template>
   <Teleport to="body">
-    <div v-if="open" class="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
-      <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg flex flex-col max-h-[90vh] overflow-hidden">
+    <div v-if="open" class="dialog-overlay">
+      <div class="dialog-container w-full max-w-lg flex flex-col max-h-[90vh] overflow-hidden">
         <!-- dialog grows to fill available height; inner form handles scrolling -->
         <div class="px-6 py-4 flex items-center justify-between shrink-0 border-b border-amber-100">
           <h2 class="text-xl font-bold text-amber-900">{{ title }}</h2>
           <button
             v-if="item"
             @click="onDelete"
-            class="text-red-500 font-medium text-sm hover:underline cursor-pointer"
+            class="btn-danger-text"
           >
             Delete
           </button>

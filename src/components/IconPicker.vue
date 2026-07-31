@@ -60,13 +60,13 @@ function clear() {
       v-model="query"
       type="text"
       placeholder="Search icons (e.g. broom, star, dishes)…"
-      class="border-2 border-amber-200 rounded-xl px-4 py-3 focus:outline-none focus:border-amber-500"
+      class="input-field"
     />
 
     <div v-if="modelValue" class="flex items-center gap-2 text-amber-700">
       <span class="text-sm">Selected:</span>
       <Icon :icon="modelValue" class="w-8 h-8" />
-      <button type="button" @click="clear" class="text-red-500 text-sm hover:underline">
+      <button type="button" @click="clear" class="btn-danger-text">
         Clear
       </button>
     </div>

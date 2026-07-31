@@ -14,6 +14,7 @@ import {
 import { db } from '../lib/firebase'
 import { currentUser } from './useAuth'
 import { hashPin } from '../lib/pin'
+import { WEEK_START_SUNDAY } from '../lib/constants'
 
 export const familyId = ref(null)
 export const family = ref(null)
@@ -112,7 +113,7 @@ export async function createFamily(profile, pin) {
   batch.set(doc(db, 'families', uid), {
     pinHash,
     authorizedUids: [uid],
-    weekStartsOn: 0,
+    weekStartsOn: WEEK_START_SUNDAY,
     createdAt: serverTimestamp(),
   })
   batch.set(doc(db, 'families', uid, 'members', uid), {

@@ -1,8 +1,12 @@
 <script setup>
 import { ref } from 'vue'
+import { writeBatch, doc } from 'firebase/firestore'
+import { db } from '../lib/firebase'
+import { familyId } from '../composables/useFamily'
 import { rooms, upsertRoom, removeRoom } from '../composables/useCleaning'
 import { tasks, removeTask, reorderTasks } from '../composables/useTasks'
 import { children } from '../composables/useChildren'
+import { CHORE_KIND, FORM_KIND } from '../lib/constants'
 import ScheduleItem from './ScheduleItem.vue'
 import PhotoLightbox from './PhotoLightbox.vue'
 import ChoreFormDialog from './ChoreFormDialog.vue'
@@ -30,14 +34,16 @@ async function deleteRoom(room) {
     ? `Delete room "${room.name}" and its ${roomTasks.length} task(s)? This cannot be undone.`
     : `Delete room "${room.name}"?`
   if (!confirm(message)) return
+  const batch = writeBatch(db)
   for (const task of roomTasks) {
-    await removeTask(task.id)
+    batch.delete(doc(db, 'families', familyId.value, 'tasks', task.id))
   }
-  await removeRoom(room.id)
+  batch.delete(doc(db, 'families', familyId.value, 'rooms', room.id))
+  await batch.commit()
 }
 
 function tasksFor(roomId) {
-  return tasks.value.filter((t) => t.kind === 'cleaning' && t.roomId === roomId)
+  return tasks.value.filter((t) => t.kind === CHORE_KIND.CLEANING && t.roomId === roomId)
 }
 
 const dragTaskId = ref(null)
@@ -105,20 +111,20 @@ function openEditTask(task) {
   <div class="flex flex-col gap-8">
     <!-- rooms & tasks -->
     <section class="flex flex-col gap-4">
-      <h2 class="text-xl font-bold text-amber-900">Rooms & tasks</h2>
+      <h2 class="heading-page">Rooms & tasks</h2>
 
       <div class="flex gap-2 max-w-md">
         <input
           v-model="newRoomName"
           type="text"
           placeholder="New room name"
-          class="flex-1 border-2 border-amber-200 rounded-xl px-4 py-3 focus:outline-none focus:border-amber-500"
+          class="input-field flex-1"
           @keyup.enter="addRoom"
         />
         <button
           @click="addRoom"
           :disabled="!newRoomName.trim()"
-          class="bg-amber-500 hover:bg-amber-600 text-white font-bold py-2 px-4 rounded-xl disabled:opacity-50 cursor-pointer"
+          class="btn-primary"
         >
           + Room
         </button>
@@ -136,7 +142,7 @@ function openEditTask(task) {
             <h3 class="font-bold text-amber-900 text-lg">{{ room.name }}</h3>
             <div class="flex gap-3">
               <button @click="renameRoom(room)" class="text-sm text-amber-600 font-medium hover:underline cursor-pointer">Rename</button>
-              <button @click="deleteRoom(room)" class="text-sm text-red-500 font-medium hover:underline cursor-pointer">Delete</button>
+              <button @click="deleteRoom(room)" class="btn-danger-text">Delete</button>
             </div>
           </div>
 
@@ -176,7 +182,7 @@ function openEditTask(task) {
     <!-- task add/edit dialog -->
     <ChoreFormDialog
       :open="taskDialogOpen"
-      kind="cleaning-task"
+      :kind="FORM_KIND.CLEANING_TASK"
       :item="editingTask"
       :prefill="taskPrefill"
       @close="taskDialogOpen = false"

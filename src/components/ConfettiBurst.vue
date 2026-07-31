@@ -1,5 +1,6 @@
 <script setup>
 import confetti from 'canvas-confetti'
+import { CONFETTI_MODE } from '../lib/constants'
 
 // Usage: const burstRef = ref(); burstRef.value.fire('confetti' | 'coins' | 'fireworks')
 function fireConfetti() {
@@ -45,9 +46,9 @@ function fireFireworks() {
   })()
 }
 
-function fire(mode = 'confetti') {
-  if (mode === 'coins') fireCoins()
-  else if (mode === 'fireworks') fireFireworks()
+function fire(mode = CONFETTI_MODE.CONFETTI) {
+  if (mode === CONFETTI_MODE.COINS) fireCoins()
+  else if (mode === CONFETTI_MODE.FIREWORKS) fireFireworks()
   else fireConfetti()
 }
 

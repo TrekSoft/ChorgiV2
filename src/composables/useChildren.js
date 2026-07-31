@@ -1,5 +1,14 @@
 import { ref, watch } from 'vue'
-import { collection, onSnapshot, query, orderBy, doc, setDoc, deleteDoc, serverTimestamp } from 'firebase/firestore'
+import {
+  collection,
+  onSnapshot,
+  query,
+  orderBy,
+  doc,
+  setDoc,
+  deleteDoc,
+  serverTimestamp,
+} from 'firebase/firestore'
 import { db } from '../lib/firebase'
 import { familyId } from './useFamily'
 
@@ -18,7 +27,7 @@ watch(
       return
     }
     childrenLoading.value = true
-    const q = query(collection(db, 'families', id, 'children'), orderBy('birthdate', 'asc'))
+    const q = query(collection(db, 'families', id, 'children'), orderBy('order', 'asc'))
     unsubscribe = onSnapshot(q, (snap) => {
       children.value = snap.docs.map((d) => ({ id: d.id, ...d.data() }))
       childrenLoading.value = false

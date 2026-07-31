@@ -1,5 +1,6 @@
 <script setup>
 import { ref, watch } from 'vue'
+import { Icon } from '@iconify/vue'
 import PhotoLightbox from './PhotoLightbox.vue'
 
 const props = defineProps({
@@ -7,6 +8,7 @@ const props = defineProps({
   previewUrl: { type: String, default: null },
   label: { type: String, default: 'Photo' },
   optional: { type: Boolean, default: true },
+  variant: { type: String, default: 'box' },
 })
 const emit = defineEmits(['update:modelValue'])
 
@@ -49,25 +51,53 @@ function clear(event) {
 </script>
 
 <template>
-  <div class="flex flex-col gap-1">
-    <span class="text-amber-800 font-medium">
-      {{ label }} <span v-if="optional" class="text-amber-500 font-normal">(optional)</span>
+  <!-- Inline variant: round thumbnail + text row -->
+  <label v-if="variant === 'inline'" class="flex flex-col gap-1">
+    <span class="form-label">
+      {{ label }} <span v-if="optional" class="form-hint">(optional)</span>
+    </span>
+    <div
+      @click="pick"
+      @dragover.prevent="dragOver = true"
+      @dragleave.prevent="dragOver = false"
+      @drop.prevent="onDrop"
+      class="flex items-center gap-4 drop-zone px-4 py-4"
+      :class="dragOver ? 'border-amber-500 bg-amber-100' : 'border-amber-300 bg-amber-50 hover:bg-amber-100'"
+    >
+      <img
+        v-if="localPreview"
+        :src="localPreview"
+        alt="Preview"
+        class="w-16 h-16 rounded-full object-cover border-2 border-amber-200 shrink-0"
+      />
+      <div v-else class="w-16 h-16 rounded-full bg-amber-200/60 flex items-center justify-center shrink-0">
+        <Icon icon="mdi:image" class="w-7 h-7 text-amber-500" />
+      </div>
+      <div class="text-amber-700 text-sm">
+        <span class="font-semibold text-amber-800">Tap to choose a photo</span>
+        <br />
+        or drag one here
+      </div>
+    </div>
+    <input ref="inputEl" type="file" accept="image/*" class="hidden" @change="onChange" />
+  </label>
+
+  <!-- Box variant: aspect-video drop zone with lightbox -->
+  <div v-else class="flex flex-col gap-1">
+    <span class="form-label">
+      {{ label }} <span v-if="optional" class="form-hint">(optional)</span>
     </span>
     <div
       @click="localPreview ? (lightboxOpen = true) : pick()"
       @dragover.prevent="dragOver = true"
       @dragleave.prevent="dragOver = false"
       @drop.prevent="onDrop"
-      class="relative aspect-video w-1/2 rounded-2xl border-2 border-dashed flex items-center justify-center cursor-pointer transition-colors overflow-hidden"
+      class="relative aspect-video w-1/2 drop-zone overflow-hidden"
       :class="dragOver ? 'border-amber-500 bg-amber-100' : 'border-amber-300 bg-amber-50 hover:bg-amber-100'"
     >
       <img v-if="localPreview" :src="localPreview" alt="Preview" class="w-full h-full object-cover" />
       <div v-else class="flex flex-col items-center gap-1 text-amber-500">
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="3" y="3" width="18" height="18" rx="2" />
-          <circle cx="8.5" cy="8.5" r="1.5" />
-          <path d="M21 15l-5-5L5 21" />
-        </svg>
+        <Icon icon="mdi:image" class="w-8 h-8" />
         <span class="text-sm font-medium">Tap or drag a photo here</span>
       </div>
       <button

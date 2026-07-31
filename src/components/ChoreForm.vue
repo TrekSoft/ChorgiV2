@@ -1,14 +1,16 @@
 <script setup>
 import { ref, computed, watch } from 'vue'
+import { Icon } from '@iconify/vue'
 import IconPicker from './IconPicker.vue'
 import PhotoUpload from './PhotoUpload.vue'
+import { FORM_KIND, CHORE_KIND, RECURRENCE_TYPE, RECURRENCE_MODE } from '../lib/constants'
+import { dollarsToCents } from '../lib/format'
 
 const props = defineProps({
-  // 'recurring-chore' | 'oneoff-chore' | 'cleaning-task'
   kind: { type: String, required: true },
   initial: { type: Object, default: null },
-  children: { type: Array, default: () => [] }, // [{id, name}]
-  rooms: { type: Array, default: () => [] }, // [{id, name}]
+  children: { type: Array, default: () => [] },
+  rooms: { type: Array, default: () => [] },
   saving: { type: Boolean, default: false },
 })
 const emit = defineEmits(['submit', 'cancel'])
@@ -24,22 +26,21 @@ const date = ref(props.initial?.date || '')
 const bonusAmount = ref(props.initial ? String((props.initial.bonusCents || 0) / 100) : '0')
 const roomId = ref(props.initial?.roomId || (props.rooms[0]?.id ?? ''))
 
-const recurrenceMode = ref(props.initial?.weekly ? 'weekly' : 'daily') // 'weekly' | 'daily'
-const dailyPatternType = ref(props.initial?.recurrence?.type || 'daily')
+const recurrenceMode = ref(props.initial?.weekly ? RECURRENCE_MODE.WEEKLY : RECURRENCE_MODE.DAILY)
+const dailyPatternType = ref(props.initial?.recurrence?.type || RECURRENCE_TYPE.DAILY)
 const weekdays = ref(props.initial?.recurrence?.days || [1, 2, 3, 4, 5])
 const dayOfMonth = ref(props.initial?.recurrence?.day || 1)
 const timeStart = ref(props.initial?.timeWindow?.start || '')
 const timeEnd = ref(props.initial?.timeWindow?.end || '')
 
-const showAssignees = computed(() => true)
-const showDate = computed(() => props.kind === 'oneoff-chore')
-const showBonus = computed(() => props.kind === 'oneoff-chore')
-const showRoom = computed(() => props.kind === 'cleaning-task')
-const showRecurrence = computed(() => props.kind === 'recurring-chore')
-const showTimeWindow = computed(() => props.kind === 'recurring-chore' && recurrenceMode.value === 'daily')
+const showDate = computed(() => props.kind === FORM_KIND.ONEOFF_CHORE)
+const showBonus = computed(() => props.kind === FORM_KIND.ONEOFF_CHORE)
+const showRoom = computed(() => props.kind === FORM_KIND.CLEANING_TASK)
+const showRecurrence = computed(() => props.kind === FORM_KIND.RECURRING_CHORE)
+const showTimeWindow = computed(() => props.kind === FORM_KIND.RECURRING_CHORE && recurrenceMode.value === RECURRENCE_MODE.DAILY)
 
 function toggleAssignee(id) {
-  if (props.kind === 'cleaning-task') {
+  if (props.kind === FORM_KIND.CLEANING_TASK) {
     assigneeId.value = assigneeId.value === id ? null : id
   } else {
     assigneeIds.value = assigneeIds.value.includes(id)
@@ -63,7 +64,7 @@ function toggleWeekday(day) {
 }
 
 watch(recurrenceMode, (mode) => {
-  if (mode === 'weekly') {
+  if (mode === RECURRENCE_MODE.WEEKLY) {
     timeStart.value = ''
     timeEnd.value = ''
   }
@@ -72,13 +73,13 @@ watch(recurrenceMode, (mode) => {
 const valid = computed(() => {
   if (!name.value.trim()) return false
   // recurring chores must be assigned; one-off chores may be left unassigned (claimable)
-  if (props.kind === 'recurring-chore' && assigneeIds.value.length === 0) return false
+  if (props.kind === FORM_KIND.RECURRING_CHORE && assigneeIds.value.length === 0) return false
   if (showDate.value && !date.value) return false
   if (showRoom.value && !roomId.value) return false
-  if (showRecurrence.value && recurrenceMode.value === 'daily' && dailyPatternType.value === 'weekdays' && weekdays.value.length === 0) {
+  if (showRecurrence.value && recurrenceMode.value === RECURRENCE_MODE.DAILY && dailyPatternType.value === RECURRENCE_TYPE.WEEKDAYS && weekdays.value.length === 0) {
     return false
   }
-  if (showRecurrence.value && recurrenceMode.value === 'daily' && dailyPatternType.value === 'dayOfMonth' && (!dayOfMonth.value || dayOfMonth.value < 1 || dayOfMonth.value > 31)) {
+  if (showRecurrence.value && recurrenceMode.value === RECURRENCE_MODE.DAILY && dailyPatternType.value === RECURRENCE_TYPE.DAY_OF_MONTH && (!dayOfMonth.value || dayOfMonth.value < 1 || dayOfMonth.value > 31)) {
     return false
   }
   return true
@@ -93,13 +94,13 @@ function submit() {
     photoFile: photoFile.value,
   }
 
-  if (props.kind === 'recurring-chore') {
+  if (props.kind === FORM_KIND.RECURRING_CHORE) {
     let recurrence = null
     let timeWindow = null
-    if (recurrenceMode.value !== 'weekly') {
+    if (recurrenceMode.value !== RECURRENCE_MODE.WEEKLY) {
       recurrence = { type: dailyPatternType.value }
-      if (dailyPatternType.value === 'weekdays') recurrence.days = weekdays.value
-      if (dailyPatternType.value === 'dayOfMonth') recurrence.day = Number(dayOfMonth.value)
+      if (dailyPatternType.value === RECURRENCE_TYPE.WEEKDAYS) recurrence.days = weekdays.value
+      if (dailyPatternType.value === RECURRENCE_TYPE.DAY_OF_MONTH) recurrence.day = Number(dayOfMonth.value)
       timeWindow = {}
       if (timeStart.value) timeWindow.start = timeStart.value
       if (timeEnd.value) timeWindow.end = timeEnd.value
@@ -107,24 +108,24 @@ function submit() {
     }
     emit('submit', {
       ...base,
-      kind: 'recurring',
+      kind: CHORE_KIND.RECURRING,
       assigneeIds: assigneeIds.value,
-      weekly: recurrenceMode.value === 'weekly',
+      weekly: recurrenceMode.value === RECURRENCE_MODE.WEEKLY,
       recurrence,
       timeWindow,
     })
-  } else if (props.kind === 'oneoff-chore') {
+  } else if (props.kind === FORM_KIND.ONEOFF_CHORE) {
     emit('submit', {
       ...base,
-      kind: 'oneoff',
+      kind: CHORE_KIND.ONEOFF,
       assigneeIds: assigneeIds.value,
       date: date.value,
-      bonusCents: Math.round(parseFloat(bonusAmount.value || '0') * 100),
+      bonusCents: dollarsToCents(bonusAmount.value),
     })
-  } else if (props.kind === 'cleaning-task') {
+  } else if (props.kind === FORM_KIND.CLEANING_TASK) {
     emit('submit', {
       ...base,
-      kind: 'cleaning',
+      kind: CHORE_KIND.CLEANING,
       assigneeId: assigneeId.value,
       roomId: roomId.value,
     })
@@ -136,34 +137,30 @@ function submit() {
   <form @submit.prevent="submit" class="flex flex-col flex-1 min-h-0 gap-4">
     <div class="flex flex-col gap-4 overflow-y-auto flex-1 min-h-0">
     <label class="flex flex-col gap-1">
-      <span class="text-amber-800 font-medium">Name</span>
-      <input
-        v-model="name"
-        type="text"
-        class="border-2 border-amber-200 rounded-xl px-4 py-3 focus:outline-none focus:border-amber-500"
-      />
+      <span class="form-label">Name</span>
+      <input v-model="name" type="text" class="input-field" />
     </label>
 
     <div class="flex flex-col gap-1">
-      <span class="text-amber-800 font-medium">Icon</span>
+      <span class="form-label">Icon</span>
       <IconPicker v-model="iconName" />
     </div>
 
     <PhotoUpload v-model="photoFile" label="Photo" :preview-url="initial?.photoURL" />
 
-    <div v-if="showAssignees" class="flex flex-col gap-2">
-      <span class="text-amber-800 font-medium">
+    <div class="flex flex-col gap-2">
+      <span class="form-label">
         Assign to
-        <span v-if="kind === 'oneoff-chore'" class="text-amber-500 font-normal">(optional — unassigned one-offs can be claimed by any kid)</span>
-        <span v-else-if="kind === 'cleaning-task'" class="text-amber-500 font-normal">(optional)</span>
+        <span v-if="kind === FORM_KIND.ONEOFF_CHORE" class="form-hint">(optional — unassigned one-offs can be claimed by any kid)</span>
+        <span v-else-if="kind === FORM_KIND.CLEANING_TASK" class="form-hint">(optional)</span>
       </span>
       <div class="flex flex-wrap gap-2">
         <button
-          v-if="kind !== 'cleaning-task'"
+          v-if="kind !== FORM_KIND.CLEANING_TASK"
           type="button"
           @click="toggleAll"
-          class="px-4 py-2 rounded-full border-2 font-bold cursor-pointer transition-colors"
-          :class="allAssigned ? 'border-amber-500 bg-amber-100 text-amber-800' : 'border-amber-200 text-amber-600 hover:bg-amber-50'"
+          class="pill font-bold"
+          :class="allAssigned ? 'pill-selected' : 'pill-unselected'"
         >
           All
         </button>
@@ -172,8 +169,8 @@ function submit() {
           :key="child.id"
           type="button"
           @click="toggleAssignee(child.id)"
-          class="px-4 py-2 rounded-full border-2 font-medium cursor-pointer transition-colors"
-          :class="(kind === 'cleaning-task' ? assigneeId === child.id : assigneeIds.includes(child.id)) ? 'border-amber-500 bg-amber-100 text-amber-800' : 'border-amber-200 text-amber-600 hover:bg-amber-50'"
+          class="pill"
+          :class="(kind === FORM_KIND.CLEANING_TASK ? assigneeId === child.id : assigneeIds.includes(child.id)) ? 'pill-selected' : 'pill-unselected'"
         >
           {{ child.name }}
         </button>
@@ -181,78 +178,62 @@ function submit() {
     </div>
 
     <div v-if="showRoom" class="flex flex-col gap-1">
-      <span class="text-amber-800 font-medium">Room</span>
+      <span class="form-label">Room</span>
       <div class="relative">
-        <select
-          v-model="roomId"
-          class="w-full appearance-none border-2 border-amber-200 rounded-xl pl-4 pr-10 py-3 focus:outline-none focus:border-amber-500"
-        >
+        <select v-model="roomId" class="input-field appearance-none pr-10">
           <option v-for="room in rooms" :key="room.id" :value="room.id">{{ room.name }}</option>
         </select>
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-amber-500 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="6 9 12 15 18 9" />
-        </svg>
+        <Icon icon="mdi:chevron-down" class="w-5 h-5 text-amber-500 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
       </div>
     </div>
 
     <div v-if="showRecurrence" class="flex flex-col gap-3">
-      <span class="text-amber-800 font-medium">Repeats</span>
+      <span class="form-label">Repeats</span>
       <div class="flex gap-2">
         <button
           type="button"
-          @click="recurrenceMode = 'daily'"
-          class="px-4 py-2 rounded-full border-2 font-medium cursor-pointer"
-          :class="recurrenceMode === 'daily' ? 'border-amber-500 bg-amber-100 text-amber-800' : 'border-amber-200 text-amber-600'"
+          @click="recurrenceMode = RECURRENCE_MODE.DAILY"
+          class="pill"
+          :class="recurrenceMode === RECURRENCE_MODE.DAILY ? 'pill-selected' : 'pill-unselected'"
         >
           Daily pattern
         </button>
         <button
           type="button"
-          @click="recurrenceMode = 'weekly'"
-          class="px-4 py-2 rounded-full border-2 font-medium cursor-pointer"
-          :class="recurrenceMode === 'weekly' ? 'border-amber-500 bg-amber-100 text-amber-800' : 'border-amber-200 text-amber-600'"
+          @click="recurrenceMode = RECURRENCE_MODE.WEEKLY"
+          class="pill"
+          :class="recurrenceMode === RECURRENCE_MODE.WEEKLY ? 'pill-selected' : 'pill-unselected'"
         >
           Weekly (any day)
         </button>
       </div>
 
-      <template v-if="recurrenceMode === 'daily'">
+      <template v-if="recurrenceMode === RECURRENCE_MODE.DAILY">
         <div class="relative">
-          <select
-            v-model="dailyPatternType"
-            class="w-full appearance-none border-2 border-amber-200 rounded-xl pl-4 pr-10 py-3 focus:outline-none focus:border-amber-500"
-          >
-            <option value="daily">Every day</option>
-            <option value="weekdays">Specific weekdays</option>
-            <option value="oddDays">Odd days of month</option>
-            <option value="evenDays">Even days of month</option>
-            <option value="dayOfMonth">A specific day of the month</option>
+          <select v-model="dailyPatternType" class="input-field appearance-none pr-10">
+            <option :value="RECURRENCE_TYPE.DAILY">Every day</option>
+            <option :value="RECURRENCE_TYPE.WEEKDAYS">Specific weekdays</option>
+            <option :value="RECURRENCE_TYPE.ODD_DAYS">Odd days of month</option>
+            <option :value="RECURRENCE_TYPE.EVEN_DAYS">Even days of month</option>
+            <option :value="RECURRENCE_TYPE.DAY_OF_MONTH">A specific day of the month</option>
           </select>
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-amber-500 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="6 9 12 15 18 9" />
-          </svg>
+          <Icon icon="mdi:chevron-down" class="w-5 h-5 text-amber-500 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
         </div>
 
-        <label v-if="dailyPatternType === 'dayOfMonth'" class="flex flex-col gap-1">
-          <span class="text-amber-800 font-medium">Day of month</span>
-          <input
-            v-model.number="dayOfMonth"
-            type="number"
-            min="1"
-            max="31"
-            class="border-2 border-amber-200 rounded-xl px-4 py-3 focus:outline-none focus:border-amber-500 w-28"
-          />
-          <span class="text-amber-500 text-sm">If a month is shorter than this day, it falls on the last day of that month.</span>
+        <label v-if="dailyPatternType === RECURRENCE_TYPE.DAY_OF_MONTH" class="flex flex-col gap-1">
+          <span class="form-label">Day of month</span>
+          <input v-model.number="dayOfMonth" type="number" min="1" max="31" class="input-field w-28" />
+          <span class="form-hint">If a month is shorter than this day, it falls on the last day of that month.</span>
         </label>
 
-        <div v-if="dailyPatternType === 'weekdays'" class="flex flex-wrap gap-2">
+        <div v-if="dailyPatternType === RECURRENCE_TYPE.WEEKDAYS" class="flex flex-wrap gap-2">
           <button
             v-for="(label, day) in WEEKDAY_LABELS"
             :key="day"
             type="button"
             @click="toggleWeekday(day)"
             class="w-12 h-12 rounded-full border-2 font-medium cursor-pointer"
-            :class="weekdays.includes(day) ? 'border-amber-500 bg-amber-100 text-amber-800' : 'border-amber-200 text-amber-600'"
+            :class="weekdays.includes(day) ? 'pill-selected' : 'pill-unselected'"
           >
             {{ label }}
           </button>
@@ -262,57 +243,31 @@ function submit() {
 
     <div v-if="showTimeWindow" class="flex gap-3">
       <label class="flex flex-col gap-1 flex-1">
-        <span class="text-amber-800 font-medium">Start time <span class="text-amber-500 font-normal">(optional)</span></span>
-        <input
-          v-model="timeStart"
-          type="time"
-          class="border-2 border-amber-200 rounded-xl px-4 py-3 focus:outline-none focus:border-amber-500"
-        />
+        <span class="form-label">Start time <span class="form-hint">(optional)</span></span>
+        <input v-model="timeStart" type="time" class="input-field" />
       </label>
       <label class="flex flex-col gap-1 flex-1">
-        <span class="text-amber-800 font-medium">End time <span class="text-amber-500 font-normal">(optional)</span></span>
-        <input
-          v-model="timeEnd"
-          type="time"
-          class="border-2 border-amber-200 rounded-xl px-4 py-3 focus:outline-none focus:border-amber-500"
-        />
+        <span class="form-label">End time <span class="form-hint">(optional)</span></span>
+        <input v-model="timeEnd" type="time" class="input-field" />
       </label>
     </div>
 
     <label v-if="showDate" class="flex flex-col gap-1">
-      <span class="text-amber-800 font-medium">Date</span>
-      <input
-        v-model="date"
-        type="date"
-        class="border-2 border-amber-200 rounded-xl px-4 py-3 focus:outline-none focus:border-amber-500"
-      />
+      <span class="form-label">Date</span>
+      <input v-model="date" type="date" class="input-field" />
     </label>
 
     <label v-if="showBonus" class="flex flex-col gap-1">
-      <span class="text-amber-800 font-medium">Bonus amount ($) <span class="text-amber-500 font-normal">(optional)</span></span>
-      <input
-        v-model="bonusAmount"
-        type="number"
-        min="0"
-        step="0.25"
-        class="border-2 border-amber-200 rounded-xl px-4 py-3 focus:outline-none focus:border-amber-500"
-      />
+      <span class="form-label">Bonus amount ($) <span class="form-hint">(optional)</span></span>
+      <input v-model="bonusAmount" type="number" min="0" step="0.25" class="input-field" />
     </label>
 
     </div>
     <div class="flex justify-end gap-2 pt-3 shrink-0 border-t border-amber-100">
-      <button
-        type="button"
-        @click="emit('cancel')"
-        class="text-amber-700 font-medium py-2 px-4 rounded-xl hover:bg-amber-50 cursor-pointer"
-      >
+      <button type="button" @click="emit('cancel')" class="btn-cancel">
         Cancel
       </button>
-      <button
-        type="submit"
-        :disabled="!valid || saving"
-        class="bg-amber-500 hover:bg-amber-600 text-white font-bold py-2 px-5 rounded-xl disabled:opacity-50 cursor-pointer"
-      >
+      <button type="submit" :disabled="!valid || saving" class="btn-primary">
         {{ saving ? 'Saving…' : 'Save' }}
       </button>
     </div>

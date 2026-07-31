@@ -5,6 +5,9 @@ import { children, childrenLoading } from './composables/useChildren'
 import { accrueDailyAllowance } from './composables/useAllowance'
 
 let accrued = false
+watch(familyId, (id) => {
+  if (!id) accrued = false
+})
 watch(
   [familyId, childrenLoading],
   ([id, loading]) => {

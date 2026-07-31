@@ -3,6 +3,7 @@ import { ref, watch } from 'vue'
 import { familyId } from '../composables/useFamily'
 import { children, upsertChild, removeChild } from '../composables/useChildren'
 import { uploadChildPhoto } from '../lib/photo'
+import { dollarsToCents } from '../lib/format'
 import PhotoPicker from './PhotoPicker.vue'
 
 const props = defineProps({
@@ -41,7 +42,7 @@ async function save() {
       name: name.value.trim(),
       birthdate: birthdate.value,
       photoURL,
-      weeklyAllowanceCents: Math.round(parseFloat(weeklyAllowance.value || '0') * 100),
+      weeklyAllowanceCents: dollarsToCents(weeklyAllowance.value),
       allowanceBalanceCents: props.child?.allowanceBalanceCents || 0,
       allowanceLastAccruedDate: props.child?.allowanceLastAccruedDate || null,
       marksCount: props.child?.marksCount || 0,
@@ -63,54 +64,40 @@ async function remove() {
 
 <template>
   <Teleport to="body">
-    <div v-if="open" class="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
-      <div class="bg-white rounded-2xl shadow-xl p-6 w-full max-w-sm flex flex-col gap-4 max-h-[90vh] overflow-y-auto">
+    <div v-if="open" class="dialog-overlay">
+      <div class="dialog-container p-6 w-full max-w-sm flex flex-col gap-4 max-h-[90vh] overflow-y-auto">
         <h2 class="text-xl font-bold text-amber-900">{{ child ? 'Edit child' : 'Add child' }}</h2>
 
         <label class="flex flex-col gap-1">
-          <span class="text-amber-800 font-medium">Name</span>
-          <input
-            v-model="name"
-            type="text"
-            class="border-2 border-amber-200 rounded-xl px-4 py-3 focus:outline-none focus:border-amber-500"
-          />
+          <span class="form-label">Name</span>
+          <input v-model="name" type="text" class="input-field" />
         </label>
 
         <label class="flex flex-col gap-1">
-          <span class="text-amber-800 font-medium">Birthday</span>
-          <input
-            v-model="birthdate"
-            type="date"
-            class="border-2 border-amber-200 rounded-xl px-4 py-3 focus:outline-none focus:border-amber-500"
-          />
+          <span class="form-label">Birthday</span>
+          <input v-model="birthdate" type="date" class="input-field" />
         </label>
 
         <PhotoPicker v-model="photoFile" label="Profile photo" :preview-url="child?.photoURL" />
 
         <label class="flex flex-col gap-1">
-          <span class="text-amber-800 font-medium">Weekly allowance ($)</span>
-          <input
-            v-model="weeklyAllowance"
-            type="number"
-            min="0"
-            step="0.25"
-            class="border-2 border-amber-200 rounded-xl px-4 py-3 focus:outline-none focus:border-amber-500"
-          />
+          <span class="form-label">Weekly allowance ($)</span>
+          <input v-model="weeklyAllowance" type="number" min="0" step="0.25" class="input-field" />
         </label>
 
         <div class="flex justify-between items-center pt-2">
-          <button v-if="child" @click="remove" class="text-red-500 font-medium text-sm hover:underline">
+          <button v-if="child" @click="remove" class="btn-danger-text">
             Remove child
           </button>
           <div v-else></div>
           <div class="flex gap-2">
-            <button @click="emit('close')" class="text-amber-700 font-medium py-2 px-4 rounded-xl hover:bg-amber-50">
+            <button @click="emit('close')" class="btn-cancel">
               Cancel
             </button>
             <button
               @click="save"
               :disabled="saving || !name.trim() || !birthdate"
-              class="bg-amber-500 hover:bg-amber-600 text-white font-bold py-2 px-5 rounded-xl disabled:opacity-50"
+              class="btn-primary"
             >
               {{ saving ? 'Saving…' : 'Save' }}
             </button>

@@ -1,6 +1,6 @@
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted } from 'vue'
+import { ADMIN_TIMEOUT_MS } from '../lib/constants'
 
-const TIMEOUT_MS = 30 * 60 * 1000
 const ACTIVITY_EVENTS = ['pointerdown', 'keydown', 'touchstart']
 
 export const isAdminMode = ref(false)
@@ -20,7 +20,7 @@ function resetTimer() {
   clearTimer()
   timer = setTimeout(() => {
     isAdminMode.value = false
-  }, TIMEOUT_MS)
+  }, ADMIN_TIMEOUT_MS)
 }
 
 function bindActivityListeners() {
@@ -42,7 +42,4 @@ export function exitAdminMode() {
 
 export function useAdminModeTimeout() {
   onMounted(bindActivityListeners)
-  onUnmounted(() => {
-    // listeners intentionally stay bound app-wide; nothing to tear down per-component
-  })
 }

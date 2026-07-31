@@ -1,6 +1,8 @@
 <script setup>
 import { Icon } from '@iconify/vue'
 import CountdownLabel from './CountdownLabel.vue'
+import { CARD_VARIANT } from '../lib/constants'
+import { formatCents } from '../lib/format'
 
 const props = defineProps({
   name: { type: String, required: true },
@@ -16,11 +18,8 @@ const props = defineProps({
   claimedByPhoto: { type: String, default: null },
   bonusCents: { type: Number, default: null },
   disabled: { type: Boolean, default: false },
-  // 'chore' = pre-assigned (left pane); 'task' = claimable (right pane)
-  variant: { type: String, default: 'chore' },
-  // show the unassign button (kid-accessible, no PIN)
+  variant: { type: String, default: CARD_VARIANT.CHORE },
   canUnassign: { type: Boolean, default: false },
-  // label for the unassign button (e.g. 'Remove me' for own claims, 'Unassign' for admin override)
   unassignLabel: { type: String, default: 'Remove me' },
 })
 const emit = defineEmits(['toggle', 'photo-click', 'unassign'])
@@ -57,11 +56,7 @@ function onUnassignClick() {
       :class="completed ? 'bg-green-100 hover:bg-green-200 text-red-500' : overdue ? 'bg-red-100 hover:bg-red-200 text-red-600' : 'bg-amber-50 hover:bg-amber-100 text-red-500'"
       :title="unassignLabel"
     >
-      <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-        <polyline points="16 17 21 12 16 7" />
-        <line x1="21" y1="12" x2="9" y2="12" />
-      </svg>
+      <Icon icon="mdi:logout" class="w-6 h-6" />
       <span class="text-xs font-bold">{{ unassignLabel }}</span>
     </button>
 
@@ -93,13 +88,13 @@ function onUnassignClick() {
       <div class="flex-1 min-w-0">
         <div class="flex items-center gap-2 flex-wrap">
           <span class="text-lg font-bold truncate" :class="disabled ? 'text-stone-500' : 'text-amber-900'">{{ name }}</span>
-          <span v-if="oneoff" class="text-xs font-bold uppercase tracking-wide text-purple-500 bg-purple-100 px-2 py-0.5 rounded-full">
+          <span v-if="oneoff" class="badge text-purple-500 bg-purple-100">
             one-off
           </span>
-          <span v-if="bonusCents" class="text-xs font-bold text-amber-700 bg-amber-100 px-2 py-0.5 rounded-full">
-            + ${{ (bonusCents / 100).toFixed(2) }}
+          <span v-if="bonusCents" class="badge text-amber-700 bg-amber-100">
+            + ${{ formatCents(bonusCents) }}
           </span>
-          <span v-if="late" class="text-xs font-bold uppercase tracking-wide text-red-500 bg-red-100 px-2 py-0.5 rounded-full">
+          <span v-if="late" class="badge text-red-500 bg-red-100">
             late
           </span>
         </div>
@@ -124,9 +119,7 @@ function onUnassignClick() {
         class="w-9 h-9 rounded-full border-2 flex items-center justify-center shrink-0"
         :class="completed ? 'bg-green-500 border-green-500 text-white' : disabled ? 'border-stone-300 text-transparent' : 'border-amber-300 text-transparent'"
       >
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="20 6 9 17 4 12" />
-        </svg>
+        <Icon icon="mdi:check" class="w-5 h-5" />
       </div>
     </div>
   </div>

@@ -1,7 +1,10 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { format, addDays, addWeeks, startOfWeek, eachDayOfInterval, isToday } from 'date-fns'
+import { Icon } from '@iconify/vue'
 import { occursOn } from '../lib/recurrence'
+import { CHORE_KIND, FORM_KIND, WEEK_START_SUNDAY } from '../lib/constants'
+import { DATE_FORMAT } from '../lib/format'
 import { family } from '../composables/useFamily'
 import { children } from '../composables/useChildren'
 import { chores } from '../composables/useChores'
@@ -25,7 +28,7 @@ function openCleaningDialog(day) {
   cleaningDialogOpen.value = true
 }
 
-const weekStartsOn = computed(() => family.value?.weekStartsOn ?? 0)
+const weekStartsOn = computed(() => family.value?.weekStartsOn ?? WEEK_START_SUNDAY)
 
 const days = computed(() => {
   const start = startOfWeek(anchor.value, { weekStartsOn: weekStartsOn.value })
@@ -47,7 +50,7 @@ function goToday() {
 function matchesFilter(chore) {
   if (!filterChildId.value) return true
   // unassigned one-off chores are claimable by any kid, so they show under every filter
-  if (chore.kind === 'oneoff' && (chore.assigneeIds || []).length === 0) return true
+  if (chore.kind === CHORE_KIND.ONEOFF && (chore.assigneeIds || []).length === 0) return true
   return (chore.assigneeIds || []).includes(filterChildId.value)
 }
 
@@ -65,12 +68,12 @@ function entriesFor(day) {
     if (!matchesFilter(chore)) continue
     entries.push({
       key: `chore-${chore.id}`,
-      kind: chore.kind === 'oneoff' ? 'oneoff-chore' : 'recurring-chore',
+      kind: chore.kind === CHORE_KIND.ONEOFF ? FORM_KIND.ONEOFF_CHORE : FORM_KIND.RECURRING_CHORE,
       item: chore,
       assignees: assigneesFor(chore),
       assignedToAll:
         children.value.length > 0 && (chore.assigneeIds || []).length >= children.value.length,
-      claimable: chore.kind === 'oneoff' && (chore.assigneeIds || []).length === 0,
+      claimable: chore.kind === CHORE_KIND.ONEOFF && (chore.assigneeIds || []).length === 0,
       // sort by start time (untimed chores last)
       sortKey: chore.timeWindow?.start || '99:99',
     })
@@ -81,14 +84,14 @@ function entriesFor(day) {
 
 // --- dialog state ---
 const dialogOpen = ref(false)
-const dialogKind = ref('recurring-chore')
+const dialogKind = ref(FORM_KIND.RECURRING_CHORE)
 const editingItem = ref(null)
 const prefill = ref(null)
 
 function openAdd(kind, day = null) {
   dialogKind.value = kind
   editingItem.value = null
-  prefill.value = day ? { date: format(day, 'yyyy-MM-dd') } : null
+  prefill.value = day ? { date: format(day, DATE_FORMAT) } : null
   dialogOpen.value = true
 }
 
@@ -109,9 +112,7 @@ function openEdit(entry) {
         class="w-12 h-12 rounded-full hover:bg-amber-100 text-amber-700 cursor-pointer flex items-center justify-center shrink-0"
         aria-label="Previous week"
       >
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="15 18 9 12 15 6" />
-        </svg>
+        <Icon icon="mdi:chevron-left" class="w-6 h-6" />
       </button>
       <span class="font-bold text-amber-900 text-lg">{{ headerLabel }}</span>
       <button
@@ -119,15 +120,13 @@ function openEdit(entry) {
         class="w-12 h-12 rounded-full hover:bg-amber-100 text-amber-700 cursor-pointer flex items-center justify-center shrink-0"
         aria-label="Next week"
       >
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="9 18 15 12 9 6" />
-        </svg>
+        <Icon icon="mdi:chevron-right" class="w-6 h-6" />
       </button>
       <button @click="goToday" class="text-sm text-amber-600 font-medium hover:underline cursor-pointer ml-1">This week</button>
       <div class="flex-1"></div>
       <button
-        @click="openAdd('recurring-chore')"
-        class="bg-amber-500 hover:bg-amber-600 text-white font-bold py-2 px-4 rounded-xl cursor-pointer"
+        @click="openAdd(FORM_KIND.RECURRING_CHORE)"
+        class="btn-primary"
       >
         + Recurring chore
       </button>
@@ -137,8 +136,8 @@ function openEdit(entry) {
     <div class="flex gap-2 flex-wrap">
       <button
         @click="filterChildId = null"
-        class="px-4 py-2 rounded-full border-2 font-medium cursor-pointer"
-        :class="filterChildId === null ? 'border-amber-500 bg-amber-100 text-amber-800' : 'border-amber-200 text-amber-600 hover:bg-amber-50'"
+        class="pill"
+        :class="filterChildId === null ? 'pill-selected' : 'pill-unselected'"
       >
         All kids
       </button>
@@ -146,8 +145,8 @@ function openEdit(entry) {
         v-for="child in children"
         :key="child.id"
         @click="filterChildId = child.id"
-        class="px-4 py-2 rounded-full border-2 font-medium cursor-pointer"
-        :class="filterChildId === child.id ? 'border-amber-500 bg-amber-100 text-amber-800' : 'border-amber-200 text-amber-600 hover:bg-amber-50'"
+        class="pill"
+        :class="filterChildId === child.id ? 'pill-selected' : 'pill-unselected'"
       >
         {{ child.name }}
       </button>
@@ -169,12 +168,12 @@ function openEdit(entry) {
           <button
             @click="openCleaningDialog(day)"
             class="text-xs font-bold uppercase tracking-wide px-2 py-0.5 rounded-full cursor-pointer transition-colors"
-            :class="cleaningDays[format(day, 'yyyy-MM-dd')]
+            :class="cleaningDays[format(day, DATE_FORMAT)]
               ? 'text-sky-600 bg-sky-100 hover:bg-sky-200'
               : 'text-amber-400 bg-amber-50 hover:bg-amber-100 border border-dashed border-amber-300 normal-case font-medium'"
-            :title="cleaningDays[format(day, 'yyyy-MM-dd')] ? 'Edit cleaning day' : 'Mark as cleaning day'"
+            :title="cleaningDays[format(day, DATE_FORMAT)] ? 'Edit cleaning day' : 'Mark as cleaning day'"
           >
-            {{ cleaningDays[format(day, 'yyyy-MM-dd')] ? '🧹 cleaning' : '+ 🧹' }}
+            {{ cleaningDays[format(day, DATE_FORMAT)] ? '🧹 cleaning' : '+ 🧹' }}
           </button>
         </div>
 
@@ -186,7 +185,7 @@ function openEdit(entry) {
           :photo-url="entry.item.photoURL"
           :time-window="entry.item.timeWindow || null"
           :weekly="!!entry.item.weekly"
-          :oneoff="entry.kind === 'oneoff-chore'"
+          :oneoff="entry.kind === FORM_KIND.ONEOFF_CHORE"
           :bonus-cents="entry.item.bonusCents || null"
           :assignees="entry.assignees"
           :assigned-to-all="entry.assignedToAll"
@@ -197,7 +196,7 @@ function openEdit(entry) {
 
         <div class="flex gap-2 mt-auto pt-1">
           <button
-            @click="openAdd('oneoff-chore', day)"
+            @click="openAdd(FORM_KIND.ONEOFF_CHORE, day)"
             class="flex-1 text-xs font-bold text-amber-600 border-2 border-dashed border-amber-200 rounded-xl py-2 hover:bg-amber-50 cursor-pointer"
           >
             + One-off chore
@@ -225,7 +224,7 @@ function openEdit(entry) {
     <CleaningDayDialog
       :open="cleaningDialogOpen"
       :date="cleaningDialogDate"
-      :initial-room-ids="cleaningDialogDate ? (cleaningDays[format(cleaningDialogDate, 'yyyy-MM-dd')]?.roomIds || []) : []"
+      :initial-room-ids="cleaningDialogDate ? (cleaningDays[format(cleaningDialogDate, DATE_FORMAT)]?.roomIds || []) : []"
       @close="cleaningDialogOpen = false"
     />
   </div>

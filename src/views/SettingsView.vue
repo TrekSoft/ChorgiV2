@@ -15,6 +15,8 @@ import { currentUser } from '../composables/useAuth'
 import { familyMembers } from '../composables/useFamilyMembers'
 import { pendingInvites } from '../composables/usePendingInvites'
 import { uploadMemberPhoto } from '../lib/photo'
+import { DEFAULT_MARK_PENALTY_CENTS } from '../lib/constants'
+import { dollarsToCents, formatCents } from '../lib/format'
 import AppHeader from '../components/AppHeader.vue'
 import PhotoPicker from '../components/PhotoPicker.vue'
 
@@ -87,7 +89,7 @@ watch(
   family,
   (f) => {
     if (f) {
-      markPenalty.value = String((f.markPenaltyCents ?? 50) / 100)
+      markPenalty.value = formatCents(f.markPenaltyCents ?? DEFAULT_MARK_PENALTY_CENTS)
     }
   },
   { immediate: true },
@@ -97,7 +99,7 @@ async function saveMarkPenalty() {
   markPenaltySaving.value = true
   markPenaltySaved.value = false
   try {
-    await updateMarkPenaltyCents(Math.round(parseFloat(markPenalty.value || '0') * 100))
+    await updateMarkPenaltyCents(dollarsToCents(markPenalty.value))
     markPenaltySaved.value = true
   } finally {
     markPenaltySaving.value = false
@@ -124,99 +126,73 @@ async function sendInvite() {
 </script>
 
 <template>
-  <div class="min-h-screen bg-amber-50">
+  <div class="page-bg">
     <AppHeader />
     <main class="max-w-xl mx-auto p-4 sm:p-6 flex flex-col gap-8">
-      <h1 class="text-2xl font-bold text-amber-900">Settings</h1>
+      <h1 class="heading-page">Settings</h1>
 
-      <section class="bg-white rounded-2xl shadow p-6 flex flex-col gap-4">
-        <h2 class="text-lg font-bold text-amber-800">Your profile</h2>
+      <section class="card-base p-6 flex flex-col gap-4">
+        <h2 class="heading-section">Your profile</h2>
         <label class="flex flex-col gap-1">
-          <span class="text-amber-800 font-medium">Name</span>
-          <input
-            v-model="name"
-            type="text"
-            class="border-2 border-amber-200 rounded-xl px-4 py-3 focus:outline-none focus:border-amber-500"
-          />
+          <span class="form-label">Name</span>
+          <input v-model="name" type="text" class="input-field" />
         </label>
         <label class="flex flex-col gap-1">
-          <span class="text-amber-800 font-medium">Birthday</span>
-          <input
-            v-model="birthdate"
-            type="date"
-            class="border-2 border-amber-200 rounded-xl px-4 py-3 focus:outline-none focus:border-amber-500"
-          />
+          <span class="form-label">Birthday</span>
+          <input v-model="birthdate" type="date" class="input-field" />
         </label>
         <PhotoPicker v-model="photoFile" label="Profile photo" :preview-url="member?.photoURL" />
         <button
           @click="saveProfile"
           :disabled="profileSaving"
-          class="self-start bg-amber-500 hover:bg-amber-600 text-white font-bold py-2 px-5 rounded-xl disabled:opacity-50"
+          class="btn-primary self-start"
         >
           {{ profileSaving ? 'Saving…' : 'Save profile' }}
         </button>
-        <p v-if="profileSaved" class="text-green-600 text-sm font-medium">Saved!</p>
+        <p v-if="profileSaved" class="text-success">Saved!</p>
       </section>
 
-      <section class="bg-white rounded-2xl shadow p-6 flex flex-col gap-4">
-        <h2 class="text-lg font-bold text-amber-800">Family PIN</h2>
+      <section class="card-base p-6 flex flex-col gap-4">
+        <h2 class="heading-section">Family PIN</h2>
         <p class="text-amber-600 text-sm">This one PIN is shared by every parent on the account.</p>
         <label class="flex flex-col gap-1">
-          <span class="text-amber-800 font-medium">New PIN</span>
-          <input
-            v-model="newPin"
-            type="password"
-            inputmode="numeric"
-            maxlength="4"
-            class="border-2 border-amber-200 rounded-xl px-4 py-3 focus:outline-none focus:border-amber-500"
-          />
+          <span class="form-label">New PIN</span>
+          <input v-model="newPin" type="password" inputmode="numeric" maxlength="4" class="input-field" />
         </label>
         <label class="flex flex-col gap-1">
-          <span class="text-amber-800 font-medium">Confirm new PIN</span>
-          <input
-            v-model="newPinConfirm"
-            type="password"
-            inputmode="numeric"
-            maxlength="4"
-            class="border-2 border-amber-200 rounded-xl px-4 py-3 focus:outline-none focus:border-amber-500"
-          />
+          <span class="form-label">Confirm new PIN</span>
+          <input v-model="newPinConfirm" type="password" inputmode="numeric" maxlength="4" class="input-field" />
         </label>
-        <p v-if="pinError" class="text-red-500 text-sm">{{ pinError }}</p>
+        <p v-if="pinError" class="text-error">{{ pinError }}</p>
         <button
           @click="savePin"
           :disabled="pinSaving"
-          class="self-start bg-amber-500 hover:bg-amber-600 text-white font-bold py-2 px-5 rounded-xl disabled:opacity-50"
+          class="btn-primary self-start"
         >
           {{ pinSaving ? 'Saving…' : 'Change PIN' }}
         </button>
-        <p v-if="pinSaved" class="text-green-600 text-sm font-medium">PIN updated!</p>
+        <p v-if="pinSaved" class="text-success">PIN updated!</p>
       </section>
 
-      <section class="bg-white rounded-2xl shadow p-6 flex flex-col gap-4">
-        <h2 class="text-lg font-bold text-amber-800">Mark penalty</h2>
+      <section class="card-base p-6 flex flex-col gap-4">
+        <h2 class="heading-section">Mark penalty</h2>
         <p class="text-amber-600 text-sm">Each mark deducts this amount from a child's allowance balance.</p>
         <label class="flex flex-col gap-1">
-          <span class="text-amber-800 font-medium">Penalty per mark ($)</span>
-          <input
-            v-model="markPenalty"
-            type="number"
-            min="0"
-            step="0.25"
-            class="border-2 border-amber-200 rounded-xl px-4 py-3 focus:outline-none focus:border-amber-500"
-          />
+          <span class="form-label">Penalty per mark ($)</span>
+          <input v-model="markPenalty" type="number" min="0" step="0.25" class="input-field" />
         </label>
         <button
           @click="saveMarkPenalty"
           :disabled="markPenaltySaving"
-          class="self-start bg-amber-500 hover:bg-amber-600 text-white font-bold py-2 px-5 rounded-xl disabled:opacity-50"
+          class="btn-primary self-start"
         >
           {{ markPenaltySaving ? 'Saving…' : 'Save penalty' }}
         </button>
-        <p v-if="markPenaltySaved" class="text-green-600 text-sm font-medium">Saved!</p>
+        <p v-if="markPenaltySaved" class="text-success">Saved!</p>
       </section>
 
-      <section class="bg-white rounded-2xl shadow p-6 flex flex-col gap-4">
-        <h2 class="text-lg font-bold text-amber-800">Parents</h2>
+      <section class="card-base p-6 flex flex-col gap-4">
+        <h2 class="heading-section">Parents</h2>
         <ul class="flex flex-col gap-2">
           <li
             v-for="m in familyMembers"
@@ -230,7 +206,7 @@ async function sendInvite() {
             <button
               v-if="m.id !== currentUser.uid && m.id !== familyId"
               @click="removeAuthorizedParent(m.id)"
-              class="text-red-500 text-sm font-medium hover:underline"
+              class="btn-danger-text"
             >
               Remove
             </button>
@@ -246,7 +222,7 @@ async function sendInvite() {
             <span class="text-amber-700">{{ invite.email }} <span class="text-amber-400 text-sm">(authorized, not signed in yet)</span></span>
             <button
               @click="revokeInvite(invite.id)"
-              class="text-red-500 text-sm font-medium hover:underline"
+              class="btn-danger-text"
             >
               Revoke
             </button>
@@ -258,18 +234,18 @@ async function sendInvite() {
             v-model="inviteEmail"
             type="email"
             placeholder="parent@example.com"
-            class="flex-1 border-2 border-amber-200 rounded-xl px-4 py-3 focus:outline-none focus:border-amber-500"
+            class="input-field flex-1"
           />
           <button
             @click="sendInvite"
             :disabled="inviting"
-            class="bg-amber-500 hover:bg-amber-600 text-white font-bold py-2 px-5 rounded-xl disabled:opacity-50"
+            class="btn-primary"
           >
             Authorize
           </button>
         </div>
-        <p v-if="inviteSent" class="text-green-600 text-sm font-medium">{{ inviteSent }}</p>
-        <p v-if="inviteError" class="text-red-500 text-sm font-medium">{{ inviteError }}</p>
+        <p v-if="inviteSent" class="text-success">{{ inviteSent }}</p>
+        <p v-if="inviteError" class="text-error">{{ inviteError }}</p>
         <p class="text-amber-600 text-sm">
           No email is sent. They just need to sign in with this exact email at Chorgi and they'll automatically join your family.
         </p>
