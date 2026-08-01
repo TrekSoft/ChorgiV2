@@ -145,8 +145,9 @@ function removePeriod(i) {
   editablePeriods.value.splice(i, 1)
 }
 
-function resetTimePeriods() {
+async function resetTimePeriods() {
   editablePeriods.value = DEFAULT_TIME_PERIODS.map(p => ({ ...p }))
+  await saveTimePeriods()
 }
 
 async function saveTimePeriods() {
