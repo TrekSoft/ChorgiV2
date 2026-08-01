@@ -96,7 +96,7 @@ function clear(event) {
       :class="dragOver ? 'border-amber-500 bg-amber-100' : 'border-amber-300 bg-amber-50 hover:bg-amber-100'"
     >
       <img v-if="localPreview" :src="localPreview" alt="Preview" class="w-full h-full object-cover" />
-      <div v-else class="flex flex-col items-center gap-1 text-amber-500">
+      <div v-else class="flex flex-col items-center justify-center gap-1 text-amber-500 h-full">
         <Icon icon="mdi:image" class="w-8 h-8" />
         <span class="text-sm font-medium">Tap or drag a photo here</span>
       </div>
