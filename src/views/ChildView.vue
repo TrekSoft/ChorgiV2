@@ -304,6 +304,7 @@ async function onTaskUnclaim(task) {
           <h2 class="heading-section">My chores</h2>
           <EmptyState
             v-if="assigned.length === 0"
+            compact
             title="No chores right now"
             subtitle="Check back later, or grab an extra chore!"
           />
@@ -329,6 +330,12 @@ async function onTaskUnclaim(task) {
         <section class="flex flex-col gap-6">
           <div v-if="claimableChores.length > 0 || cleaningSections.length === 0" class="flex flex-col gap-3">
             <h2 class="heading-section">Extra chores</h2>
+            <EmptyState
+              v-if="claimableChores.length === 0"
+              compact
+              title="Nothing to claim right now"
+              subtitle="Extra one-off chores and cleaning-day tasks will show up here."
+            />
             <ChoreCard
               v-for="task in claimableChores"
               :key="task.id"
@@ -365,11 +372,6 @@ async function onTaskUnclaim(task) {
             />
           </div>
 
-          <EmptyState
-            v-if="claimableChores.length === 0 && cleaningSections.length === 0"
-            title="Nothing to claim right now"
-            subtitle="Extra one-off chores and cleaning-day tasks will show up here."
-          />
         </section>
       </div>
     </main>
