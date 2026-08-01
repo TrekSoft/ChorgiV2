@@ -10,7 +10,6 @@ import { CHORE_KIND, FORM_KIND } from '../lib/constants'
 import ScheduleItem from './ScheduleItem.vue'
 import PhotoLightbox from './PhotoLightbox.vue'
 import ChoreFormDialog from './ChoreFormDialog.vue'
-import EmptyState from './EmptyState.vue'
 
 // --- rooms ---
 const newRoomName = ref('')
@@ -110,7 +109,7 @@ function openEditTask(task) {
 <template>
   <div class="flex flex-col gap-8">
     <!-- rooms & tasks -->
-    <section class="flex flex-col gap-4">
+    <section class="relative flex flex-col gap-4">
       <h2 class="heading-page">Rooms & tasks</h2>
 
       <div class="flex gap-2 max-w-md">
@@ -130,13 +129,20 @@ function openEditTask(task) {
         </button>
       </div>
 
-      <EmptyState
+      <div
         v-if="rooms.length === 0"
-        title="No rooms yet"
-        subtitle="Add a room (e.g. Kitchen), then add cleaning tasks to it."
-      />
+        class="absolute top-[6.5rem] left-0 z-20 hidden sm:flex items-end gap-1 pointer-events-none select-none"
+      >
+        <span class="font-handwritten text-3xl leading-none text-amber-600 -rotate-2 mb-3 text-right">
+          Add a room and the cleaning tasks<br />that need to be done for it
+        </span>
+        <svg class="w-20 h-14 shrink-0 text-amber-500" viewBox="0 0 80 56" fill="none">
+          <path d="M8 50 C 28 48, 54 40, 68 13" stroke="currentColor" stroke-width="2.5" stroke-dasharray="7 6" stroke-linecap="round" />
+          <path d="M57 12 L 69 12 L 67 25" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </div>
 
-      <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div v-if="rooms.length > 0" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <div v-for="room in rooms" :key="room.id" class="bg-white rounded-2xl border-2 border-amber-200 p-4 flex flex-col gap-3">
           <div class="flex items-center justify-between">
             <h3 class="font-bold text-amber-900 text-lg">{{ room.name }}</h3>
@@ -175,9 +181,10 @@ function openEditTask(task) {
           </button>
         </div>
       </div>
+      <div v-else class="hidden sm:block h-28"></div>
     </section>
 
-    <p class="text-amber-600 text-sm">Mark cleaning days from the Calendar tab using the 🧹 button on each day.</p>
+    <p class="text-amber-600 text-base font-medium">Mark cleaning days from the Calendar tab using the 🧹 button on each day.</p>
 
     <!-- task add/edit dialog -->
     <ChoreFormDialog
