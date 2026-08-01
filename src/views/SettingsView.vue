@@ -238,16 +238,16 @@ async function saveTimePeriods() {
       <section class="card-shadow p-6 flex flex-col gap-4">
         <h2 class="heading-section">Time periods</h2>
         <p class="text-amber-600 text-sm">These preset time windows appear as quick options when creating recurring chores.</p>
-        <div v-for="(period, i) in editablePeriods" :key="i" class="flex gap-2 items-end">
-          <label class="flex flex-col gap-1 flex-1">
+        <div v-for="(period, i) in editablePeriods" :key="i" class="flex flex-wrap gap-2 items-end">
+          <label class="flex flex-col gap-1 flex-1 min-w-0">
             <span class="form-label">Label</span>
             <input v-model="period.label" type="text" class="input-field" placeholder="e.g. Morning" />
           </label>
-          <label class="flex flex-col gap-1">
+          <label class="flex flex-col gap-1 w-24">
             <span class="form-label">Start</span>
             <input v-model="period.start" type="time" class="input-field" />
           </label>
-          <label class="flex flex-col gap-1">
+          <label class="flex flex-col gap-1 w-24">
             <span class="form-label">End</span>
             <input v-model="period.end" type="time" class="input-field" />
           </label>
