@@ -115,4 +115,9 @@
   .drop-zone {
     @apply border-2 border-dashed rounded-2xl cursor-pointer transition-colors;
   }
+
+  /* Handwritten annotation text */
+  .font-handwritten {
+    font-family: 'Caveat', 'Comic Sans MS', cursive;
+  }
 }
