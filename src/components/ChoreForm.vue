@@ -180,7 +180,7 @@ function submit() {
     <div v-if="showRoom" class="flex flex-col gap-1">
       <span class="form-label">Room</span>
       <div class="relative">
-        <select v-model="roomId" class="input-field appearance-none pr-10">
+        <select v-model="roomId" class="input-field w-full appearance-none pr-10">
           <option v-for="room in rooms" :key="room.id" :value="room.id">{{ room.name }}</option>
         </select>
         <Icon icon="mdi:chevron-down" class="w-5 h-5 text-amber-500 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
@@ -210,7 +210,7 @@ function submit() {
 
       <template v-if="recurrenceMode === RECURRENCE_MODE.DAILY">
         <div class="relative">
-          <select v-model="dailyPatternType" class="input-field appearance-none pr-10">
+          <select v-model="dailyPatternType" class="input-field w-full appearance-none pr-10">
             <option :value="RECURRENCE_TYPE.DAILY">Every day</option>
             <option :value="RECURRENCE_TYPE.WEEKDAYS">Specific weekdays</option>
             <option :value="RECURRENCE_TYPE.ODD_DAYS">Odd days of month</option>
