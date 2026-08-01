@@ -106,7 +106,7 @@ function openEdit(entry) {
   <div class="relative flex flex-col gap-4">
     <div
       v-if="chores.length === 0"
-      class="absolute top-16 right-[4.5rem] z-20 hidden sm:flex items-end gap-1 pointer-events-none select-none"
+      class="absolute top-10 right-[7rem] z-20 hidden sm:flex items-end gap-1 pointer-events-none select-none"
     >
       <span class="font-handwritten text-3xl leading-none text-amber-600 -rotate-2 mb-3 text-right">
         Add recurring chores here<br />or one-off chores below
