@@ -243,11 +243,11 @@ async function saveTimePeriods() {
             <span class="form-label">Label</span>
             <input v-model="period.label" type="text" class="input-field" placeholder="e.g. Morning" />
           </label>
-          <label class="flex flex-col gap-1 w-24">
+          <label class="flex flex-col gap-1 flex-1 min-w-0">
             <span class="form-label">Start</span>
             <input v-model="period.start" type="time" class="input-field" />
           </label>
-          <label class="flex flex-col gap-1 w-24">
+          <label class="flex flex-col gap-1 flex-1 min-w-0">
             <span class="form-label">End</span>
             <input v-model="period.end" type="time" class="input-field" />
           </label>
