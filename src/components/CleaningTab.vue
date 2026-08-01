@@ -131,15 +131,15 @@ function openEditTask(task) {
 
       <div
         v-if="rooms.length === 0"
-        class="absolute top-[6.5rem] left-0 z-20 hidden sm:flex items-end gap-1 pointer-events-none select-none"
+        class="absolute top-[6.5rem] left-[26rem] z-20 hidden sm:flex items-end gap-1 pointer-events-none select-none"
       >
-        <span class="font-handwritten text-3xl leading-none text-amber-600 -rotate-2 mb-3 text-right">
+        <svg class="w-20 h-14 shrink-0 text-amber-500" viewBox="0 0 80 56" fill="none">
+          <path d="M72 50 C 52 48, 26 40, 12 13" stroke="currentColor" stroke-width="2.5" stroke-dasharray="7 6" stroke-linecap="round" />
+          <path d="M23 12 L 11 12 L 13 25" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+        <span class="font-handwritten text-3xl leading-none text-amber-600 -rotate-2 mb-3">
           Add a room and the cleaning tasks<br />that need to be done for it
         </span>
-        <svg class="w-20 h-14 shrink-0 text-amber-500" viewBox="0 0 80 56" fill="none">
-          <path d="M8 50 C 28 48, 54 40, 68 13" stroke="currentColor" stroke-width="2.5" stroke-dasharray="7 6" stroke-linecap="round" />
-          <path d="M57 12 L 69 12 L 67 25" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
-        </svg>
       </div>
 
       <div v-if="rooms.length > 0" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
