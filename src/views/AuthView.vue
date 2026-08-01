@@ -24,7 +24,7 @@ async function submit() {
 
 <template>
   <main class="page-bg flex items-center justify-center p-6">
-    <div class="card-base p-8 w-full max-w-sm flex flex-col items-center gap-6">
+    <div class="card-shadow p-8 w-full max-w-sm flex flex-col items-center gap-6">
       <img :src="logo" alt="Chorgi logo" class="w-32 h-32" />
       <h1 class="text-4xl font-bold text-amber-900">Chorgi</h1>
 

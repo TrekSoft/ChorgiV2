@@ -131,7 +131,7 @@ async function sendInvite() {
     <main class="max-w-xl mx-auto p-4 sm:p-6 flex flex-col gap-8">
       <h1 class="heading-page">Settings</h1>
 
-      <section class="card-base p-6 flex flex-col gap-4">
+      <section class="card-shadow p-6 flex flex-col gap-4">
         <h2 class="heading-section">Your profile</h2>
         <label class="flex flex-col gap-1">
           <span class="form-label">Name</span>
@@ -152,7 +152,7 @@ async function sendInvite() {
         <p v-if="profileSaved" class="text-success">Saved!</p>
       </section>
 
-      <section class="card-base p-6 flex flex-col gap-4">
+      <section class="card-shadow p-6 flex flex-col gap-4">
         <h2 class="heading-section">Family PIN</h2>
         <p class="text-amber-600 text-sm">This one PIN is shared by every parent on the account.</p>
         <label class="flex flex-col gap-1">
@@ -174,7 +174,7 @@ async function sendInvite() {
         <p v-if="pinSaved" class="text-success">PIN updated!</p>
       </section>
 
-      <section class="card-base p-6 flex flex-col gap-4">
+      <section class="card-shadow p-6 flex flex-col gap-4">
         <h2 class="heading-section">Mark penalty</h2>
         <p class="text-amber-600 text-sm">Each mark deducts this amount from a child's allowance balance.</p>
         <label class="flex flex-col gap-1">
@@ -191,7 +191,7 @@ async function sendInvite() {
         <p v-if="markPenaltySaved" class="text-success">Saved!</p>
       </section>
 
-      <section class="card-base p-6 flex flex-col gap-4">
+      <section class="card-shadow p-6 flex flex-col gap-4">
         <h2 class="heading-section">Parents</h2>
         <ul class="flex flex-col gap-2">
           <li
