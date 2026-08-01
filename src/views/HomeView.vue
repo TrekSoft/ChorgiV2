@@ -35,7 +35,7 @@ function closeDialog() {
         title="No children yet"
         subtitle="Turn on Admin mode from the avatar menu, then add a child here to get started."
       />
-      <div v-else class="grid gap-4 sm:gap-6 [grid-template-columns:repeat(auto-fit,minmax(24rem,1fr))]">
+      <div v-else class="grid gap-4 sm:gap-6 [grid-template-columns:repeat(auto-fit,minmax(24rem,28rem))] justify-center">
         <ChildTile v-for="child in children" :key="child.id" :child="child" @edit="openEdit" />
         <AddChildTile v-if="isAdminMode" @click="openAdd" />
       </div>
