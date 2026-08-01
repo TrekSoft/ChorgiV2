@@ -13,7 +13,6 @@ import ScheduleItem from './ScheduleItem.vue'
 import PhotoLightbox from './PhotoLightbox.vue'
 import ChoreFormDialog from './ChoreFormDialog.vue'
 import CleaningDayDialog from './CleaningDayDialog.vue'
-import EmptyState from './EmptyState.vue'
 
 const anchor = ref(new Date())
 const filterChildId = ref(null)
@@ -104,7 +103,19 @@ function openEdit(entry) {
 </script>
 
 <template>
-  <div class="flex flex-col gap-4">
+  <div class="relative flex flex-col gap-4">
+    <div
+      v-if="chores.length === 0"
+      class="absolute top-16 right-[4.5rem] z-20 hidden sm:flex items-end gap-1 pointer-events-none select-none"
+    >
+      <span class="font-handwritten text-3xl leading-none text-amber-600 -rotate-2 mb-3 text-right">
+        Add recurring chores here<br />or one-off chores below
+      </span>
+      <svg class="w-20 h-14 shrink-0 text-amber-500" viewBox="0 0 80 56" fill="none">
+        <path d="M8 50 C 28 48, 54 40, 68 13" stroke="currentColor" stroke-width="2.5" stroke-dasharray="7 6" stroke-linecap="round" />
+        <path d="M57 12 L 69 12 L 67 25" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+    </div>
     <!-- week nav -->
     <div class="flex items-center gap-2 flex-wrap">
       <button
@@ -204,12 +215,6 @@ function openEdit(entry) {
         </div>
       </div>
     </div>
-
-    <EmptyState
-      v-if="chores.length === 0"
-      title="No chores yet"
-      subtitle="Add a recurring chore, or use the + button on a day for a one-off chore (optionally with a bonus)."
-    />
 
     <ChoreFormDialog
       :open="dialogOpen"
