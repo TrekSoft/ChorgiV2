@@ -14,6 +14,10 @@
     @apply text-amber-700 font-medium py-2 px-4 rounded-xl hover:bg-amber-50 cursor-pointer;
   }
 
+  .btn-secondary {
+    @apply bg-amber-100 hover:bg-amber-200 text-amber-700 font-medium py-2 px-5 rounded-xl cursor-pointer;
+  }
+
   .btn-danger-text {
     @apply text-red-500 font-medium text-sm hover:underline cursor-pointer;
   }

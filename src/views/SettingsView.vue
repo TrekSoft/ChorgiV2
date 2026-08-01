@@ -15,8 +15,9 @@ import { currentUser } from '../composables/useAuth'
 import { familyMembers } from '../composables/useFamilyMembers'
 import { pendingInvites } from '../composables/usePendingInvites'
 import { uploadMemberPhoto } from '../lib/photo'
-import { DEFAULT_MARK_PENALTY_CENTS } from '../lib/constants'
+import { DEFAULT_MARK_PENALTY_CENTS, DEFAULT_TIME_PERIODS } from '../lib/constants'
 import { dollarsToCents, formatCents } from '../lib/format'
+import { timePeriods, updateTimePeriods } from '../composables/useTimePeriods'
 import AppHeader from '../components/AppHeader.vue'
 import PhotoPicker from '../components/PhotoPicker.vue'
 
@@ -123,6 +124,49 @@ async function sendInvite() {
     inviting.value = false
   }
 }
+
+const editablePeriods = ref([])
+const timePeriodsSaving = ref(false)
+const timePeriodsSaved = ref(false)
+
+watch(
+  timePeriods,
+  (periods) => {
+    editablePeriods.value = periods.map(p => ({ ...p }))
+  },
+  { immediate: true },
+)
+
+function addPeriod() {
+  editablePeriods.value.push({ id: '', label: '', start: '', end: '' })
+}
+
+function removePeriod(i) {
+  editablePeriods.value.splice(i, 1)
+}
+
+function resetTimePeriods() {
+  editablePeriods.value = DEFAULT_TIME_PERIODS.map(p => ({ ...p }))
+}
+
+async function saveTimePeriods() {
+  timePeriodsSaving.value = true
+  timePeriodsSaved.value = false
+  try {
+    const periods = editablePeriods.value
+      .filter(p => p.label.trim() && p.start && p.end)
+      .map(p => ({
+        id: p.id || crypto.randomUUID(),
+        label: p.label.trim(),
+        start: p.start,
+        end: p.end,
+      }))
+    await updateTimePeriods(periods)
+    timePeriodsSaved.value = true
+  } finally {
+    timePeriodsSaving.value = false
+  }
+}
 </script>
 
 <template>
@@ -189,6 +233,44 @@ async function sendInvite() {
           {{ markPenaltySaving ? 'Saving…' : 'Save penalty' }}
         </button>
         <p v-if="markPenaltySaved" class="text-success">Saved!</p>
+      </section>
+
+      <section class="card-shadow p-6 flex flex-col gap-4">
+        <h2 class="heading-section">Time periods</h2>
+        <p class="text-amber-600 text-sm">These preset time windows appear as quick options when creating recurring chores.</p>
+        <div v-for="(period, i) in editablePeriods" :key="i" class="flex gap-2 items-end">
+          <label class="flex flex-col gap-1 flex-1">
+            <span class="form-label">Label</span>
+            <input v-model="period.label" type="text" class="input-field" placeholder="e.g. Morning" />
+          </label>
+          <label class="flex flex-col gap-1">
+            <span class="form-label">Start</span>
+            <input v-model="period.start" type="time" class="input-field" />
+          </label>
+          <label class="flex flex-col gap-1">
+            <span class="form-label">End</span>
+            <input v-model="period.end" type="time" class="input-field" />
+          </label>
+          <button
+            type="button"
+            @click="removePeriod(i)"
+            class="btn-danger-text pb-2"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+        <button type="button" @click="addPeriod" class="btn-secondary self-start">+ Add period</button>
+        <div class="flex gap-2">
+          <button
+            @click="saveTimePeriods"
+            :disabled="timePeriodsSaving"
+            class="btn-primary"
+          >
+            {{ timePeriodsSaving ? 'Saving…' : 'Save periods' }}
+          </button>
+          <button type="button" @click="resetTimePeriods" class="btn-secondary">Reset to defaults</button>
+        </div>
+        <p v-if="timePeriodsSaved" class="text-success">Saved!</p>
       </section>
 
       <section class="card-shadow p-6 flex flex-col gap-4">

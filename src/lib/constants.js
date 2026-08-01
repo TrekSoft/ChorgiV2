@@ -48,6 +48,12 @@ export const RECURRENCE_MODE = Object.freeze({
 export const WEEK_START_SUNDAY = 0
 export const WEEK_START_MONDAY = 1
 
+export const DEFAULT_TIME_PERIODS = [
+  { id: 'morning', label: 'Morning', start: '07:00', end: '12:00' },
+  { id: 'afternoon', label: 'Afternoon', start: '12:00', end: '18:00' },
+  { id: 'bedtime', label: 'Bedtime', start: '17:00', end: '21:00' },
+]
+
 export const DEFAULT_MARK_PENALTY_CENTS = 50
 export const ADMIN_TIMEOUT_MS = 30 * 60 * 1000
 export const NOW_TICK_INTERVAL_MS = 15_000

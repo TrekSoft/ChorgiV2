@@ -5,6 +5,7 @@ import IconPicker from './IconPicker.vue'
 import PhotoUpload from './PhotoUpload.vue'
 import { FORM_KIND, CHORE_KIND, RECURRENCE_TYPE, RECURRENCE_MODE } from '../lib/constants'
 import { dollarsToCents } from '../lib/format'
+import { timePeriods } from '../composables/useTimePeriods'
 
 const props = defineProps({
   kind: { type: String, required: true },
@@ -32,6 +33,26 @@ const weekdays = ref(props.initial?.recurrence?.days || [1, 2, 3, 4, 5])
 const dayOfMonth = ref(props.initial?.recurrence?.day || 1)
 const timeStart = ref(props.initial?.timeWindow?.start || '')
 const timeEnd = ref(props.initial?.timeWindow?.end || '')
+const useCustomTime = ref(false)
+const selectedPeriodId = ref('')
+
+if (props.initial?.timeWindow) {
+  const tw = props.initial.timeWindow
+  const match = timePeriods.value.find(p => p.start === tw.start && p.end === tw.end)
+  if (match) {
+    selectedPeriodId.value = match.id
+  } else {
+    useCustomTime.value = true
+  }
+}
+
+function formatTimeLabel(time) {
+  if (!time) return ''
+  const [h, m] = time.split(':').map(Number)
+  const period = h >= 12 ? 'pm' : 'am'
+  const displayH = h === 0 ? 12 : h > 12 ? h - 12 : h
+  return m === 0 ? `${displayH}${period}` : `${displayH}:${String(m).padStart(2, '0')}${period}`
+}
 
 const showDate = computed(() => props.kind === FORM_KIND.ONEOFF_CHORE)
 const showBonus = computed(() => props.kind === FORM_KIND.ONEOFF_CHORE)
@@ -67,6 +88,22 @@ watch(recurrenceMode, (mode) => {
   if (mode === RECURRENCE_MODE.WEEKLY) {
     timeStart.value = ''
     timeEnd.value = ''
+    selectedPeriodId.value = ''
+    useCustomTime.value = false
+  }
+})
+
+watch(selectedPeriodId, (id) => {
+  if (useCustomTime.value) return
+  if (!id) {
+    timeStart.value = ''
+    timeEnd.value = ''
+    return
+  }
+  const period = timePeriods.value.find(p => p.id === id)
+  if (period) {
+    timeStart.value = period.start
+    timeEnd.value = period.end
   }
 })
 
@@ -241,15 +278,33 @@ function submit() {
       </template>
     </div>
 
-    <div v-if="showTimeWindow" class="flex gap-3">
-      <label class="flex flex-col gap-1 flex-1">
-        <span class="form-label">Start time <span class="form-hint">(optional)</span></span>
-        <input v-model="timeStart" type="time" class="input-field" />
-      </label>
-      <label class="flex flex-col gap-1 flex-1">
-        <span class="form-label">End time <span class="form-hint">(optional)</span></span>
-        <input v-model="timeEnd" type="time" class="input-field" />
-      </label>
+    <div v-if="showTimeWindow" class="flex flex-col gap-1">
+      <span class="form-label">Time window <span class="form-hint">(optional)</span></span>
+      <div v-if="!useCustomTime" class="flex items-center gap-2">
+        <div class="relative flex-1">
+          <select v-model="selectedPeriodId" class="input-field w-full appearance-none pr-10">
+            <option value="">None</option>
+            <option v-for="period in timePeriods" :key="period.id" :value="period.id">
+              {{ period.label }} ({{ formatTimeLabel(period.start) }}–{{ formatTimeLabel(period.end) }})
+            </option>
+          </select>
+          <Icon icon="mdi:chevron-down" class="w-5 h-5 text-amber-500 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+        </div>
+        <button type="button" @click="useCustomTime = true; selectedPeriodId = ''" class="text-sm text-amber-600 hover:text-amber-700 underline whitespace-nowrap pb-2">Custom</button>
+      </div>
+      <div v-else class="flex flex-col gap-2">
+        <div class="flex gap-3">
+          <label class="flex flex-col gap-1 flex-1">
+            <span class="form-label">Start time</span>
+            <input v-model="timeStart" type="time" class="input-field" />
+          </label>
+          <label class="flex flex-col gap-1 flex-1">
+            <span class="form-label">End time</span>
+            <input v-model="timeEnd" type="time" class="input-field" />
+          </label>
+        </div>
+        <button type="button" @click="useCustomTime = false; selectedPeriodId = ''; timeStart = ''; timeEnd = ''" class="text-sm text-amber-600 hover:text-amber-700 underline self-start">← Presets</button>
+      </div>
     </div>
 
     <label v-if="showDate" class="flex flex-col gap-1">
