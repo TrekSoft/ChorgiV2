@@ -327,7 +327,7 @@ async function onTaskUnclaim(task) {
 
         <!-- right: claimable tasks -->
         <section class="flex flex-col gap-6">
-          <div v-if="claimableChores.length > 0" class="flex flex-col gap-3">
+          <div v-if="claimableChores.length > 0 || cleaningSections.length === 0" class="flex flex-col gap-3">
             <h2 class="heading-section">Extra chores</h2>
             <ChoreCard
               v-for="task in claimableChores"
