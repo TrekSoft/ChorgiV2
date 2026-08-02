@@ -286,7 +286,7 @@ function submit() {
 
     <div v-if="showTimeWindow" class="flex flex-col gap-1">
       <span class="form-label">Time window <span class="form-hint">(optional)</span></span>
-      <div v-if="!useCustomTime" class="flex flex-col sm:flex-row sm:items-center gap-2">
+      <div v-if="!useCustomTime" class="flex items-center gap-2">
         <div class="relative flex-1">
           <select v-model="selectedPeriodId" class="input-field w-full appearance-none pr-10">
             <option value="">None</option>
@@ -296,10 +296,10 @@ function submit() {
           </select>
           <Icon icon="mdi:chevron-down" class="w-5 h-5 text-amber-500 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
         </div>
-        <button type="button" @click="useCustomTime = true; selectedPeriodId = ''" class="text-sm text-amber-600 hover:text-amber-700 underline whitespace-nowrap self-start sm:self-auto">Custom</button>
+        <button type="button" @click="useCustomTime = true; selectedPeriodId = ''" class="text-sm text-amber-600 hover:text-amber-700 underline whitespace-nowrap pb-2">Custom</button>
       </div>
       <div v-else class="flex flex-col gap-2">
-        <div class="flex flex-col sm:flex-row gap-3">
+        <div class="flex gap-3">
           <label class="flex flex-col gap-1 flex-1">
             <span class="form-label">Start time</span>
             <input v-model="timeStart" type="time" class="input-field" />

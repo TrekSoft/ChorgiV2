@@ -240,8 +240,8 @@ async function saveTimePeriods() {
       <section class="card-shadow p-6 flex flex-col gap-4">
         <h2 class="heading-section">Time periods</h2>
         <p class="text-amber-600 text-sm">These preset time windows appear as quick options when creating recurring chores.</p>
-        <div v-for="(period, i) in editablePeriods" :key="i" class="flex flex-wrap gap-2 items-end">
-          <label class="flex flex-col gap-1 w-28 shrink-0">
+        <div v-for="(period, i) in editablePeriods" :key="i" class="flex flex-col sm:flex-row sm:flex-wrap gap-2 sm:items-end">
+          <label class="flex flex-col gap-1 sm:w-28 sm:shrink-0">
             <span class="form-label">Label</span>
             <input v-model="period.label" type="text" class="input-field" placeholder="e.g. Morning" />
           </label>
@@ -256,7 +256,7 @@ async function saveTimePeriods() {
           <button
             type="button"
             @click="removePeriod(i)"
-            class="btn-danger-text pb-2"
+            class="btn-danger-text self-start sm:pb-2"
           >
             <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
           </button>
