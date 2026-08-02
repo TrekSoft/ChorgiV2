@@ -3,12 +3,13 @@ import { computed } from 'vue'
 import { Icon } from '@iconify/vue'
 import { format, parse } from 'date-fns'
 import { formatCents } from '../lib/format'
+import type { TimeWindow } from '../types/firebase'
 
 const props = withDefaults(defineProps<{
   name: string
   iconName?: string | null
   photoUrl?: string | null
-  timeWindow?: { start?: string; end?: string } | null
+  timeWindow?: TimeWindow | null
   weekly?: boolean
   oneoff?: boolean
   bonusCents?: number | null

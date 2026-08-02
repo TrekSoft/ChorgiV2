@@ -9,26 +9,28 @@ import PhotoLightbox from '../components/PhotoLightbox.vue'
 import CountdownLabel from '../components/CountdownLabel.vue'
 import ConfettiBurst from '../components/ConfettiBurst.vue'
 import AddChildTile from '../components/AddChildTile.vue'
+import { FORM_KIND, type FormKind, type ConfettiMode } from '../lib/constants'
+import type { ChoreFormPayload, Child, Room } from '../types/firebase'
 
 const dummyChildren = [
   { id: 'c1', name: 'Hadassah' },
   { id: 'c2', name: 'Samuel' },
   { id: 'c3', name: 'River' },
-]
+] as unknown as Child[]
 const dummyRooms = [
   { id: 'r1', name: 'Kitchen' },
   { id: 'r2', name: 'Living Room' },
-]
+] as unknown as Room[]
 
 const icon = ref('mdi:broom')
 const photoFile = ref<Blob | null>(null)
 
 const lightboxOpen = ref(false)
-const confettiRef = ref<any>(null)
+const confettiRef = ref<{ fire: (mode?: ConfettiMode) => void } | null>(null)
 
-const formKind = ref('recurring-chore')
+const formKind = ref<FormKind>(FORM_KIND.RECURRING_CHORE)
 
-function onFormSubmit(data: Record<string, any>) {
+function onFormSubmit(data: ChoreFormPayload) {
   console.log('form submit', data)
   alert('Submitted! Check the console for the payload.')
 }
@@ -106,9 +108,9 @@ function onUnassign() {
       <h2 class="text-xl font-bold text-amber-800">ConfettiBurst</h2>
       <ConfettiBurst ref="confettiRef" />
       <div class="flex gap-2">
-        <button @click="confettiRef.fire('confetti')" class="bg-amber-500 text-white font-bold py-2 px-4 rounded-xl cursor-pointer">Confetti</button>
-        <button @click="confettiRef.fire('coins')" class="bg-amber-500 text-white font-bold py-2 px-4 rounded-xl cursor-pointer">Coins</button>
-        <button @click="confettiRef.fire('fireworks')" class="bg-amber-500 text-white font-bold py-2 px-4 rounded-xl cursor-pointer">Fireworks</button>
+        <button @click="confettiRef?.fire('confetti')" class="bg-amber-500 text-white font-bold py-2 px-4 rounded-xl cursor-pointer">Confetti</button>
+        <button @click="confettiRef?.fire('coins')" class="bg-amber-500 text-white font-bold py-2 px-4 rounded-xl cursor-pointer">Coins</button>
+        <button @click="confettiRef?.fire('fireworks')" class="bg-amber-500 text-white font-bold py-2 px-4 rounded-xl cursor-pointer">Fireworks</button>
       </div>
     </section>
 
@@ -141,7 +143,7 @@ function onUnassign() {
       <h2 class="text-xl font-bold text-amber-800">ChoreForm</h2>
       <div class="flex gap-2 flex-wrap">
         <button
-          v-for="k in ['recurring-chore', 'oneoff-chore', 'cleaning-task']"
+          v-for="k in ([FORM_KIND.RECURRING_CHORE, FORM_KIND.ONEOFF_CHORE, FORM_KIND.CLEANING_TASK] as FormKind[])"
           :key="k"
           @click="formKind = k"
           class="px-3 py-1.5 rounded-full border-2 font-medium cursor-pointer"

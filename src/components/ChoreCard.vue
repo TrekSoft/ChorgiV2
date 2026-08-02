@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue'
 import CountdownLabel from './CountdownLabel.vue'
-import { CARD_VARIANT } from '../lib/constants'
+import { CARD_VARIANT, type CardVariant } from '../lib/constants'
 import { formatCents } from '../lib/format'
 
 const props = withDefaults(defineProps<{
@@ -18,7 +18,7 @@ const props = withDefaults(defineProps<{
   claimedByPhoto?: string | null
   bonusCents?: number | null
   disabled?: boolean
-  variant?: string
+  variant?: CardVariant
   canUnassign?: boolean
   unassignLabel?: string
 }>(), {

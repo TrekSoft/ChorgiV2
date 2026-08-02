@@ -4,7 +4,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { format } from 'date-fns'
 import { Icon } from '@iconify/vue'
 import { occursOn, deadlineFor, startsAt } from '../lib/recurrence'
-import { CHORE_KIND, CARD_VARIANT, CONFETTI_MODE, NOW_TICK_INTERVAL_MS, TOAST_DURATION_MS, WEEK_START_SUNDAY } from '../lib/constants'
+import { CHORE_KIND, CARD_VARIANT, CONFETTI_MODE, NOW_TICK_INTERVAL_MS, TOAST_DURATION_MS, WEEK_START_SUNDAY, type ConfettiMode } from '../lib/constants'
 import { DATE_FORMAT, formatCents } from '../lib/format'
 import { family } from '../composables/useFamily'
 import { children } from '../composables/useChildren'
@@ -29,6 +29,7 @@ import ChoreCard from '../components/ChoreCard.vue'
 import EmptyState from '../components/EmptyState.vue'
 import ConfettiBurst from '../components/ConfettiBurst.vue'
 import PhotoLightbox from '../components/PhotoLightbox.vue'
+import type { Chore, Task, Claim, Child, ClaimableItem, AssignedEntry } from '../types/firebase'
 
 const route = useRoute()
 const router = useRouter()
@@ -51,7 +52,7 @@ watch(() => route.params.id, () => {
 
 const todayStr = computed(() => format(now.value, DATE_FORMAT))
 
-const burst = ref<any>(null)
+const burst = ref<{ fire: (mode?: ConfettiMode) => void } | null>(null)
 const toast = ref<string | null>(null)
 let toastTimer: ReturnType<typeof setTimeout> | null = null
 function showToast(message: string) {
@@ -68,7 +69,7 @@ const lightboxSrc = ref<string | null>(null)
 // Snapshot the initial order on mount so completing a chore doesn't reshuffle
 let initialOrder: string[] = []
 
-function snapshotOrder(list: any[]) {
+function snapshotOrder(list: AssignedEntry[]) {
   initialOrder = list.map((e) => e.chore.id)
 }
 
@@ -79,7 +80,7 @@ function orderIndex(choreId: string) {
 
 const assigned = computed(() => {
   if (!child.value) return []
-  const list: any[] = []
+  const list: AssignedEntry[] = []
   for (const chore of chores.value) {
     if (chore.active === false) continue
     if (!(chore.assigneeIds || []).includes(child.value.id)) continue
@@ -99,8 +100,8 @@ const assigned = computed(() => {
   }
   // On first load, snapshot the natural order (overdue, then actionable, then completed by deadline)
   if (initialOrder.length === 0 && list.length > 0) {
-    const rank = (e: any) => (e.overdue ? 0 : e.completed ? 2 : 1)
-    const sorted = [...list].sort((a, b) => rank(a) - rank(b) || a.deadline - b.deadline)
+    const rank = (e: AssignedEntry) => (e.overdue ? 0 : e.completed ? 2 : 1)
+    const sorted = [...list].sort((a, b) => rank(a) - rank(b) || a.deadline.getTime() - b.deadline.getTime())
     snapshotOrder(sorted)
   }
   // Keep the initial order stable; new chores (not in snapshot) go to the end
@@ -109,7 +110,7 @@ const assigned = computed(() => {
 
 let completedThisSession = false
 
-async function toggleChore(entry: any) {
+async function toggleChore(entry: AssignedEntry) {
   if (!child.value) return
   if (entry.completed) {
     await uncompleteChore(entry.chore, child.value.id, now.value, weekStartsOn.value)
@@ -133,11 +134,11 @@ watch(allAssignedDone, (done) => {
 })
 
 // --- right pane: claimable tasks ---
-function claimFor(task: any) {
+function claimFor(task: ClaimableItem) {
   return claims.value[claimIdFor(task, todayStr.value)] || null
 }
 
-function claimChild(claim: Record<string, any> | null) {
+function claimChild(claim: Claim | null) {
   return children.value.find((c) => c.id === claim?.childId) || null
 }
 
@@ -163,20 +164,20 @@ const cleaningSections = computed(() => {
     .filter((s) => s.room && s.tasks.length > 0)
 })
 
-function isPreAssigned(task: any) {
+function isPreAssigned(task: ClaimableItem) {
   return !!task.assigneeId && task.assigneeId === child.value?.id
 }
 
-function isAssignedToOther(task: any) {
+function isAssignedToOther(task: ClaimableItem) {
   return !!task.assigneeId && task.assigneeId !== child.value?.id
 }
 
-function assignedChild(task: any) {
+function assignedChild(task: ClaimableItem): Child | null {
   return children.value.find((c) => c.id === task.assigneeId) || null
 }
 
 // card state helpers for claimable tasks
-function taskCardProps(task: any) {
+function taskCardProps(task: ClaimableItem) {
   if (task.assigneeId) {
     const claim = claimFor(task)
     const child_ = assignedChild(task)
@@ -199,7 +200,7 @@ function taskCardProps(task: any) {
   }
 }
 
-function canUnclaim(task: any) {
+function canUnclaim(task: ClaimableItem) {
   if (isPreAssigned(task)) return false
   const claim = claimFor(task)
   if (!claim || claim.completed) return false
@@ -207,13 +208,13 @@ function canUnclaim(task: any) {
   return !!(mine || isAdminMode.value)
 }
 
-function unclaimLabel(task: any) {
+function unclaimLabel(task: ClaimableItem) {
   const claim = claimFor(task)
   const mine = claim && child.value && claim.childId === child.value.id
   return mine ? 'Remove me' : 'Unassign'
 }
 
-async function onTaskTap(task: any) {
+async function onTaskTap(task: ClaimableItem) {
   if (!child.value) return
   if (isAssignedToOther(task)) {
     if (!isAdminMode.value) return
@@ -264,7 +265,7 @@ async function onTaskTap(task: any) {
   }
 }
 
-async function onTaskUnclaim(task: any) {
+async function onTaskUnclaim(task: ClaimableItem) {
   const claim = claimFor(task)
   if (!claim || claim.completed) return
   const mine = child.value && claim.childId === child.value.id

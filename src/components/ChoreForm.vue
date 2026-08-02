@@ -3,15 +3,16 @@ import { ref, computed, watch } from 'vue'
 import { Icon } from '@iconify/vue'
 import IconPicker from './IconPicker.vue'
 import PhotoUpload from './PhotoUpload.vue'
-import { FORM_KIND, CHORE_KIND, RECURRENCE_TYPE, RECURRENCE_MODE } from '../lib/constants'
+import { FORM_KIND, CHORE_KIND, RECURRENCE_TYPE, RECURRENCE_MODE, type FormKind } from '../lib/constants'
 import { dollarsToCents } from '../lib/format'
 import { timePeriods } from '../composables/useTimePeriods'
+import type { Child, Room, ChoreFormInitial, ChoreFormPayload, RecurrencePattern, TimeWindow } from '../types/firebase'
 
 const props = withDefaults(defineProps<{
-  kind: string
-  initial?: Record<string, any> | null
-  children?: Record<string, any>[]
-  rooms?: Record<string, any>[]
+  kind: FormKind
+  initial?: ChoreFormInitial | null
+  children?: Child[]
+  rooms?: Room[]
   saving?: boolean
 }>(), {
   initial: null,
@@ -19,7 +20,7 @@ const props = withDefaults(defineProps<{
   rooms: () => [],
   saving: false,
 })
-const emit = defineEmits<{ submit: [data: Record<string, any>]; cancel: [] }>()
+const emit = defineEmits<{ submit: [data: ChoreFormPayload]; cancel: [] }>()
 
 const WEEKDAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
@@ -137,13 +138,13 @@ function submit() {
   }
 
   if (props.kind === FORM_KIND.RECURRING_CHORE) {
-    let recurrence: Record<string, any> | null = null
-    let timeWindow: Record<string, any> | null = null
+    let recurrence: RecurrencePattern | null = null
+    let timeWindow: TimeWindow | null = null
     if (recurrenceMode.value !== RECURRENCE_MODE.WEEKLY) {
       recurrence = { type: dailyPatternType.value }
       if (dailyPatternType.value === RECURRENCE_TYPE.WEEKDAYS) recurrence.days = weekdays.value
       if (dailyPatternType.value === RECURRENCE_TYPE.DAY_OF_MONTH) recurrence.day = Number(dayOfMonth.value)
-      timeWindow = {} as Record<string, any>
+      timeWindow = {}
       if (timeStart.value) timeWindow.start = timeStart.value
       if (timeEnd.value) timeWindow.end = timeEnd.value
       if (Object.keys(timeWindow).length === 0) timeWindow = null

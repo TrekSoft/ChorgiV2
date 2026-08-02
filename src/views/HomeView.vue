@@ -7,16 +7,17 @@ import ChildTile from '../components/ChildTile.vue'
 import AddChildTile from '../components/AddChildTile.vue'
 import EmptyState from '../components/EmptyState.vue'
 import ChildFormDialog from '../components/ChildFormDialog.vue'
+import type { Child } from '../types/firebase'
 
 const dialogOpen = ref(false)
-const editingChild = ref<Record<string, any> | null>(null)
+const editingChild = ref<Child | null>(null)
 
 function openAdd() {
   editingChild.value = null
   dialogOpen.value = true
 }
 
-function openEdit(child: Record<string, any>) {
+function openEdit(child: Child) {
   editingChild.value = child
   dialogOpen.value = true
 }

@@ -7,11 +7,12 @@ import { isAdminMode } from '../composables/useAdminMode'
 import { addMark, removeMark, setAllowanceBalance, payoutChild } from '../composables/useAllowance'
 import { formatCents, dollarsToCents } from '../lib/format'
 import Tooltip from './Tooltip.vue'
+import type { Child } from '../types/firebase'
 
 const props = defineProps<{
-  child: Record<string, any>
+  child: Child
 }>()
-const emit = defineEmits<{ edit: [child: Record<string, any>] }>()
+const emit = defineEmits<{ edit: [child: Child] }>()
 
 const router = useRouter()
 

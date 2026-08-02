@@ -5,12 +5,14 @@ export const CHORE_KIND = Object.freeze({
   ONEOFF: 'oneoff',
   CLEANING: 'cleaning',
 } as const)
+export type ChoreKind = typeof CHORE_KIND[keyof typeof CHORE_KIND]
 
 export const FORM_KIND = Object.freeze({
   RECURRING_CHORE: 'recurring-chore',
   ONEOFF_CHORE: 'oneoff-chore',
   CLEANING_TASK: 'cleaning-task',
 } as const)
+export type FormKind = typeof FORM_KIND[keyof typeof FORM_KIND]
 
 export const FORM_TITLES = Object.freeze({
   [FORM_KIND.RECURRING_CHORE]: 'Recurring chore',
@@ -30,12 +32,14 @@ export const CARD_VARIANT = Object.freeze({
   CHORE: 'chore',
   TASK: 'task',
 } as const)
+export type CardVariant = typeof CARD_VARIANT[keyof typeof CARD_VARIANT]
 
 export const CONFETTI_MODE = Object.freeze({
   CONFETTI: 'confetti',
   COINS: 'coins',
   FIREWORKS: 'fireworks',
 } as const)
+export type ConfettiMode = typeof CONFETTI_MODE[keyof typeof CONFETTI_MODE]
 
 export const SCHEDULE_TAB = Object.freeze({
   CALENDAR: 'calendar',

@@ -3,12 +3,13 @@ import { ref, computed } from 'vue'
 import { format, addDays, addWeeks, startOfWeek, eachDayOfInterval, isToday } from 'date-fns'
 import { Icon } from '@iconify/vue'
 import { occursOn } from '../lib/recurrence'
-import { CHORE_KIND, FORM_KIND, WEEK_START_SUNDAY } from '../lib/constants'
+import { CHORE_KIND, FORM_KIND, WEEK_START_SUNDAY, type FormKind } from '../lib/constants'
 import { DATE_FORMAT } from '../lib/format'
 import { family } from '../composables/useFamily'
 import { children } from '../composables/useChildren'
 import { chores } from '../composables/useChores'
 import { cleaningDays } from '../composables/useCleaning'
+import type { Chore, Child, ScheduleEntry, ChoreFormInitial } from '../types/firebase'
 import ScheduleItem from './ScheduleItem.vue'
 import PhotoLightbox from './PhotoLightbox.vue'
 import ChoreFormDialog from './ChoreFormDialog.vue'
@@ -46,21 +47,21 @@ function goToday() {
   anchor.value = new Date()
 }
 
-function matchesFilter(chore: Record<string, any>) {
+function matchesFilter(chore: Chore) {
   if (!filterChildId.value) return true
   // unassigned one-off chores are claimable by any kid, so they show under every filter
   if (chore.kind === CHORE_KIND.ONEOFF && (chore.assigneeIds || []).length === 0) return true
   return (chore.assigneeIds || []).includes(filterChildId.value)
 }
 
-function assigneesFor(chore: Record<string, any>) {
+function assigneesFor(chore: Chore): Child[] {
   return (chore.assigneeIds || [])
     .map((id: string) => children.value.find((c) => c.id === id))
-    .filter(Boolean)
+    .filter((c): c is Child => !!c)
 }
 
-function entriesFor(day: Date) {
-  const entries: any[] = []
+function entriesFor(day: Date): ScheduleEntry[] {
+  const entries: ScheduleEntry[] = []
   for (const chore of chores.value) {
     if (chore.active === false) continue
     if (!occursOn(chore, day)) continue
@@ -83,18 +84,18 @@ function entriesFor(day: Date) {
 
 // --- dialog state ---
 const dialogOpen = ref(false)
-const dialogKind = ref<string>(FORM_KIND.RECURRING_CHORE)
-const editingItem = ref<Record<string, any> | null>(null)
-const prefill = ref<Record<string, any> | null>(null)
+const dialogKind = ref<FormKind>(FORM_KIND.RECURRING_CHORE)
+const editingItem = ref<Chore | null>(null)
+const prefill = ref<ChoreFormInitial | null>(null)
 
-function openAdd(kind: string, day: Date | null = null) {
+function openAdd(kind: FormKind, day: Date | null = null) {
   dialogKind.value = kind
   editingItem.value = null
   prefill.value = day ? { date: format(day, DATE_FORMAT) } : null
   dialogOpen.value = true
 }
 
-function openEdit(entry: any) {
+function openEdit(entry: ScheduleEntry) {
   dialogKind.value = entry.kind
   editingItem.value = entry.item
   prefill.value = null
@@ -202,7 +203,7 @@ function openEdit(entry: any) {
           :assigned-to-all="entry.assignedToAll"
           :claimable="entry.claimable"
           @click="openEdit(entry)"
-          @photo-click="lightboxSrc = entry.item.photoURL"
+          @photo-click="lightboxSrc = entry.item.photoURL || null"
         />
 
         <div class="flex gap-2 mt-auto pt-1">

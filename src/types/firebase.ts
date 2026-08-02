@@ -4,6 +4,8 @@ import type {
   SnapshotOptions,
   Timestamp,
 } from 'firebase/firestore'
+import type { ChoreKind } from '../lib/constants'
+import type { FormKind } from '../lib/constants'
 
 // ── Primitive type aliases ──────────────────────────────────────────────────
 
@@ -55,8 +57,6 @@ export interface MarkDoc {
   note?: string
   createdAt: MaybeTimestamp
 }
-
-export type ChoreKind = 'recurring' | 'oneoff' | 'cleaning'
 
 export type RecurrenceType = 'daily' | 'weekdays' | 'oddDays' | 'evenDays' | 'dayOfMonth'
 
@@ -189,6 +189,71 @@ export interface FamilyMember extends MemberDoc {
 
 export interface PendingInvite extends PendingInviteDoc {
   id: string
+}
+
+// ── UI-level types (form payloads, display entries) ─────────────────────────
+
+/** Fields the ChoreForm reads from an existing Chore or Task for editing/prefill. */
+export interface ChoreFormInitial {
+  id?: string
+  name?: string
+  iconName?: string | null
+  photoURL?: string | null
+  assigneeIds?: string[]
+  assigneeId?: string | null
+  date?: string
+  bonusCents?: number
+  roomId?: string
+  weekly?: boolean
+  recurrence?: RecurrencePattern | null
+  timeWindow?: TimeWindow | null
+}
+
+/** Payload emitted by ChoreForm on submit — covers all three form kinds. */
+export interface ChoreFormPayload {
+  name: string
+  iconName: string | null
+  photoFile: Blob | null
+  kind: ChoreKind
+  assigneeIds?: string[]
+  assigneeId?: string | null
+  weekly?: boolean
+  recurrence?: RecurrencePattern | null
+  timeWindow?: TimeWindow | null
+  date?: string
+  bonusCents?: number
+  roomId?: string
+}
+
+/** Structural type for items that can be claimed (both Chore and Task satisfy this). */
+export interface ClaimableItem {
+  id: string
+  name: string
+  kind: ChoreKind
+  iconName?: string | null
+  photoURL?: string | null
+  bonusCents?: number
+  assigneeId?: string | null
+}
+
+/** A calendar day entry in CalendarTab. */
+export interface ScheduleEntry {
+  key: string
+  kind: FormKind
+  item: Chore
+  assignees: Child[]
+  assignedToAll: boolean
+  claimable: boolean
+  sortKey: string
+}
+
+/** An assigned chore entry in ChildView. */
+export interface AssignedEntry {
+  chore: Chore
+  completed: boolean
+  late: boolean
+  overdue: boolean
+  deadline: Date
 }
 
 // ── FirestoreDataConverter factory ──────────────────────────────────────────

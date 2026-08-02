@@ -5,14 +5,15 @@ import ChoreForm from './ChoreForm.vue'
 import { children } from '../composables/useChildren'
 import { rooms } from '../composables/useCleaning'
 import { upsertChore, removeChore } from '../composables/useChores'
-import { upsertTask, removeTask } from '../composables/useTasks'
-import { FORM_KIND, FORM_TITLES } from '../lib/constants'
+import { upsertTask, removeTask, type TaskUpsertData } from '../composables/useTasks'
+import { FORM_KIND, FORM_TITLES, type FormKind } from '../lib/constants'
+import type { Chore, Task, ChoreFormPayload, ChoreFormInitial } from '../types/firebase'
 
 const props = withDefaults(defineProps<{
   open: boolean
-  kind: string
-  item?: Record<string, any> | null
-  prefill?: Record<string, any> | null
+  kind: FormKind
+  item?: Chore | Task | null
+  prefill?: ChoreFormInitial | null
 }>(), {
   item: null,
   prefill: null,
@@ -21,19 +22,19 @@ const emit = defineEmits<{ close: [] }>()
 
 const saving = ref(false)
 
-const title = computed(() => `${props.item ? 'Edit' : 'Add'} ${FORM_TITLES[props.kind as keyof typeof FORM_TITLES]}`)
+const title = computed(() => `${props.item ? 'Edit' : 'Add'} ${FORM_TITLES[props.kind]}`)
 const initial = computed(() => props.item || props.prefill || null)
 
 const isChore = computed(() => props.kind === FORM_KIND.RECURRING_CHORE || props.kind === FORM_KIND.ONEOFF_CHORE)
 
-async function onSubmit(data: Record<string, any>) {
+async function onSubmit(data: ChoreFormPayload) {
   saving.value = true
   try {
     const payload = { ...data, photoURL: props.item?.photoURL || null }
     if (isChore.value) {
       await upsertChore(props.item?.id || null, payload)
     } else {
-      await upsertTask(props.item?.id || null, payload)
+      await upsertTask(props.item?.id || null, payload as TaskUpsertData)
     }
     emit('close')
   } catch (e) {

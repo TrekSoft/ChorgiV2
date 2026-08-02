@@ -5,10 +5,11 @@ import { children, upsertChild, removeChild } from '../composables/useChildren'
 import { uploadChildPhoto } from '../lib/photo'
 import { dollarsToCents } from '../lib/format'
 import PhotoPicker from './PhotoPicker.vue'
+import type { Child } from '../types/firebase'
 
 const props = withDefaults(defineProps<{
   open: boolean
-  child?: Record<string, any> | null
+  child?: Child | null
 }>(), {
   child: null,
 })

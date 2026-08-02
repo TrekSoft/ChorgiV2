@@ -7,6 +7,7 @@ import { rooms, upsertRoom, removeRoom } from '../composables/useCleaning'
 import { tasks, removeTask, reorderTasks } from '../composables/useTasks'
 import { children } from '../composables/useChildren'
 import { CHORE_KIND, FORM_KIND } from '../lib/constants'
+import type { Room, Task, ChoreFormInitial } from '../types/firebase'
 import ScheduleItem from './ScheduleItem.vue'
 import PhotoLightbox from './PhotoLightbox.vue'
 import ChoreFormDialog from './ChoreFormDialog.vue'
@@ -21,13 +22,13 @@ async function addRoom() {
   newRoomName.value = ''
 }
 
-async function renameRoom(room: Record<string, any>) {
+async function renameRoom(room: Room) {
   const name = prompt('Room name', room.name)?.trim()
   if (!name || name === room.name) return
   await upsertRoom(room.id, { name, order: room.order })
 }
 
-async function deleteRoom(room: Record<string, any>) {
+async function deleteRoom(room: Room) {
   const roomTasks = tasksFor(room.id)
   const message = roomTasks.length
     ? `Delete room "${room.name}" and its ${roomTasks.length} task(s)? This cannot be undone.`
@@ -80,7 +81,7 @@ async function onDrop(roomId: string) {
   dragOverTaskId.value = null
 }
 
-function assigneesFor(task: Record<string, any>) {
+function assigneesFor(task: Task) {
   if (!task.assigneeId) return []
   const c = children.value.find((c) => c.id === task.assigneeId)
   return c ? [c] : []
@@ -90,8 +91,8 @@ const lightboxSrc = ref<string | null>(null)
 
 // --- task dialog ---
 const taskDialogOpen = ref(false)
-const editingTask = ref<Record<string, any> | null>(null)
-const taskPrefill = ref<Record<string, any> | null>(null)
+const editingTask = ref<Task | null>(null)
+const taskPrefill = ref<ChoreFormInitial | null>(null)
 
 function openAddTask(roomId: string) {
   editingTask.value = null
@@ -99,7 +100,7 @@ function openAddTask(roomId: string) {
   taskDialogOpen.value = true
 }
 
-function openEditTask(task: Record<string, any>) {
+function openEditTask(task: Task) {
   editingTask.value = task
   taskPrefill.value = null
   taskDialogOpen.value = true
