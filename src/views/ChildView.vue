@@ -8,8 +8,8 @@ import { CHORE_KIND, CARD_VARIANT, CONFETTI_MODE, NOW_TICK_INTERVAL_MS, TOAST_DU
 import { DATE_FORMAT, formatCents } from '../lib/format'
 import { family } from '../composables/useFamily'
 import { children } from '../composables/useChildren'
-import { chores } from '../composables/useChores'
-import { tasks } from '../composables/useTasks'
+import { chores, choresLoading } from '../composables/useChores'
+import { tasks, tasksLoading } from '../composables/useTasks'
 import { rooms, cleaningDays } from '../composables/useCleaning'
 import {
   completions,
@@ -321,7 +321,7 @@ async function onTaskUnclaim(task: ClaimableItem) {
         <section class="flex flex-col gap-3">
           <h2 class="heading-section">My chores</h2>
           <EmptyState
-            v-if="assigned.length === 0"
+            v-if="!choresLoading && assigned.length === 0"
             compact
             title="No chores right now"
             subtitle="Check back later, or grab an extra chore!"
@@ -346,7 +346,7 @@ async function onTaskUnclaim(task: ClaimableItem) {
 
         <!-- right: claimable tasks -->
         <section class="flex flex-col gap-6">
-          <div v-if="claimableChores.length > 0 || cleaningSections.length === 0" class="flex flex-col gap-3">
+          <div v-if="!choresLoading && !tasksLoading && (claimableChores.length > 0 || cleaningSections.length === 0)" class="flex flex-col gap-3">
             <h2 class="heading-section">Extra chores</h2>
             <EmptyState
               v-if="claimableChores.length === 0"

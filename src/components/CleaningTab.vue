@@ -3,7 +3,7 @@ import { ref } from 'vue'
 import { writeBatch, doc } from 'firebase/firestore'
 import { db } from '../lib/firebase'
 import { familyId } from '../composables/useFamily'
-import { rooms, upsertRoom, removeRoom } from '../composables/useCleaning'
+import { rooms, upsertRoom, removeRoom, roomsLoading } from '../composables/useCleaning'
 import { tasks, removeTask, reorderTasks } from '../composables/useTasks'
 import { children } from '../composables/useChildren'
 import { useDialog } from '../composables/useDialog'
@@ -147,7 +147,7 @@ function openEditTask(task: Task) {
       </div>
 
       <div
-        v-if="rooms.length === 0"
+        v-if="!roomsLoading && rooms.length === 0"
         class="absolute top-[6.5rem] left-[26rem] z-20 hidden sm:flex items-end gap-1 pointer-events-none select-none"
       >
         <svg class="w-20 h-14 shrink-0 text-amber-500" viewBox="0 0 80 56" fill="none">

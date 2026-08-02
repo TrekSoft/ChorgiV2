@@ -7,7 +7,7 @@ import { CHORE_KIND, FORM_KIND, WEEK_START_SUNDAY, type FormKind } from '../lib/
 import { DATE_FORMAT } from '../lib/format'
 import { family } from '../composables/useFamily'
 import { children } from '../composables/useChildren'
-import { chores } from '../composables/useChores'
+import { chores, choresLoading } from '../composables/useChores'
 import { cleaningDays } from '../composables/useCleaning'
 import type { Chore, Child, ScheduleEntry, ChoreFormInitial } from '../types/firebase'
 import ScheduleItem from './ScheduleItem.vue'
@@ -119,7 +119,7 @@ onMounted(() => {
 <template>
   <div class="relative flex flex-col gap-4 pb-20 sm:pb-0">
     <div
-      v-if="chores.length === 0"
+      v-if="!choresLoading && chores.length === 0"
       class="absolute top-10 right-[7rem] z-20 hidden sm:flex items-end gap-1 pointer-events-none select-none"
     >
       <span class="font-handwritten text-3xl leading-none text-amber-600 -rotate-2 mb-3 text-right">
