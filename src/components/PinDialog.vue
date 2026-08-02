@@ -8,11 +8,12 @@ const props = withDefaults(defineProps<{
 }>(), {
   title: 'Enter PIN',
 })
-const emit = defineEmits<{ success: []; cancel: [] }>()
+const emit = defineEmits<{ success: [keepAdmin: boolean]; cancel: [] }>()
 
 const digits = ref(['', '', '', ''])
 const inputs = ref<HTMLInputElement[]>([])
 const error = ref(false)
+const keepAdmin = ref(false)
 
 watch(
   () => props.open,
@@ -20,6 +21,7 @@ watch(
     if (isOpen) {
       digits.value = ['', '', '', '']
       error.value = false
+      keepAdmin.value = false
       await nextTick()
       inputs.value[0]?.focus()
     }
@@ -42,7 +44,7 @@ function onKeydown(index: number, event: KeyboardEvent) {
 async function submit() {
   const pin = digits.value.join('')
   if (await verifyPin(pin)) {
-    emit('success')
+    emit('success', keepAdmin.value)
   } else {
     error.value = true
     digits.value = ['', '', '', '']
@@ -73,6 +75,14 @@ async function submit() {
           />
         </div>
         <p v-if="error" class="text-red-500 text-sm font-medium">Wrong PIN — try again</p>
+        <label class="flex items-center gap-2 text-sm text-amber-700 cursor-pointer">
+          <input
+            v-model="keepAdmin"
+            type="checkbox"
+            class="w-4 h-4 rounded border-amber-300 text-amber-500 focus:ring-amber-400 cursor-pointer"
+          />
+          Keep me in admin mode on this device
+        </label>
         <button
           @click="emit('cancel')"
           class="w-full bg-amber-200 hover:bg-amber-300 text-amber-800 text-lg font-bold py-3 rounded-xl"

@@ -4,7 +4,7 @@ import { useRouter } from 'vue-router'
 import AvatarMenu from './AvatarMenu.vue'
 import PinDialog from './PinDialog.vue'
 import logo from '../assets/logo.png'
-import { isAdminMode, enterAdminMode, exitAdminMode } from '../composables/useAdminMode'
+import { isAdminMode, enterAdminMode, exitAdminMode, setKeepAdmin } from '../composables/useAdminMode'
 
 const router = useRouter()
 const showPin = ref(false)
@@ -17,8 +17,9 @@ function toggleAdmin() {
   }
 }
 
-function onPinSuccess() {
+function onPinSuccess(keepAdmin: boolean) {
   showPin.value = false
+  if (keepAdmin) setKeepAdmin(true)
   enterAdminMode()
 }
 
