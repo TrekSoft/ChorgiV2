@@ -121,3 +121,12 @@
     font-family: 'Caveat', 'Comic Sans MS', cursive;
   }
 }
+
+/* Hide scrollbar on mobile filter strip */
+.schedule-filter-scroll {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.schedule-filter-scroll::-webkit-scrollbar {
+  display: none;
+}

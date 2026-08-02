@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, nextTick } from 'vue'
 import { format, addDays, addWeeks, startOfWeek, eachDayOfInterval, isToday } from 'date-fns'
 import { Icon } from '@iconify/vue'
 import { occursOn } from '../lib/recurrence'
@@ -18,6 +18,8 @@ import CleaningDayDialog from './CleaningDayDialog.vue'
 const anchor = ref(new Date())
 const filterChildId = ref<string | null>(null)
 const lightboxSrc = ref<string | null>(null)
+const todayCardRef = ref<HTMLElement | null>(null)
+const today = new Date()
 
 // --- cleaning day dialog ---
 const cleaningDialogOpen = ref(false)
@@ -101,10 +103,21 @@ function openEdit(entry: ScheduleEntry) {
   prefill.value = null
   dialogOpen.value = true
 }
+
+onMounted(() => {
+  // Only auto-scroll if the viewed week contains today
+  const weekStart = startOfWeek(anchor.value, { weekStartsOn: weekStartsOn.value })
+  const weekEnd = addDays(weekStart, 6)
+  if (today >= weekStart && today <= weekEnd) {
+    nextTick(() => {
+      todayCardRef.value?.scrollIntoView({ block: 'start', behavior: 'smooth' })
+    })
+  }
+})
 </script>
 
 <template>
-  <div class="relative flex flex-col gap-4">
+  <div class="relative flex flex-col gap-4 pb-20 sm:pb-0">
     <div
       v-if="chores.length === 0"
       class="absolute top-10 right-[7rem] z-20 hidden sm:flex items-end gap-1 pointer-events-none select-none"
@@ -118,37 +131,37 @@ function openEdit(entry: ScheduleEntry) {
       </svg>
     </div>
     <!-- week nav -->
-    <div class="flex items-center gap-2 flex-wrap">
+    <div class="flex items-center gap-2">
       <button
         @click="prev"
-        class="w-12 h-12 rounded-full hover:bg-amber-100 text-amber-700 cursor-pointer flex items-center justify-center shrink-0"
+        class="w-9 h-9 sm:w-12 sm:h-12 rounded-full hover:bg-amber-100 text-amber-700 cursor-pointer flex items-center justify-center shrink-0"
         aria-label="Previous week"
       >
-        <Icon icon="mdi:chevron-left" class="w-6 h-6" />
+        <Icon icon="mdi:chevron-left" class="w-5 h-5 sm:w-6 sm:h-6" />
       </button>
-      <span class="font-bold text-amber-900 text-lg">{{ headerLabel }}</span>
+      <span class="font-bold text-amber-900 text-base sm:text-lg">{{ headerLabel }}</span>
       <button
         @click="next"
-        class="w-12 h-12 rounded-full hover:bg-amber-100 text-amber-700 cursor-pointer flex items-center justify-center shrink-0"
+        class="w-9 h-9 sm:w-12 sm:h-12 rounded-full hover:bg-amber-100 text-amber-700 cursor-pointer flex items-center justify-center shrink-0"
         aria-label="Next week"
       >
-        <Icon icon="mdi:chevron-right" class="w-6 h-6" />
+        <Icon icon="mdi:chevron-right" class="w-5 h-5 sm:w-6 sm:h-6" />
       </button>
-      <button @click="goToday" class="text-sm text-amber-600 font-medium hover:underline cursor-pointer ml-1">This week</button>
+      <button @click="goToday" class="text-sm text-amber-600 font-medium hover:underline cursor-pointer ml-1 whitespace-nowrap">This week</button>
       <div class="flex-1"></div>
       <button
         @click="openAdd(FORM_KIND.RECURRING_CHORE)"
-        class="btn-primary"
+        class="btn-primary hidden sm:block"
       >
         + Recurring chore
       </button>
     </div>
 
     <!-- child filter -->
-    <div class="flex gap-2 flex-wrap">
+    <div class="flex gap-2 flex-nowrap overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0 sm:flex-wrap schedule-filter-scroll">
       <button
         @click="filterChildId = null"
-        class="pill"
+        class="pill shrink-0"
         :class="filterChildId === null ? 'pill-selected' : 'pill-unselected'"
       >
         All kids
@@ -157,7 +170,7 @@ function openEdit(entry: ScheduleEntry) {
         v-for="child in children"
         :key="child.id"
         @click="filterChildId = child.id"
-        class="pill"
+        class="pill shrink-0"
         :class="filterChildId === child.id ? 'pill-selected' : 'pill-unselected'"
       >
         {{ child.name }}
@@ -169,7 +182,8 @@ function openEdit(entry: ScheduleEntry) {
       <div
         v-for="day in days"
         :key="day.toISOString()"
-        class="flex flex-col gap-2 rounded-2xl border-2 p-3 min-h-32"
+        :ref="(el) => { if (isToday(day)) todayCardRef = el as HTMLElement | null }"
+        class="flex flex-col gap-2 rounded-2xl border-2 p-2 sm:p-3 sm:min-h-32"
         :class="isToday(day) ? 'border-amber-400 bg-white' : 'border-amber-200 bg-white/60'"
       >
         <div class="flex items-center justify-between">
@@ -209,7 +223,10 @@ function openEdit(entry: ScheduleEntry) {
         <div class="flex gap-2 mt-auto pt-1">
           <button
             @click="openAdd(FORM_KIND.ONEOFF_CHORE, day)"
-            class="flex-1 text-xs font-bold text-amber-600 border-2 border-dashed border-amber-200 rounded-xl py-2 hover:bg-amber-50 cursor-pointer"
+            class="flex-1 text-xs font-bold border-2 border-dashed rounded-xl py-1.5 sm:py-2 hover:bg-amber-50 cursor-pointer"
+            :class="isToday(day)
+              ? 'border-amber-400 text-amber-700 bg-amber-50'
+              : 'border-amber-200 text-amber-600'"
           >
             + One-off chore
           </button>
@@ -233,5 +250,14 @@ function openEdit(entry: ScheduleEntry) {
       :initial-room-ids="cleaningDialogDate ? (cleaningDays[format(cleaningDialogDate, DATE_FORMAT)]?.roomIds || []) : []"
       @close="cleaningDialogOpen = false"
     />
+
+    <!-- sticky bottom action bar (mobile only) -->
+    <div
+      class="fixed bottom-0 inset-x-0 z-30 sm:hidden bg-white/95 backdrop-blur border-t-2 border-amber-200 p-3 flex gap-2"
+      style="padding-bottom: calc(0.75rem + env(safe-area-inset-bottom))"
+    >
+      <button class="btn-primary flex-1" @click="openAdd(FORM_KIND.ONEOFF_CHORE, today)">+ Chore today</button>
+      <button class="btn-secondary flex-1" @click="openAdd(FORM_KIND.RECURRING_CHORE)">+ Recurring</button>
+    </div>
   </div>
 </template>
