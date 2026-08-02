@@ -177,8 +177,8 @@ function submit() {
 </script>
 
 <template>
-  <form @submit.prevent="submit" class="flex flex-col flex-1 min-h-0 gap-4">
-    <div class="flex flex-col gap-4 overflow-y-auto flex-1 min-h-0">
+  <form @submit.prevent="submit" class="flex flex-col flex-1 min-h-0 gap-3 sm:gap-4">
+    <div class="flex flex-col gap-3 sm:gap-4 overflow-y-auto flex-1 min-h-0">
     <label class="flex flex-col gap-1">
       <span class="form-label">Name</span>
       <input v-model="name" type="text" class="input-field" />
@@ -269,13 +269,13 @@ function submit() {
           <span class="form-hint">If a month is shorter than this day, it falls on the last day of that month.</span>
         </label>
 
-        <div v-if="dailyPatternType === RECURRENCE_TYPE.WEEKDAYS" class="flex flex-wrap gap-2">
+        <div v-if="dailyPatternType === RECURRENCE_TYPE.WEEKDAYS" class="flex flex-wrap gap-2 justify-between">
           <button
             v-for="(label, day) in WEEKDAY_LABELS"
             :key="day"
             type="button"
             @click="toggleWeekday(day)"
-            class="w-12 h-12 rounded-full border-2 font-medium cursor-pointer"
+            class="w-10 h-10 sm:w-12 sm:h-12 rounded-full border-2 font-medium cursor-pointer text-xs sm:text-base"
             :class="weekdays.includes(day) ? 'pill-selected' : 'pill-unselected'"
           >
             {{ label }}
@@ -324,11 +324,11 @@ function submit() {
     </label>
 
     </div>
-    <div class="flex justify-end gap-2 pt-3 shrink-0 border-t border-amber-100">
-      <button type="button" @click="emit('cancel')" class="btn-cancel">
+    <div class="flex flex-col-reverse gap-2 pt-3 shrink-0 border-t border-amber-100 sm:flex-row sm:justify-end" style="padding-bottom: env(safe-area-inset-bottom)">
+      <button type="button" @click="emit('cancel')" class="btn-cancel w-full sm:w-auto py-3 sm:py-2">
         Cancel
       </button>
-      <button type="submit" :disabled="!valid || saving" class="btn-primary">
+      <button type="submit" :disabled="!valid || saving" class="btn-primary w-full sm:w-auto py-3 sm:py-2">
         {{ saving ? 'Saving…' : 'Save' }}
       </button>
     </div>

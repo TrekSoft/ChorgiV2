@@ -98,13 +98,14 @@ function clear(event: Event) {
       @dragover.prevent="dragOver = true"
       @dragleave.prevent="dragOver = false"
       @drop.prevent="onDrop"
-      class="relative aspect-video w-1/2 drop-zone overflow-hidden"
+      class="relative aspect-video w-full sm:w-1/2 drop-zone overflow-hidden"
       :class="dragOver ? 'border-amber-500 bg-amber-100' : 'border-amber-300 bg-amber-50 hover:bg-amber-100'"
     >
       <img v-if="localPreview" :src="localPreview" alt="Preview" class="w-full h-full object-cover" />
       <div v-else class="flex flex-col items-center justify-center gap-1 text-amber-500 h-full">
         <Icon icon="mdi:image" class="w-8 h-8" />
-        <span class="text-sm font-medium">Tap or drag a photo here</span>
+        <span class="text-sm font-medium sm:hidden">Tap to add a photo</span>
+        <span class="text-sm font-medium hidden sm:block">Tap or drag a photo here</span>
       </div>
       <button
         v-if="localPreview"

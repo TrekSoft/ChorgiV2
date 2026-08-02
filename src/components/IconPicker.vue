@@ -74,7 +74,7 @@ function clear() {
     <p v-if="!modelValue && loading" class="text-amber-500 text-sm">Searching…</p>
     <p v-if="!modelValue && error" class="text-red-500 text-sm">Could not load icons. Check your connection.</p>
 
-    <div v-if="!modelValue && results.length" class="grid grid-cols-6 sm:grid-cols-8 gap-2 max-h-64 overflow-y-auto p-1">
+    <div v-if="!modelValue && results.length" class="grid grid-cols-6 sm:grid-cols-8 gap-2 max-h-48 sm:max-h-64 overflow-y-auto p-1">
       <button
         v-for="iconName in results"
         :key="iconName"
