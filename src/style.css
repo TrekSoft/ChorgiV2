@@ -130,3 +130,10 @@
 .schedule-filter-scroll::-webkit-scrollbar {
   display: none;
 }
+
+/* Restore native picker indicators on date/time inputs (Tailwind preflight strips them) */
+input[type="date"],
+input[type="time"] {
+  -webkit-appearance: auto;
+  appearance: auto;
+}
