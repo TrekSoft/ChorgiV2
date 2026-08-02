@@ -134,6 +134,13 @@
 /* Restore native picker indicators on date/time inputs (Tailwind preflight strips them) */
 input[type="date"],
 input[type="time"] {
-  -webkit-appearance: auto;
-  appearance: auto;
+  -webkit-appearance: auto !important;
+  appearance: auto !important;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator {
+  display: block;
+  opacity: 1;
+  cursor: pointer;
 }
