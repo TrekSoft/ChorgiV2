@@ -141,7 +141,7 @@ function onUnassignClick() {
               alt=""
               class="w-5 h-5 rounded-full object-cover border border-amber-200"
             />
-            <span :class="disabled ? 'text-stone-400' : 'text-amber-500'">Claimed by {{ claimedByName }}</span>
+            <span :class="disabled ? 'text-stone-400' : 'text-amber-500'">{{ claimedByName }}</span>
           </template>
           <CountdownLabel v-else-if="deadline && !completed" :deadline="deadline" :force-overdue-label="overdue" />
           <span v-else-if="completed" class="text-green-600 font-semibold">Done!</span>
