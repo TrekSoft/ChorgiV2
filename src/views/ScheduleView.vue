@@ -4,14 +4,14 @@ import { useRoute, useRouter } from 'vue-router'
 import AppHeader from '../components/AppHeader.vue'
 import CalendarTab from '../components/CalendarTab.vue'
 import CleaningTab from '../components/CleaningTab.vue'
-import { SCHEDULE_TAB } from '../lib/constants'
+import { SCHEDULE_TAB, type ScheduleTab } from '../lib/constants'
 
 const route = useRoute()
 const router = useRouter()
 
 const tab = computed(() => (route.query.tab === SCHEDULE_TAB.CLEANING ? SCHEDULE_TAB.CLEANING : SCHEDULE_TAB.CALENDAR))
 
-function setTab(next: string) {
+function setTab(next: ScheduleTab) {
   router.replace({ query: { ...route.query, tab: next } })
 }
 </script>

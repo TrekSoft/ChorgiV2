@@ -27,6 +27,7 @@ export const RECURRENCE_TYPE = Object.freeze({
   EVEN_DAYS: 'evenDays',
   DAY_OF_MONTH: 'dayOfMonth',
 } as const)
+export type RecurrenceTypeValue = typeof RECURRENCE_TYPE[keyof typeof RECURRENCE_TYPE]
 
 export const CARD_VARIANT = Object.freeze({
   CHORE: 'chore',
@@ -45,11 +46,13 @@ export const SCHEDULE_TAB = Object.freeze({
   CALENDAR: 'calendar',
   CLEANING: 'cleaning',
 } as const)
+export type ScheduleTab = typeof SCHEDULE_TAB[keyof typeof SCHEDULE_TAB]
 
 export const RECURRENCE_MODE = Object.freeze({
   DAILY: 'daily',
   WEEKLY: 'weekly',
 } as const)
+export type RecurrenceMode = typeof RECURRENCE_MODE[keyof typeof RECURRENCE_MODE]
 
 export const WEEK_START_SUNDAY = 0
 export const WEEK_START_MONDAY = 1

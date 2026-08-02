@@ -18,6 +18,7 @@ import { uploadMemberPhoto } from '../lib/photo'
 import { DEFAULT_MARK_PENALTY_CENTS, DEFAULT_TIME_PERIODS } from '../lib/constants'
 import { dollarsToCents, formatCents } from '../lib/format'
 import { timePeriods, updateTimePeriods } from '../composables/useTimePeriods'
+import type { TimePeriod } from '../types/firebase'
 import AppHeader from '../components/AppHeader.vue'
 import PhotoPicker from '../components/PhotoPicker.vue'
 
@@ -125,7 +126,7 @@ async function sendInvite() {
   }
 }
 
-const editablePeriods = ref<{ id: string; label: string; start: string; end: string }[]>([])
+const editablePeriods = ref<TimePeriod[]>([])
 const timePeriodsSaving = ref(false)
 const timePeriodsSaved = ref(false)
 

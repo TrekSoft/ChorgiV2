@@ -11,7 +11,7 @@ const props = withDefaults(defineProps<{
 const emit = defineEmits<{ success: []; cancel: [] }>()
 
 const digits = ref(['', '', '', ''])
-const inputs = ref<any[]>([])
+const inputs = ref<HTMLInputElement[]>([])
 const error = ref(false)
 
 watch(
@@ -61,7 +61,7 @@ async function submit() {
           <input
             v-for="(_, i) in digits"
             :key="i"
-            :ref="(el) => (inputs[i] = el)"
+            :ref="(el) => (inputs[i] = el as HTMLInputElement)"
             :value="digits[i]"
             @input="onInput(i, $event)"
             @keydown="onKeydown(i, $event)"
