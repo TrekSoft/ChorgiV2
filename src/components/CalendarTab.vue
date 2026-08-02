@@ -183,7 +183,7 @@ onMounted(() => {
         v-for="day in days"
         :key="day.toISOString()"
         :ref="(el) => { if (isToday(day)) todayCardRef = el as HTMLElement | null }"
-        class="flex flex-col gap-2 rounded-2xl border-2 p-2 sm:p-3 sm:min-h-32"
+        class="flex flex-col gap-2 rounded-2xl border-2 p-2 sm:p-3 sm:min-h-32 scroll-mt-24"
         :class="isToday(day) ? 'border-amber-400 bg-white' : 'border-amber-200 bg-white/60'"
       >
         <div class="flex items-center justify-between">

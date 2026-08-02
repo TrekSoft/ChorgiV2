@@ -68,7 +68,7 @@ async function onDelete() {
     <div v-if="open" class="dialog-overlay !p-0 sm:!p-4" @click.self="emit('close')">
       <div class="dialog-container w-full h-full sm:h-auto max-w-lg flex flex-col max-h-none sm:max-h-[90vh] overflow-hidden rounded-none sm:rounded-2xl">
         <!-- dialog grows to fill available height; inner form handles scrolling -->
-        <div class="px-4 py-3 sm:px-6 sm:py-4 flex items-center justify-between shrink-0 border-b border-amber-100">
+        <div class="px-4 py-3 sm:px-6 sm:py-4 flex items-center justify-between shrink-0 border-b border-amber-200">
           <h2 class="text-lg sm:text-xl font-bold text-amber-900">{{ title }}</h2>
           <div class="flex items-center gap-2">
             <button

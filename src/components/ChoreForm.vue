@@ -324,7 +324,7 @@ function submit() {
     </label>
 
     </div>
-    <div class="flex flex-col-reverse gap-2 pt-3 shrink-0 border-t border-amber-100 sm:flex-row sm:justify-end" style="padding-bottom: env(safe-area-inset-bottom)">
+    <div class="flex flex-col-reverse gap-2 shrink-0 border-t border-amber-200 sm:flex-row sm:justify-end" style="padding-bottom: env(safe-area-inset-bottom)">
       <button type="button" @click="emit('cancel')" class="btn-cancel w-full sm:w-auto py-3 sm:py-2">
         Cancel
       </button>
