@@ -202,7 +202,7 @@ const reportData = computed(() => {
       <div class="flex items-center gap-4 bg-white rounded-2xl shadow p-4 max-w-md mx-auto w-full">
         <button
           @click="prevDay"
-          class="w-10 h-10 rounded-full bg-amber-100 text-amber-700 font-bold text-xl flex items-center justify-center hover:bg-amber-200 cursor-pointer"
+          class="w-12 h-12 rounded-full bg-amber-100 text-amber-700 font-bold text-xl flex items-center justify-center hover:bg-amber-200 cursor-pointer"
         >‹</button>
         <div class="flex-1 text-center">
           <button
@@ -224,7 +224,7 @@ const reportData = computed(() => {
         </div>
         <button
           @click="nextDay"
-          class="w-10 h-10 rounded-full bg-amber-100 text-amber-700 font-bold text-xl flex items-center justify-center hover:bg-amber-200 cursor-pointer"
+          class="w-12 h-12 rounded-full bg-amber-100 text-amber-700 font-bold text-xl flex items-center justify-center hover:bg-amber-200 cursor-pointer"
         >›</button>
       </div>
 
@@ -233,7 +233,7 @@ const reportData = computed(() => {
         <p class="text-amber-600 text-lg">No children to report on.</p>
       </div>
 
-      <div class="grid gap-4 [grid-template-columns:repeat(auto-fit,minmax(22rem,1fr))]">
+      <div class="grid gap-4 grid-cols-1 sm:[grid-template-columns:repeat(auto-fit,minmax(22rem,1fr))]">
       <div v-for="report in reportData" :key="report.child.id" class="bg-white rounded-2xl shadow p-5 flex flex-col gap-4">
         <!-- Child header -->
         <div class="flex items-center gap-3">

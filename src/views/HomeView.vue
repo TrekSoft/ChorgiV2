@@ -47,7 +47,7 @@ function closeDialog() {
         title="No children yet"
         subtitle="Toggle on Admin mode in the nav bar, then add a child here to get started."
       />
-      <div v-else class="grid gap-4 sm:gap-6 [grid-template-columns:repeat(auto-fit,minmax(24rem,28rem))] justify-center">
+      <div v-else class="grid gap-4 sm:gap-6 grid-cols-1 sm:[grid-template-columns:repeat(auto-fit,minmax(24rem,28rem))] justify-center">
         <ChildTile v-for="child in children" :key="child.id" :child="child" @edit="openEdit" />
         <AddChildTile v-if="isAdminMode" @click="openAdd" />
       </div>

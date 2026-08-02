@@ -237,7 +237,7 @@ families/{uid}/claims/{yyyy-MM-dd}_{taskId}
 - Pure read view computed from chores + completions + claims; no new writes
 - **DoD:** pick any past date → accurate per-child breakdown; today shows overdue correctly.
 
-### Phase 9 — Polish + Deploy `[ ]`
+### Phase 9 — Polish + Deploy `[x]`
 - Real logo asset, favicon, app title
 - Mobile/laptop responsiveness audit, touch-target audit
 - `firebase init hosting`, build, deploy to the default `*.web.app` URL and verify end-to-end
