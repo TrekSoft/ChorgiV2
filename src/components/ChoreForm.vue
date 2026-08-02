@@ -177,7 +177,7 @@ function submit() {
 </script>
 
 <template>
-  <form @submit.prevent="submit" class="flex flex-col flex-1 min-h-0 gap-3 sm:gap-4">
+  <form @submit.prevent="submit" class="flex flex-col flex-1 min-h-0">
     <div class="flex flex-col gap-3 sm:gap-4 overflow-y-auto flex-1 min-h-0">
     <label class="flex flex-col gap-1">
       <span class="form-label">Name</span>

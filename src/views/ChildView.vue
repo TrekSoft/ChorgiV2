@@ -24,6 +24,7 @@ import {
   unclaimTask,
 } from '../composables/useCompletions'
 import { isAdminMode } from '../composables/useAdminMode'
+import { useDialog } from '../composables/useDialog'
 import AppHeader from '../components/AppHeader.vue'
 import ChoreCard from '../components/ChoreCard.vue'
 import EmptyState from '../components/EmptyState.vue'
@@ -34,6 +35,8 @@ import type { Chore, Task, Claim, Child, ClaimableItem, AssignedEntry } from '..
 const route = useRoute()
 const router = useRouter()
 const child = computed(() => children.value.find((c) => c.id === route.params.id))
+
+const { confirm } = useDialog()
 
 const weekStartsOn = computed(() => family.value?.weekStartsOn ?? WEEK_START_SUNDAY)
 
@@ -259,7 +262,13 @@ async function onTaskTap(task: ClaimableItem) {
   // claimed by another child — locked for kids; admin mode can release the claim
   if (isAdminMode.value) {
     const owner = claimChild(claim)
-    if (confirm(`Release ${owner?.name || 'the other child'}'s claim on "${task.name}"?`)) {
+    const ok = await confirm({
+      title: 'Release claim',
+      message: `Release ${owner?.name || 'the other child'}'s claim on "${task.name}"?`,
+      confirmLabel: 'Release',
+      danger: true,
+    })
+    if (ok) {
       await unclaimTask(task, todayStr.value)
     }
   }
@@ -273,7 +282,13 @@ async function onTaskUnclaim(task: ClaimableItem) {
     await unclaimTask(task, todayStr.value)
   } else if (isAdminMode.value) {
     const owner = claimChild(claim)
-    if (confirm(`Release ${owner?.name || 'the other child'}'s claim on "${task.name}"?`)) {
+    const ok = await confirm({
+      title: 'Release claim',
+      message: `Release ${owner?.name || 'the other child'}'s claim on "${task.name}"?`,
+      confirmLabel: 'Release',
+      danger: true,
+    })
+    if (ok) {
       await unclaimTask(task, todayStr.value)
     }
   }

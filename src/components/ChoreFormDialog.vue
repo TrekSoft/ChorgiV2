@@ -7,6 +7,7 @@ import { children } from '../composables/useChildren'
 import { rooms } from '../composables/useCleaning'
 import { upsertChore, removeChore } from '../composables/useChores'
 import { upsertTask, removeTask, type TaskUpsertData } from '../composables/useTasks'
+import { useDialog } from '../composables/useDialog'
 import { FORM_KIND, FORM_TITLES, type FormKind } from '../lib/constants'
 import type { Chore, Task, ChoreFormPayload, ChoreFormInitial } from '../types/firebase'
 
@@ -20,6 +21,8 @@ const props = withDefaults(defineProps<{
   prefill: null,
 })
 const emit = defineEmits<{ close: [] }>()
+
+const { confirm, alert } = useDialog()
 
 const saving = ref(false)
 
@@ -48,7 +51,10 @@ async function onSubmit(data: ChoreFormPayload) {
     emit('close')
   } catch (e) {
     console.error('Failed to save', e)
-    alert(`Failed to save: ${(e as Error).message}`)
+    alert({
+      title: 'Save failed',
+      message: `Failed to save: ${(e as Error).message}`,
+    })
   } finally {
     saving.value = false
   }
@@ -56,7 +62,13 @@ async function onSubmit(data: ChoreFormPayload) {
 
 async function onDelete() {
   if (!props.item) return
-  if (!confirm(`Delete "${props.item.name}"? This cannot be undone.`)) return
+  const ok = await confirm({
+    title: 'Delete',
+    message: `Delete "${props.item.name}"? This cannot be undone.`,
+    confirmLabel: 'Delete',
+    danger: true,
+  })
+  if (!ok) return
   if (isChore.value) await removeChore(props.item.id)
   else await removeTask(props.item.id)
   emit('close')

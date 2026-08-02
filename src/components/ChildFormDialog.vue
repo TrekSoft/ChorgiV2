@@ -4,6 +4,7 @@ import { familyId } from '../composables/useFamily'
 import { children, upsertChild, removeChild } from '../composables/useChildren'
 import { uploadChildPhoto } from '../lib/photo'
 import { dollarsToCents } from '../lib/format'
+import { useDialog } from '../composables/useDialog'
 import PhotoPicker from './PhotoPicker.vue'
 import type { Child } from '../types/firebase'
 
@@ -57,9 +58,17 @@ async function save() {
   }
 }
 
+const { confirm } = useDialog()
+
 async function remove() {
   if (!props.child) return
-  if (!confirm(`Remove ${props.child.name}? This cannot be undone.`)) return
+  const ok = await confirm({
+    title: 'Remove child',
+    message: `Remove ${props.child.name}? This cannot be undone.`,
+    confirmLabel: 'Remove',
+    danger: true,
+  })
+  if (!ok) return
   await removeChild(props.child.id)
   emit('close')
 }

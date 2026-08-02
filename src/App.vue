@@ -3,6 +3,7 @@ import { watch } from 'vue'
 import { familyId } from './composables/useFamily'
 import { children, childrenLoading } from './composables/useChildren'
 import { accrueDailyAllowance } from './composables/useAllowance'
+import DialogHost from './components/DialogHost.vue'
 
 let accrued = false
 watch(familyId, (id) => {
@@ -22,4 +23,5 @@ watch(
 
 <template>
   <router-view />
+  <DialogHost />
 </template>

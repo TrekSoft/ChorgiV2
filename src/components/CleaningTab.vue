@@ -6,6 +6,7 @@ import { familyId } from '../composables/useFamily'
 import { rooms, upsertRoom, removeRoom } from '../composables/useCleaning'
 import { tasks, removeTask, reorderTasks } from '../composables/useTasks'
 import { children } from '../composables/useChildren'
+import { useDialog } from '../composables/useDialog'
 import { CHORE_KIND, FORM_KIND } from '../lib/constants'
 import type { Room, Task, ChoreFormInitial } from '../types/firebase'
 import ScheduleItem from './ScheduleItem.vue'
@@ -28,12 +29,20 @@ async function renameRoom(room: Room) {
   await upsertRoom(room.id, { name, order: room.order })
 }
 
+const { confirm } = useDialog()
+
 async function deleteRoom(room: Room) {
   const roomTasks = tasksFor(room.id)
   const message = roomTasks.length
     ? `Delete room "${room.name}" and its ${roomTasks.length} task(s)? This cannot be undone.`
     : `Delete room "${room.name}"?`
-  if (!confirm(message)) return
+  const ok = await confirm({
+    title: 'Delete room',
+    message,
+    confirmLabel: 'Delete',
+    danger: true,
+  })
+  if (!ok) return
   if (!familyId.value) return
   const batch = writeBatch(db)
   for (const task of roomTasks) {

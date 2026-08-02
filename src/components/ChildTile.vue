@@ -5,6 +5,7 @@ import { Icon } from '@iconify/vue'
 import { daysUntilBirthday, isBirthdayToday } from '../lib/birthday'
 import { isAdminMode } from '../composables/useAdminMode'
 import { addMark, removeMark, setAllowanceBalance, payoutChild } from '../composables/useAllowance'
+import { useDialog } from '../composables/useDialog'
 import { formatCents, dollarsToCents } from '../lib/format'
 import Tooltip from './Tooltip.vue'
 import type { Child } from '../types/firebase'
@@ -62,10 +63,16 @@ function cancelBalance(event: Event) {
   editingBalance.value = false
 }
 
+const { confirm } = useDialog()
+
 function onPayoutClick(event: Event) {
   event.stopPropagation()
-  if (!confirm(`Mark ${props.child.name} as paid? This resets their balance to $0.00.`)) return
-  payoutChild(props.child.id)
+  confirm({
+    title: 'Mark as paid',
+    message: `Mark ${props.child.name} as paid? This resets their balance to $0.00.`,
+    confirmLabel: 'Mark paid',
+    danger: true,
+  }).then((ok) => { if (ok) payoutChild(props.child.id) })
 }
 </script>
 
