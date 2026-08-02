@@ -32,7 +32,7 @@ function closeDialog() {
     <AppHeader />
     <div
       v-if="!childrenLoading && children.length === 0 && !isAdminMode"
-      class="absolute top-[6.25rem] right-[9rem] z-20 flex items-end gap-1 pointer-events-none select-none"
+      class="absolute top-[6.25rem] right-[9rem] z-20 hidden sm:flex items-end gap-1 pointer-events-none select-none"
     >
       <span class="font-handwritten text-3xl leading-none text-amber-600 -rotate-2 mb-3 text-right">
         Click here to enter<br />Admin mode
