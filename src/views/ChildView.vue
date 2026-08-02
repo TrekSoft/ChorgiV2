@@ -4,7 +4,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { format } from 'date-fns'
 import { Icon } from '@iconify/vue'
 import { occursOn, deadlineFor, startsAt } from '../lib/recurrence'
-import { CHORE_KIND, CARD_VARIANT, CONFETTI_MODE, NOW_TICK_INTERVAL_MS, TOAST_DURATION_MS, WEEK_START_SUNDAY, type ConfettiMode } from '../lib/constants'
+import { CHORE_KIND, CARD_VARIANT, CONFETTI_MODE, FORM_KIND, NOW_TICK_INTERVAL_MS, TOAST_DURATION_MS, WEEK_START_SUNDAY, type ConfettiMode, type FormKind } from '../lib/constants'
 import { DATE_FORMAT, formatCents } from '../lib/format'
 import { family } from '../composables/useFamily'
 import { children } from '../composables/useChildren'
@@ -30,6 +30,7 @@ import ChoreCard from '../components/ChoreCard.vue'
 import EmptyState from '../components/EmptyState.vue'
 import ConfettiBurst from '../components/ConfettiBurst.vue'
 import PhotoLightbox from '../components/PhotoLightbox.vue'
+import ChoreFormDialog from '../components/ChoreFormDialog.vue'
 import type { Chore, Task, Claim, Child, ClaimableItem, AssignedEntry } from '../types/firebase'
 
 const route = useRoute()
@@ -67,6 +68,23 @@ function showToast(message: string) {
 }
 
 const lightboxSrc = ref<string | null>(null)
+
+// --- admin mode: edit a chore/task straight from its card ---
+const editDialogOpen = ref(false)
+const editDialogKind = ref<FormKind>(FORM_KIND.RECURRING_CHORE)
+const editingItem = ref<Chore | Task | null>(null)
+
+function openChoreEdit(chore: Chore) {
+  editDialogKind.value = chore.kind === CHORE_KIND.ONEOFF ? FORM_KIND.ONEOFF_CHORE : FORM_KIND.RECURRING_CHORE
+  editingItem.value = chore
+  editDialogOpen.value = true
+}
+
+function openTaskEdit(task: Task) {
+  editDialogKind.value = FORM_KIND.CLEANING_TASK
+  editingItem.value = task
+  editDialogOpen.value = true
+}
 
 // --- left pane: assigned chores ---
 // Snapshot the initial order on mount so completing a chore doesn't reshuffle
@@ -339,7 +357,9 @@ async function onTaskUnclaim(task: ClaimableItem) {
             :oneoff="entry.chore.kind === CHORE_KIND.ONEOFF"
             :bonus-cents="entry.chore.bonusCents || null"
             :variant="CARD_VARIANT.CHORE"
+            :editable="isAdminMode"
             @toggle="toggleChore(entry)"
+            @edit="openChoreEdit(entry.chore)"
             @photo-click="lightboxSrc = entry.chore.photoURL || null"
           />
         </section>
@@ -366,7 +386,9 @@ async function onTaskUnclaim(task: ClaimableItem) {
               v-bind="taskCardProps(task)"
               :can-unassign="canUnclaim(task)"
               :unassign-label="unclaimLabel(task)"
+              :editable="isAdminMode"
               @toggle="onTaskTap(task)"
+              @edit="openChoreEdit(task)"
               @photo-click="lightboxSrc = task.photoURL || null"
               @unassign="onTaskUnclaim(task)"
             />
@@ -384,7 +406,9 @@ async function onTaskUnclaim(task: ClaimableItem) {
               v-bind="taskCardProps(task)"
               :can-unassign="canUnclaim(task)"
               :unassign-label="unclaimLabel(task)"
+              :editable="isAdminMode"
               @toggle="onTaskTap(task)"
+              @edit="openTaskEdit(task)"
               @photo-click="lightboxSrc = task.photoURL || null"
               @unassign="onTaskUnclaim(task)"
             />
@@ -403,6 +427,13 @@ async function onTaskUnclaim(task: ClaimableItem) {
         {{ toast }}
       </div>
     </Teleport>
+
+    <ChoreFormDialog
+      :open="editDialogOpen"
+      :kind="editDialogKind"
+      :item="editingItem"
+      @close="editDialogOpen = false"
+    />
 
     <ConfettiBurst ref="burst" />
     <PhotoLightbox :open="!!lightboxSrc" :src="lightboxSrc || undefined" @close="lightboxSrc = null" />
