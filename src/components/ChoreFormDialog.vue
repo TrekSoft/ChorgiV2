@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, watch, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { Icon } from '@iconify/vue'
 import ChoreForm from './ChoreForm.vue'
 import { children } from '../composables/useChildren'
 import { rooms } from '../composables/useCleaning'
@@ -90,16 +89,9 @@ async function onDelete() {
             >
               Delete
             </button>
-            <button
-              @click="emit('close')"
-              class="w-9 h-9 -mr-1 flex items-center justify-center rounded-full hover:bg-amber-100 text-amber-600 cursor-pointer shrink-0"
-              aria-label="Close"
-            >
-              <Icon icon="mdi:close" class="w-5 h-5" />
-            </button>
           </div>
         </div>
-        <div class="px-4 sm:px-6 flex-1 min-h-0 flex flex-col overflow-hidden">
+        <div class="px-4 pt-3 pb-4 sm:px-6 sm:pt-4 sm:pb-6 flex-1 min-h-0 flex flex-col overflow-hidden">
           <ChoreForm
             :kind="kind"
             :initial="initial"

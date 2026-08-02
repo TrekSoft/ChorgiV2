@@ -173,7 +173,10 @@ export async function revokeInvite(email: string): Promise<void> {
 }
 
 export async function removeAuthorizedParent(uid: string): Promise<void> {
-  await updateDoc(doc(db, 'families', familyId.value!), { authorizedUids: arrayRemove(uid) })
+  const batch = writeBatch(db)
+  batch.update(doc(db, 'families', familyId.value!), { authorizedUids: arrayRemove(uid) })
+  batch.delete(doc(db, 'families', familyId.value!, 'members', uid))
+  await batch.commit()
 }
 
 export async function claimInvite(profile: MemberProfile): Promise<void> {

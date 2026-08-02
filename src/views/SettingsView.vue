@@ -251,14 +251,14 @@ async function saveTimePeriods() {
               <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
             </button>
           </div>
-          <div class="flex gap-2">
+          <div class="flex gap-3">
             <label class="flex flex-col gap-1 flex-1 min-w-0">
               <span class="form-label">Start</span>
-              <input v-model="period.start" type="time" class="input-field !px-2" />
+              <input v-model="period.start" type="time" class="input-field !px-3" />
             </label>
             <label class="flex flex-col gap-1 flex-1 min-w-0">
               <span class="form-label">End</span>
-              <input v-model="period.end" type="time" class="input-field !px-2" />
+              <input v-model="period.end" type="time" class="input-field !px-3" />
             </label>
           </div>
         </div>
