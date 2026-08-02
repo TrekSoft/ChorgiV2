@@ -318,7 +318,7 @@ async function onTaskUnclaim(task: ClaimableItem) {
 
       <div class="grid gap-6 lg:grid-cols-2">
         <!-- left: assigned chores -->
-        <section class="flex flex-col gap-3">
+        <section class="flex flex-col gap-3 min-w-0">
           <h2 class="heading-section">My chores</h2>
           <EmptyState
             v-if="!choresLoading && assigned.length === 0"
@@ -345,7 +345,7 @@ async function onTaskUnclaim(task: ClaimableItem) {
         </section>
 
         <!-- right: claimable tasks -->
-        <section class="flex flex-col gap-6">
+        <section class="flex flex-col gap-6 min-w-0">
           <div v-if="!choresLoading && !tasksLoading && (claimableChores.length > 0 || cleaningSections.length === 0)" class="flex flex-col gap-3">
             <h2 class="heading-section">Extra chores</h2>
             <EmptyState
