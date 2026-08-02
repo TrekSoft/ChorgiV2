@@ -21,6 +21,7 @@ const props = withDefaults(defineProps<{
   variant?: CardVariant
   canUnassign?: boolean
   unassignLabel?: string
+  editable?: boolean
 }>(), {
   iconName: null,
   photoUrl: null,
@@ -37,16 +38,32 @@ const props = withDefaults(defineProps<{
   variant: CARD_VARIANT.CHORE,
   canUnassign: false,
   unassignLabel: 'Remove me',
+  editable: false,
 })
-const emit = defineEmits<{ toggle: []; 'photo-click': []; unassign: [] }>()
+const emit = defineEmits<{ toggle: []; 'photo-click': []; unassign: []; edit: [] }>()
 
 function onCardClick() {
+  if (props.editable) {
+    emit('edit')
+    return
+  }
+  if (props.disabled) return
+  emit('toggle')
+}
+
+function onCheckClick(event: Event) {
+  if (!props.editable) return
+  event.stopPropagation()
   if (props.disabled) return
   emit('toggle')
 }
 
 function onPhotoClick(event: Event) {
   event.stopPropagation()
+  if (props.editable) {
+    emit('edit')
+    return
+  }
   emit('photo-click')
 }
 
@@ -81,7 +98,7 @@ function onUnassignClick() {
       @click="onCardClick"
       class="flex items-center gap-3 p-3 sm:p-4 flex-1 min-w-0"
       :class="[
-        disabled ? 'cursor-default' : 'cursor-pointer active:scale-[0.98]',
+        disabled && !editable ? 'cursor-default' : 'cursor-pointer active:scale-[0.98]',
         disabled ? 'bg-stone-100' : completed ? 'bg-green-50' : overdue ? 'bg-red-50' : 'bg-white',
       ]"
     >
@@ -132,8 +149,12 @@ function onUnassignClick() {
       </div>
 
       <div
+        @click="onCheckClick"
         class="w-9 h-9 rounded-full border-2 flex items-center justify-center shrink-0"
-        :class="completed ? 'bg-green-500 border-green-500 text-white' : disabled ? 'border-stone-300 text-transparent' : 'border-amber-300 text-transparent'"
+        :class="[
+          completed ? 'bg-green-500 border-green-500 text-white' : disabled ? 'border-stone-300 text-transparent' : 'border-amber-300 text-transparent',
+          editable && !disabled ? 'cursor-pointer hover:border-amber-500' : '',
+        ]"
       >
         <Icon icon="mdi:check" class="w-5 h-5" />
       </div>
