@@ -240,26 +240,27 @@ async function saveTimePeriods() {
       <section class="card-shadow p-6 flex flex-col gap-4">
         <h2 class="heading-section">Time periods</h2>
         <p class="text-amber-600 text-sm">These preset time windows appear as quick options when creating recurring chores.</p>
-        <div v-for="(period, i) in editablePeriods" :key="i" class="flex flex-col sm:flex-row sm:flex-wrap gap-2 sm:items-end">
-          <label class="flex flex-col gap-1 sm:w-28 sm:shrink-0">
-            <span class="form-label">Label</span>
-            <input v-model="period.label" type="text" class="input-field" placeholder="e.g. Morning" />
-          </label>
-          <label class="flex flex-col gap-1 flex-1 min-w-0">
-            <span class="form-label">Start</span>
-            <input v-model="period.start" type="time" class="input-field" />
-          </label>
-          <label class="flex flex-col gap-1 flex-1 min-w-0">
-            <span class="form-label">End</span>
-            <input v-model="period.end" type="time" class="input-field" />
-          </label>
-          <button
-            type="button"
-            @click="removePeriod(i)"
-            class="btn-danger-text self-start sm:pb-2"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-          </button>
+        <div v-for="(period, i) in editablePeriods" :key="i" class="rounded-xl border-2 border-amber-200 p-3 flex flex-col gap-2">
+          <div class="flex items-center gap-2">
+            <input v-model="period.label" type="text" class="input-field flex-1" placeholder="e.g. Morning" />
+            <button
+              type="button"
+              @click="removePeriod(i)"
+              class="shrink-0 w-8 h-8 flex items-center justify-center rounded-full text-red-400 hover:bg-red-50 hover:text-red-600 cursor-pointer"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+          </div>
+          <div class="flex gap-2">
+            <label class="flex flex-col gap-1 flex-1">
+              <span class="form-label">Start</span>
+              <input v-model="period.start" type="time" class="input-field" />
+            </label>
+            <label class="flex flex-col gap-1 flex-1">
+              <span class="form-label">End</span>
+              <input v-model="period.end" type="time" class="input-field" />
+            </label>
+          </div>
         </div>
         <button type="button" @click="addPeriod" class="btn-secondary self-start">+ Add period</button>
         <div class="flex gap-2">
