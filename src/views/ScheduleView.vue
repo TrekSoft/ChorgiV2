@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import AppHeader from '../components/AppHeader.vue'
@@ -11,7 +11,7 @@ const router = useRouter()
 
 const tab = computed(() => (route.query.tab === SCHEDULE_TAB.CLEANING ? SCHEDULE_TAB.CLEANING : SCHEDULE_TAB.CALENDAR))
 
-function setTab(next) {
+function setTab(next: string) {
   router.replace({ query: { ...route.query, tab: next } })
 }
 </script>

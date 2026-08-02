@@ -14,8 +14,9 @@ import {
 } from 'date-fns'
 import { CHORE_KIND, RECURRENCE_TYPE, WEEK_START_SUNDAY } from './constants'
 import { DATE_FORMAT, WEEK_KEY_FORMAT } from './format'
+import type { Chore } from '../types/firebase'
 
-function toDate(dateOrString) {
+function toDate(dateOrString: Date | string): Date {
   return typeof dateOrString === 'string' ? parseISO(dateOrString) : dateOrString
 }
 
@@ -24,7 +25,7 @@ function toDate(dateOrString) {
  * Weekly chores are considered to "occur" every day of their active week,
  * since they can be completed any day before the week ends.
  */
-export function occursOn(chore, dateOrString) {
+export function occursOn(chore: Chore, dateOrString: Date | string): boolean {
   const date = toDate(dateOrString)
 
   if (chore.kind === CHORE_KIND.ONEOFF) {
@@ -61,7 +62,7 @@ export function occursOn(chore, dateOrString) {
  * - daily-pattern with timeWindow.end: that HH:mm on that day
  * - weekly: end of the family's week (per weekStartsOn)
  */
-export function deadlineFor(chore, dateOrString, weekStartsOn = WEEK_START_SUNDAY) {
+export function deadlineFor(chore: Chore, dateOrString: Date | string, weekStartsOn: 0 | 1 = WEEK_START_SUNDAY): Date {
   const date = toDate(dateOrString)
 
   if (chore.kind === CHORE_KIND.RECURRING && chore.weekly) {
@@ -80,7 +81,7 @@ export function deadlineFor(chore, dateOrString, weekStartsOn = WEEK_START_SUNDA
 /**
  * When does this occurrence become visible/completable? Null if no start restriction.
  */
-export function startsAt(chore, dateOrString) {
+export function startsAt(chore: Chore, dateOrString: Date | string): Date | null {
   const date = toDate(dateOrString)
   const start = chore.kind === CHORE_KIND.RECURRING && !chore.weekly ? chore.timeWindow?.start : null
   if (!start) return null
@@ -92,7 +93,7 @@ export function startsAt(chore, dateOrString) {
  * Stable key identifying the period this occurrence belongs to, for keying
  * completion docs: 'yyyy-MM-dd' for daily/oneoff, 'yyyy-Www' for weekly.
  */
-export function periodKeyFor(chore, dateOrString, weekStartsOn = WEEK_START_SUNDAY) {
+export function periodKeyFor(chore: Chore, dateOrString: Date | string, weekStartsOn: 0 | 1 = WEEK_START_SUNDAY): string {
   const date = toDate(dateOrString)
 
   if (chore.kind === CHORE_KIND.RECURRING && chore.weekly) {

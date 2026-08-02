@@ -1,9 +1,9 @@
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue'
 
-defineProps({
-  label: { type: String, required: true },
-})
+defineProps<{
+  label: string
+}>()
 
 const show = ref(false)
 </script>

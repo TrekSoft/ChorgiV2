@@ -1,26 +1,32 @@
-<script setup>
+<script setup lang="ts">
 import { ref, watch } from 'vue'
 import { Icon } from '@iconify/vue'
 import PhotoLightbox from './PhotoLightbox.vue'
 
-const props = defineProps({
-  modelValue: { type: File, default: null },
-  previewUrl: { type: String, default: null },
-  label: { type: String, default: 'Photo' },
-  optional: { type: Boolean, default: true },
-  variant: { type: String, default: 'box' },
+const props = withDefaults(defineProps<{
+  modelValue?: Blob | null
+  previewUrl?: string | null
+  label?: string
+  optional?: boolean
+  variant?: string
+}>(), {
+  modelValue: null,
+  previewUrl: null,
+  label: 'Photo',
+  optional: true,
+  variant: 'box',
 })
-const emit = defineEmits(['update:modelValue'])
+const emit = defineEmits<{ 'update:modelValue': [value: Blob | null] }>()
 
-const inputEl = ref(null)
-const localPreview = ref(props.previewUrl)
+const inputEl = ref<HTMLInputElement | null>(null)
+const localPreview = ref<string | undefined>(props.previewUrl ?? undefined)
 const dragOver = ref(false)
 const lightboxOpen = ref(false)
 
 watch(
   () => props.previewUrl,
   (url) => {
-    if (!props.modelValue) localPreview.value = url
+    if (!props.modelValue) localPreview.value = url ?? undefined
   },
 )
 
@@ -28,24 +34,24 @@ function pick() {
   inputEl.value?.click()
 }
 
-function handleFile(file) {
+function handleFile(file: File | undefined) {
   if (!file || !file.type.startsWith('image/')) return
   localPreview.value = URL.createObjectURL(file)
   emit('update:modelValue', file)
 }
 
-function onChange(event) {
-  handleFile(event.target.files[0])
+function onChange(event: Event) {
+  handleFile((event.target as HTMLInputElement).files?.[0])
 }
 
-function onDrop(event) {
+function onDrop(event: DragEvent) {
   dragOver.value = false
-  handleFile(event.dataTransfer.files[0])
+  handleFile(event.dataTransfer?.files[0])
 }
 
-function clear(event) {
+function clear(event: Event) {
   event.stopPropagation()
-  localPreview.value = null
+  localPreview.value = undefined
   emit('update:modelValue', null)
 }
 </script>

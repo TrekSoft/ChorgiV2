@@ -1,13 +1,18 @@
-<script setup>
+<script setup lang="ts">
 import PhotoUpload from './PhotoUpload.vue'
 
-defineProps({
-  modelValue: { type: File, default: null },
-  previewUrl: { type: String, default: null },
-  label: { type: String, default: 'Photo' },
-  optional: { type: Boolean, default: true },
+withDefaults(defineProps<{
+  modelValue?: Blob | null
+  previewUrl?: string | null
+  label?: string
+  optional?: boolean
+}>(), {
+  modelValue: null,
+  previewUrl: null,
+  label: 'Photo',
+  optional: true,
 })
-const emit = defineEmits(['update:modelValue'])
+const emit = defineEmits<{ 'update:modelValue': [value: Blob | null] }>()
 </script>
 
 <template>

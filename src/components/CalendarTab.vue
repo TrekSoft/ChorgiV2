@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { ref, computed } from 'vue'
 import { format, addDays, addWeeks, startOfWeek, eachDayOfInterval, isToday } from 'date-fns'
 import { Icon } from '@iconify/vue'
@@ -15,14 +15,14 @@ import ChoreFormDialog from './ChoreFormDialog.vue'
 import CleaningDayDialog from './CleaningDayDialog.vue'
 
 const anchor = ref(new Date())
-const filterChildId = ref(null)
-const lightboxSrc = ref(null)
+const filterChildId = ref<string | null>(null)
+const lightboxSrc = ref<string | null>(null)
 
 // --- cleaning day dialog ---
 const cleaningDialogOpen = ref(false)
-const cleaningDialogDate = ref(null)
+const cleaningDialogDate = ref<Date | null>(null)
 
-function openCleaningDialog(day) {
+function openCleaningDialog(day: Date) {
   cleaningDialogDate.value = day
   cleaningDialogOpen.value = true
 }
@@ -46,21 +46,21 @@ function goToday() {
   anchor.value = new Date()
 }
 
-function matchesFilter(chore) {
+function matchesFilter(chore: Record<string, any>) {
   if (!filterChildId.value) return true
   // unassigned one-off chores are claimable by any kid, so they show under every filter
   if (chore.kind === CHORE_KIND.ONEOFF && (chore.assigneeIds || []).length === 0) return true
   return (chore.assigneeIds || []).includes(filterChildId.value)
 }
 
-function assigneesFor(chore) {
+function assigneesFor(chore: Record<string, any>) {
   return (chore.assigneeIds || [])
-    .map((id) => children.value.find((c) => c.id === id))
+    .map((id: string) => children.value.find((c) => c.id === id))
     .filter(Boolean)
 }
 
-function entriesFor(day) {
-  const entries = []
+function entriesFor(day: Date) {
+  const entries: any[] = []
   for (const chore of chores.value) {
     if (chore.active === false) continue
     if (!occursOn(chore, day)) continue
@@ -83,18 +83,18 @@ function entriesFor(day) {
 
 // --- dialog state ---
 const dialogOpen = ref(false)
-const dialogKind = ref(FORM_KIND.RECURRING_CHORE)
-const editingItem = ref(null)
-const prefill = ref(null)
+const dialogKind = ref<string>(FORM_KIND.RECURRING_CHORE)
+const editingItem = ref<Record<string, any> | null>(null)
+const prefill = ref<Record<string, any> | null>(null)
 
-function openAdd(kind, day = null) {
+function openAdd(kind: string, day: Date | null = null) {
   dialogKind.value = kind
   editingItem.value = null
   prefill.value = day ? { date: format(day, DATE_FORMAT) } : null
   dialogOpen.value = true
 }
 
-function openEdit(entry) {
+function openEdit(entry: any) {
   dialogKind.value = entry.kind
   editingItem.value = entry.item
   prefill.value = null
@@ -224,7 +224,7 @@ function openEdit(entry) {
       @close="dialogOpen = false"
     />
 
-    <PhotoLightbox :open="!!lightboxSrc" :src="lightboxSrc" @close="lightboxSrc = null" />
+    <PhotoLightbox :open="!!lightboxSrc" :src="lightboxSrc || undefined" @close="lightboxSrc = null" />
 
     <CleaningDayDialog
       :open="cleaningDialogOpen"

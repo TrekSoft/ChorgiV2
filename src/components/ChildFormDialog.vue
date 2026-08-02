@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { ref, watch } from 'vue'
 import { familyId } from '../composables/useFamily'
 import { children, upsertChild, removeChild } from '../composables/useChildren'
@@ -6,16 +6,18 @@ import { uploadChildPhoto } from '../lib/photo'
 import { dollarsToCents } from '../lib/format'
 import PhotoPicker from './PhotoPicker.vue'
 
-const props = defineProps({
-  open: Boolean,
-  child: { type: Object, default: null },
+const props = withDefaults(defineProps<{
+  open: boolean
+  child?: Record<string, any> | null
+}>(), {
+  child: null,
 })
-const emit = defineEmits(['close'])
+const emit = defineEmits<{ close: [] }>()
 
 const name = ref('')
 const birthdate = ref('')
 const weeklyAllowance = ref('0')
-const photoFile = ref(null)
+const photoFile = ref<Blob | null>(null)
 const saving = ref(false)
 
 watch(
@@ -34,8 +36,8 @@ async function save() {
   saving.value = true
   try {
     const childId = props.child?.id || crypto.randomUUID()
-    let photoURL = props.child?.photoURL || null
-    if (photoFile.value) {
+    let photoURL: string | null = props.child?.photoURL || null
+    if (photoFile.value && familyId.value) {
       photoURL = await uploadChildPhoto(familyId.value, childId, photoFile.value)
     }
     await upsertChild(childId, {

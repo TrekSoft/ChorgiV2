@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { Icon } from '@iconify/vue'
@@ -8,10 +8,10 @@ import { addMark, removeMark, setAllowanceBalance, payoutChild } from '../compos
 import { formatCents, dollarsToCents } from '../lib/format'
 import Tooltip from './Tooltip.vue'
 
-const props = defineProps({
-  child: { type: Object, required: true },
-})
-const emit = defineEmits(['edit'])
+const props = defineProps<{
+  child: Record<string, any>
+}>()
+const emit = defineEmits<{ edit: [child: Record<string, any>] }>()
 
 const router = useRouter()
 
@@ -22,17 +22,17 @@ function open() {
   router.push(`/child/${props.child.id}`)
 }
 
-function onEditClick(event) {
+function onEditClick(event: Event) {
   event.stopPropagation()
   emit('edit', props.child)
 }
 
-function onMarkAdd(event) {
+function onMarkAdd(event: Event) {
   event.stopPropagation()
   addMark(props.child.id)
 }
 
-function onMarkRemove(event) {
+function onMarkRemove(event: Event) {
   event.stopPropagation()
   removeMark(props.child.id)
 }
@@ -40,14 +40,14 @@ function onMarkRemove(event) {
 const editingBalance = ref(false)
 const balanceInput = ref('')
 
-function onBalanceClick(event) {
+function onBalanceClick(event: Event) {
   event.stopPropagation()
   if (!isAdminMode.value) return
   balanceInput.value = formatCents(props.child.allowanceBalanceCents)
   editingBalance.value = true
 }
 
-function saveBalance(event) {
+function saveBalance(event: Event) {
   event.stopPropagation()
   const cents = dollarsToCents(balanceInput.value)
   if (!isNaN(cents)) {
@@ -56,12 +56,12 @@ function saveBalance(event) {
   editingBalance.value = false
 }
 
-function cancelBalance(event) {
+function cancelBalance(event: Event) {
   event.stopPropagation()
   editingBalance.value = false
 }
 
-function onPayoutClick(event) {
+function onPayoutClick(event: Event) {
   event.stopPropagation()
   if (!confirm(`Mark ${props.child.name} as paid? This resets their balance to $0.00.`)) return
   payoutChild(props.child.id)

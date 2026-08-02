@@ -1,17 +1,20 @@
-<script setup>
+<script setup lang="ts">
 import { ref, watch } from 'vue'
 import { format } from 'date-fns'
 import { rooms, setCleaningDayRooms } from '../composables/useCleaning'
 import { DATE_FORMAT } from '../lib/format'
 
-const props = defineProps({
-  open: Boolean,
-  date: { type: Date, default: null },
-  initialRoomIds: { type: Array, default: () => [] },
+const props = withDefaults(defineProps<{
+  open: boolean
+  date?: Date | null
+  initialRoomIds?: string[]
+}>(), {
+  date: null,
+  initialRoomIds: () => [],
 })
-const emit = defineEmits(['close'])
+const emit = defineEmits<{ close: [] }>()
 
-const selectedRoomIds = ref([])
+const selectedRoomIds = ref<string[]>([])
 
 watch(
   () => props.open,
@@ -20,13 +23,14 @@ watch(
   },
 )
 
-function toggleRoom(roomId) {
+function toggleRoom(roomId: string) {
   selectedRoomIds.value = selectedRoomIds.value.includes(roomId)
     ? selectedRoomIds.value.filter((r) => r !== roomId)
     : [...selectedRoomIds.value, roomId]
 }
 
 async function save() {
+  if (!props.date) return
   await setCleaningDayRooms(format(props.date, DATE_FORMAT), selectedRoomIds.value)
   emit('close')
 }
@@ -37,7 +41,7 @@ async function save() {
     <div v-if="open" class="dialog-overlay">
       <div class="dialog-container p-6 w-full max-w-sm flex flex-col gap-4">
         <h2 class="text-xl font-bold text-amber-900">
-          Cleaning day — {{ format(date, 'EEE, MMM d') }}
+          Cleaning day — {{ date ? format(date, 'EEE, MMM d') : '' }}
         </h2>
         <p class="text-amber-600 text-sm">Select the rooms to clean this day. Unselect all to unmark the day.</p>
         <div class="flex flex-wrap gap-2">

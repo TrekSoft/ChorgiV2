@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import confetti from 'canvas-confetti'
 import { CONFETTI_MODE } from '../lib/constants'
 
@@ -46,7 +46,7 @@ function fireFireworks() {
   })()
 }
 
-function fire(mode = CONFETTI_MODE.CONFETTI) {
+function fire(mode: string = CONFETTI_MODE.CONFETTI) {
   if (mode === CONFETTI_MODE.COINS) fireCoins()
   else if (mode === CONFETTI_MODE.FIREWORKS) fireFireworks()
   else fireConfetti()

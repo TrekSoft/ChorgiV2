@@ -1,4 +1,5 @@
 import { ref, watch } from 'vue'
+import type { User } from 'firebase/auth'
 import {
   doc,
   getDoc,
@@ -15,20 +16,22 @@ import { db } from '../lib/firebase'
 import { currentUser } from './useAuth'
 import { hashPin } from '../lib/pin'
 import { WEEK_START_SUNDAY } from '../lib/constants'
+import type { Family, Member, MemberDoc } from '../types/firebase'
+import { familyConverter, memberConverter } from '../types/firebase'
 
-export const familyId = ref(null)
-export const family = ref(null)
-export const member = ref(null)
+export const familyId = ref<string | null>(null)
+export const family = ref<Family | null>(null)
+export const member = ref<Member | null>(null)
 export const familyLoading = ref(true)
 export const needsOnboarding = ref(false)
-export const pendingInvite = ref(null)
+export const pendingInvite = ref<{ email: string; familyId: string } | null>(null)
 export const connectionError = ref(false)
 
-export function clearConnectionError() {
+export function clearConnectionError(): void {
   connectionError.value = false
 }
 
-export function waitForFamilyReady() {
+export function waitForFamilyReady(): Promise<void> {
   if (!familyLoading.value) return Promise.resolve()
   return new Promise((resolve) => {
     const unwatch = watch(familyLoading, (loading) => {
@@ -40,10 +43,10 @@ export function waitForFamilyReady() {
   })
 }
 
-let unsubscribeFamily = null
-let unsubscribeMember = null
+let unsubscribeFamily: (() => void) | null = null
+let unsubscribeMember: (() => void) | null = null
 
-function resetFamilyState() {
+function resetFamilyState(): void {
   unsubscribeFamily?.()
   unsubscribeMember?.()
   unsubscribeFamily = null
@@ -57,30 +60,37 @@ function resetFamilyState() {
   familyLoading.value = false
 }
 
-function bindFamily(id) {
+function bindFamily(id: string): void {
   familyId.value = id
   needsOnboarding.value = false
-  unsubscribeFamily = onSnapshot(doc(db, 'families', id), (snap) => {
-    family.value = snap.data()
-    familyLoading.value = false
-  })
-  unsubscribeMember = onSnapshot(doc(db, 'families', id, 'members', currentUser.value.uid), (snap) => {
-    member.value = snap.data()
-  })
+  unsubscribeFamily = onSnapshot(
+    doc(db, 'families', id).withConverter(familyConverter),
+    (snap) => {
+      family.value = snap.data() ?? null
+      familyLoading.value = false
+    },
+  )
+  const uid = currentUser.value!.uid
+  unsubscribeMember = onSnapshot(
+    doc(db, 'families', id, 'members', uid).withConverter(memberConverter),
+    (snap) => {
+      member.value = snap.data() ?? null
+    },
+  )
 }
 
-async function loadFamily(user) {
+async function loadFamily(user: User): Promise<void> {
   familyLoading.value = true
   try {
     const indexSnap = await getDoc(doc(db, 'userIndex', user.uid))
     if (indexSnap.exists()) {
-      bindFamily(indexSnap.data().familyId)
+      bindFamily(indexSnap.data()!.familyId)
       return
     }
-    const email = user.email.toLowerCase()
+    const email = user.email!.toLowerCase()
     const inviteSnap = await getDoc(doc(db, 'invites', email))
     if (inviteSnap.exists()) {
-      pendingInvite.value = { email, familyId: inviteSnap.data().familyId }
+      pendingInvite.value = { email, familyId: inviteSnap.data()!.familyId }
     }
     needsOnboarding.value = true
   } catch (e) {
@@ -106,8 +116,14 @@ watch(
   { immediate: true },
 )
 
-export async function createFamily(profile, pin) {
-  const uid = currentUser.value.uid
+export interface MemberProfile {
+  name: string
+  birthdate: string
+  photoURL?: string | null
+}
+
+export async function createFamily(profile: MemberProfile, pin: string): Promise<void> {
+  const uid = currentUser.value!.uid
   const pinHash = await hashPin(pin, uid)
   const batch = writeBatch(db)
   batch.set(doc(db, 'families', uid), {
@@ -125,44 +141,44 @@ export async function createFamily(profile, pin) {
   bindFamily(uid)
 }
 
-export async function updateOwnProfile(profile) {
-  const uid = currentUser.value.uid
-  await updateDoc(doc(db, 'families', familyId.value, 'members', uid), { ...profile })
+export async function updateOwnProfile(profile: Partial<MemberDoc>): Promise<void> {
+  const uid = currentUser.value!.uid
+  await updateDoc(doc(db, 'families', familyId.value!, 'members', uid), { ...profile })
 }
 
-export async function changeFamilyPin(newPin) {
-  const pinHash = await hashPin(newPin, familyId.value)
-  await updateDoc(doc(db, 'families', familyId.value), { pinHash })
+export async function changeFamilyPin(newPin: string): Promise<void> {
+  const pinHash = await hashPin(newPin, familyId.value!)
+  await updateDoc(doc(db, 'families', familyId.value!), { pinHash })
 }
 
-export async function inviteParent(email) {
+export async function inviteParent(email: string): Promise<void> {
   const normalizedEmail = email.trim().toLowerCase()
   const batch = writeBatch(db)
   batch.set(doc(db, 'invites', normalizedEmail), {
-    familyId: familyId.value,
+    familyId: familyId.value!,
     createdAt: serverTimestamp(),
   })
-  batch.set(doc(db, 'families', familyId.value, 'pendingInvites', normalizedEmail), {
+  batch.set(doc(db, 'families', familyId.value!, 'pendingInvites', normalizedEmail), {
     email: normalizedEmail,
     createdAt: serverTimestamp(),
   })
   await batch.commit()
 }
 
-export async function revokeInvite(email) {
+export async function revokeInvite(email: string): Promise<void> {
   const batch = writeBatch(db)
   batch.delete(doc(db, 'invites', email))
-  batch.delete(doc(db, 'families', familyId.value, 'pendingInvites', email))
+  batch.delete(doc(db, 'families', familyId.value!, 'pendingInvites', email))
   await batch.commit()
 }
 
-export async function removeAuthorizedParent(uid) {
-  await updateDoc(doc(db, 'families', familyId.value), { authorizedUids: arrayRemove(uid) })
+export async function removeAuthorizedParent(uid: string): Promise<void> {
+  await updateDoc(doc(db, 'families', familyId.value!), { authorizedUids: arrayRemove(uid) })
 }
 
-export async function claimInvite(profile) {
-  const uid = currentUser.value.uid
-  const { email, familyId: fid } = pendingInvite.value
+export async function claimInvite(profile: MemberProfile): Promise<void> {
+  const uid = currentUser.value!.uid
+  const { email, familyId: fid } = pendingInvite.value!
   const batch = writeBatch(db)
   batch.update(doc(db, 'families', fid), { authorizedUids: arrayUnion(uid) })
   batch.set(doc(db, 'families', fid, 'members', uid), {

@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { watch } from 'vue'
 import { familyId } from './composables/useFamily'
 import { children, childrenLoading } from './composables/useChildren'

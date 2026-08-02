@@ -1,8 +1,11 @@
-<script setup>
-defineProps({
-  title: { type: String, required: true },
-  subtitle: { type: String, default: '' },
-  compact: { type: Boolean, default: false },
+<script setup lang="ts">
+withDefaults(defineProps<{
+  title: string
+  subtitle?: string
+  compact?: boolean
+}>(), {
+  subtitle: '',
+  compact: false,
 })
 </script>
 

@@ -1,21 +1,21 @@
 import { ref, onMounted } from 'vue'
 import { ADMIN_TIMEOUT_MS } from '../lib/constants'
 
-const ACTIVITY_EVENTS = ['pointerdown', 'keydown', 'touchstart']
+const ACTIVITY_EVENTS = ['pointerdown', 'keydown', 'touchstart'] as const
 
 export const isAdminMode = ref(false)
 
-let timer = null
+let timer: ReturnType<typeof setTimeout> | null = null
 let listenersBound = false
 
-function clearTimer() {
+function clearTimer(): void {
   if (timer) {
     clearTimeout(timer)
     timer = null
   }
 }
 
-function resetTimer() {
+function resetTimer(): void {
   if (!isAdminMode.value) return
   clearTimer()
   timer = setTimeout(() => {
@@ -23,23 +23,23 @@ function resetTimer() {
   }, ADMIN_TIMEOUT_MS)
 }
 
-function bindActivityListeners() {
+function bindActivityListeners(): void {
   if (listenersBound) return
   listenersBound = true
   ACTIVITY_EVENTS.forEach((evt) => window.addEventListener(evt, resetTimer, { passive: true }))
 }
 
-export function enterAdminMode() {
+export function enterAdminMode(): void {
   isAdminMode.value = true
   bindActivityListeners()
   resetTimer()
 }
 
-export function exitAdminMode() {
+export function exitAdminMode(): void {
   isAdminMode.value = false
   clearTimer()
 }
 
-export function useAdminModeTimeout() {
+export function useAdminModeTimeout(): void {
   onMounted(bindActivityListeners)
 }

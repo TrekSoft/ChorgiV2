@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue'
 import { sendSignInLink } from '../composables/useAuth'
 import logo from '../assets/logo.png'

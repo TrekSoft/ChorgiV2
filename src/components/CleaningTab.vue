@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue'
 import { writeBatch, doc } from 'firebase/firestore'
 import { db } from '../lib/firebase'
@@ -21,18 +21,19 @@ async function addRoom() {
   newRoomName.value = ''
 }
 
-async function renameRoom(room) {
+async function renameRoom(room: Record<string, any>) {
   const name = prompt('Room name', room.name)?.trim()
   if (!name || name === room.name) return
   await upsertRoom(room.id, { name, order: room.order })
 }
 
-async function deleteRoom(room) {
+async function deleteRoom(room: Record<string, any>) {
   const roomTasks = tasksFor(room.id)
   const message = roomTasks.length
     ? `Delete room "${room.name}" and its ${roomTasks.length} task(s)? This cannot be undone.`
     : `Delete room "${room.name}"?`
   if (!confirm(message)) return
+  if (!familyId.value) return
   const batch = writeBatch(db)
   for (const task of roomTasks) {
     batch.delete(doc(db, 'families', familyId.value, 'tasks', task.id))
@@ -41,18 +42,18 @@ async function deleteRoom(room) {
   await batch.commit()
 }
 
-function tasksFor(roomId) {
+function tasksFor(roomId: string) {
   return tasks.value.filter((t) => t.kind === CHORE_KIND.CLEANING && t.roomId === roomId)
 }
 
-const dragTaskId = ref(null)
-const dragOverTaskId = ref(null)
+const dragTaskId = ref<string | null>(null)
+const dragOverTaskId = ref<string | null>(null)
 
-function onDragStart(taskId) {
+function onDragStart(taskId: string) {
   dragTaskId.value = taskId
 }
 
-function onDragOver(taskId) {
+function onDragOver(taskId: string) {
   if (dragTaskId.value === null) return
   if (taskId !== dragOverTaskId.value) dragOverTaskId.value = taskId
 }
@@ -61,7 +62,7 @@ function onDragLeave() {
   dragOverTaskId.value = null
 }
 
-async function onDrop(roomId) {
+async function onDrop(roomId: string) {
   if (dragTaskId.value === null) return
   const roomTasks = tasksFor(roomId)
   const fromIdx = roomTasks.findIndex((t) => t.id === dragTaskId.value)
@@ -79,26 +80,26 @@ async function onDrop(roomId) {
   dragOverTaskId.value = null
 }
 
-function assigneesFor(task) {
+function assigneesFor(task: Record<string, any>) {
   if (!task.assigneeId) return []
   const c = children.value.find((c) => c.id === task.assigneeId)
   return c ? [c] : []
 }
 
-const lightboxSrc = ref(null)
+const lightboxSrc = ref<string | null>(null)
 
 // --- task dialog ---
 const taskDialogOpen = ref(false)
-const editingTask = ref(null)
-const taskPrefill = ref(null)
+const editingTask = ref<Record<string, any> | null>(null)
+const taskPrefill = ref<Record<string, any> | null>(null)
 
-function openAddTask(roomId) {
+function openAddTask(roomId: string) {
   editingTask.value = null
   taskPrefill.value = { roomId }
   taskDialogOpen.value = true
 }
 
-function openEditTask(task) {
+function openEditTask(task: Record<string, any>) {
   editingTask.value = task
   taskPrefill.value = null
   taskDialogOpen.value = true
@@ -169,7 +170,7 @@ function openEditTask(task) {
               :assignees="assigneesFor(task)"
               draggable
               @click="openEditTask(task)"
-              @photo-click="lightboxSrc = task.photoURL"
+              @photo-click="lightboxSrc = task.photoURL || null"
             />
           </div>
 
@@ -195,6 +196,6 @@ function openEditTask(task) {
       @close="taskDialogOpen = false"
     />
 
-    <PhotoLightbox :open="!!lightboxSrc" :src="lightboxSrc" @close="lightboxSrc = null" />
+    <PhotoLightbox :open="!!lightboxSrc" :src="lightboxSrc || undefined" @close="lightboxSrc = null" />
   </div>
 </template>

@@ -1,20 +1,20 @@
-<script setup>
+<script setup lang="ts">
 import { ref, watch } from 'vue'
 import { Icon } from '@iconify/vue'
 
-const props = defineProps({
-  modelValue: { type: String, default: null }, // iconify icon name, e.g. 'mdi:broom'
-})
-const emit = defineEmits(['update:modelValue'])
+const props = defineProps<{
+  modelValue?: string | null
+}>()
+const emit = defineEmits<{ 'update:modelValue': [value: string | null] }>()
 
 const query = ref('')
-const results = ref([])
+const results = ref<string[]>([])
 const loading = ref(false)
 const error = ref(false)
 
-let debounceTimer = null
+let debounceTimer: ReturnType<typeof setTimeout> | null = null
 
-async function search(term) {
+async function search(term: string) {
   if (!term.trim()) {
     results.value = []
     return
@@ -25,7 +25,7 @@ async function search(term) {
     const res = await fetch(
       `https://api.iconify.design/search?query=${encodeURIComponent(term)}&limit=48`,
     )
-    const data = await res.json()
+    const data = await res.json() as { icons?: string[] }
     results.value = data.icons || []
   } catch (e) {
     error.value = true
@@ -36,11 +36,11 @@ async function search(term) {
 }
 
 watch(query, (term) => {
-  clearTimeout(debounceTimer)
+  if (debounceTimer) clearTimeout(debounceTimer)
   debounceTimer = setTimeout(() => search(term), 300)
 })
 
-function select(iconName) {
+function select(iconName: string) {
   emit('update:modelValue', iconName)
   query.value = ''
   results.value = []

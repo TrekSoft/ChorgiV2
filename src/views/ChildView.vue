@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { format } from 'date-fns'
@@ -37,13 +37,13 @@ const child = computed(() => children.value.find((c) => c.id === route.params.id
 const weekStartsOn = computed(() => family.value?.weekStartsOn ?? WEEK_START_SUNDAY)
 
 const now = ref(new Date())
-let nowTimer = null
+let nowTimer: ReturnType<typeof setInterval> | null = null
 onMounted(() => {
   nowTimer = setInterval(() => {
     now.value = new Date()
   }, NOW_TICK_INTERVAL_MS)
 })
-onUnmounted(() => clearInterval(nowTimer))
+onUnmounted(() => { if (nowTimer) clearInterval(nowTimer) })
 
 watch(() => route.params.id, () => {
   initialOrder = []
@@ -51,35 +51,35 @@ watch(() => route.params.id, () => {
 
 const todayStr = computed(() => format(now.value, DATE_FORMAT))
 
-const burst = ref(null)
-const toast = ref(null)
-let toastTimer = null
-function showToast(message) {
+const burst = ref<any>(null)
+const toast = ref<string | null>(null)
+let toastTimer: ReturnType<typeof setTimeout> | null = null
+function showToast(message: string) {
   toast.value = message
-  clearTimeout(toastTimer)
+  if (toastTimer) clearTimeout(toastTimer)
   toastTimer = setTimeout(() => {
     toast.value = null
   }, TOAST_DURATION_MS)
 }
 
-const lightboxSrc = ref(null)
+const lightboxSrc = ref<string | null>(null)
 
 // --- left pane: assigned chores ---
 // Snapshot the initial order on mount so completing a chore doesn't reshuffle
-let initialOrder = []
+let initialOrder: string[] = []
 
-function snapshotOrder(list) {
+function snapshotOrder(list: any[]) {
   initialOrder = list.map((e) => e.chore.id)
 }
 
-function orderIndex(choreId) {
+function orderIndex(choreId: string) {
   const idx = initialOrder.indexOf(choreId)
   return idx === -1 ? Infinity : idx
 }
 
 const assigned = computed(() => {
   if (!child.value) return []
-  const list = []
+  const list: any[] = []
   for (const chore of chores.value) {
     if (chore.active === false) continue
     if (!(chore.assigneeIds || []).includes(child.value.id)) continue
@@ -99,7 +99,7 @@ const assigned = computed(() => {
   }
   // On first load, snapshot the natural order (overdue, then actionable, then completed by deadline)
   if (initialOrder.length === 0 && list.length > 0) {
-    const rank = (e) => (e.overdue ? 0 : e.completed ? 2 : 1)
+    const rank = (e: any) => (e.overdue ? 0 : e.completed ? 2 : 1)
     const sorted = [...list].sort((a, b) => rank(a) - rank(b) || a.deadline - b.deadline)
     snapshotOrder(sorted)
   }
@@ -109,7 +109,8 @@ const assigned = computed(() => {
 
 let completedThisSession = false
 
-async function toggleChore(entry) {
+async function toggleChore(entry: any) {
+  if (!child.value) return
   if (entry.completed) {
     await uncompleteChore(entry.chore, child.value.id, now.value, weekStartsOn.value)
   } else {
@@ -132,11 +133,11 @@ watch(allAssignedDone, (done) => {
 })
 
 // --- right pane: claimable tasks ---
-function claimFor(task) {
+function claimFor(task: any) {
   return claims.value[claimIdFor(task, todayStr.value)] || null
 }
 
-function claimChild(claim) {
+function claimChild(claim: Record<string, any> | null) {
   return children.value.find((c) => c.id === claim?.childId) || null
 }
 
@@ -162,20 +163,20 @@ const cleaningSections = computed(() => {
     .filter((s) => s.room && s.tasks.length > 0)
 })
 
-function isPreAssigned(task) {
+function isPreAssigned(task: any) {
   return !!task.assigneeId && task.assigneeId === child.value?.id
 }
 
-function isAssignedToOther(task) {
+function isAssignedToOther(task: any) {
   return !!task.assigneeId && task.assigneeId !== child.value?.id
 }
 
-function assignedChild(task) {
+function assignedChild(task: any) {
   return children.value.find((c) => c.id === task.assigneeId) || null
 }
 
 // card state helpers for claimable tasks
-function taskCardProps(task) {
+function taskCardProps(task: any) {
   if (task.assigneeId) {
     const claim = claimFor(task)
     const child_ = assignedChild(task)
@@ -198,7 +199,7 @@ function taskCardProps(task) {
   }
 }
 
-function canUnclaim(task) {
+function canUnclaim(task: any) {
   if (isPreAssigned(task)) return false
   const claim = claimFor(task)
   if (!claim || claim.completed) return false
@@ -206,13 +207,14 @@ function canUnclaim(task) {
   return !!(mine || isAdminMode.value)
 }
 
-function unclaimLabel(task) {
+function unclaimLabel(task: any) {
   const claim = claimFor(task)
   const mine = claim && child.value && claim.childId === child.value.id
   return mine ? 'Remove me' : 'Unassign'
 }
 
-async function onTaskTap(task) {
+async function onTaskTap(task: any) {
+  if (!child.value) return
   if (isAssignedToOther(task)) {
     if (!isAdminMode.value) return
     return
@@ -262,7 +264,7 @@ async function onTaskTap(task) {
   }
 }
 
-async function onTaskUnclaim(task) {
+async function onTaskUnclaim(task: any) {
   const claim = claimFor(task)
   if (!claim || claim.completed) return
   const mine = child.value && claim.childId === child.value.id
@@ -322,7 +324,7 @@ async function onTaskUnclaim(task) {
             :bonus-cents="entry.chore.bonusCents || null"
             :variant="CARD_VARIANT.CHORE"
             @toggle="toggleChore(entry)"
-            @photo-click="lightboxSrc = entry.chore.photoURL"
+            @photo-click="lightboxSrc = entry.chore.photoURL || null"
           />
         </section>
 
@@ -349,13 +351,13 @@ async function onTaskUnclaim(task) {
               :can-unassign="canUnclaim(task)"
               :unassign-label="unclaimLabel(task)"
               @toggle="onTaskTap(task)"
-              @photo-click="lightboxSrc = task.photoURL"
+              @photo-click="lightboxSrc = task.photoURL || null"
               @unassign="onTaskUnclaim(task)"
             />
           </div>
 
-          <div v-for="section in cleaningSections" :key="section.room.id" class="flex flex-col gap-3">
-            <h2 class="text-lg font-bold text-sky-800">🧹 {{ section.room.name }}</h2>
+          <div v-for="section in cleaningSections" :key="section.room!.id" class="flex flex-col gap-3">
+            <h2 class="text-lg font-bold text-sky-800">🧹 {{ section.room!.name }}</h2>
             <ChoreCard
               v-for="task in section.tasks"
               :key="task.id"
@@ -367,7 +369,7 @@ async function onTaskUnclaim(task) {
               :can-unassign="canUnclaim(task)"
               :unassign-label="unclaimLabel(task)"
               @toggle="onTaskTap(task)"
-              @photo-click="lightboxSrc = task.photoURL"
+              @photo-click="lightboxSrc = task.photoURL || null"
               @unassign="onTaskUnclaim(task)"
             />
           </div>
@@ -387,6 +389,6 @@ async function onTaskUnclaim(task) {
     </Teleport>
 
     <ConfettiBurst ref="burst" />
-    <PhotoLightbox :open="!!lightboxSrc" :src="lightboxSrc" @close="lightboxSrc = null" />
+    <PhotoLightbox :open="!!lightboxSrc" :src="lightboxSrc || undefined" @close="lightboxSrc = null" />
   </div>
 </template>

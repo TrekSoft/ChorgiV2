@@ -1,5 +1,6 @@
-<script setup>
+<script setup lang="ts">
 import { ref, computed } from 'vue'
+import { useRouter } from 'vue-router'
 import ChoreForm from './ChoreForm.vue'
 import { children } from '../composables/useChildren'
 import { rooms } from '../composables/useCleaning'
@@ -7,22 +8,25 @@ import { upsertChore, removeChore } from '../composables/useChores'
 import { upsertTask, removeTask } from '../composables/useTasks'
 import { FORM_KIND, FORM_TITLES } from '../lib/constants'
 
-const props = defineProps({
-  open: Boolean,
-  kind: { type: String, required: true },
-  item: { type: Object, default: null },
-  prefill: { type: Object, default: null },
+const props = withDefaults(defineProps<{
+  open: boolean
+  kind: string
+  item?: Record<string, any> | null
+  prefill?: Record<string, any> | null
+}>(), {
+  item: null,
+  prefill: null,
 })
-const emit = defineEmits(['close'])
+const emit = defineEmits<{ close: [] }>()
 
 const saving = ref(false)
 
-const title = computed(() => `${props.item ? 'Edit' : 'Add'} ${FORM_TITLES[props.kind]}`)
+const title = computed(() => `${props.item ? 'Edit' : 'Add'} ${FORM_TITLES[props.kind as keyof typeof FORM_TITLES]}`)
 const initial = computed(() => props.item || props.prefill || null)
 
 const isChore = computed(() => props.kind === FORM_KIND.RECURRING_CHORE || props.kind === FORM_KIND.ONEOFF_CHORE)
 
-async function onSubmit(data) {
+async function onSubmit(data: Record<string, any>) {
   saving.value = true
   try {
     const payload = { ...data, photoURL: props.item?.photoURL || null }
@@ -34,7 +38,7 @@ async function onSubmit(data) {
     emit('close')
   } catch (e) {
     console.error('Failed to save', e)
-    alert(`Failed to save: ${e.message}`)
+    alert(`Failed to save: ${(e as Error).message}`)
   } finally {
     saving.value = false
   }

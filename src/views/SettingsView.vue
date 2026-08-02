@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { ref, watch } from 'vue'
 import {
   member,
@@ -23,7 +23,7 @@ import PhotoPicker from '../components/PhotoPicker.vue'
 
 const name = ref('')
 const birthdate = ref('')
-const photoFile = ref(null)
+const photoFile = ref<Blob | null>(null)
 const profileSaving = ref(false)
 const profileSaved = ref(false)
 
@@ -42,8 +42,8 @@ async function saveProfile() {
   profileSaving.value = true
   profileSaved.value = false
   try {
-    let photoURL = member.value?.photoURL || null
-    if (photoFile.value) {
+    let photoURL: string | null = member.value?.photoURL || null
+    if (photoFile.value && familyId.value && currentUser.value) {
       photoURL = await uploadMemberPhoto(familyId.value, currentUser.value.uid, photoFile.value)
     }
     await updateOwnProfile({ name: name.value.trim(), birthdate: birthdate.value, photoURL })
@@ -125,7 +125,7 @@ async function sendInvite() {
   }
 }
 
-const editablePeriods = ref([])
+const editablePeriods = ref<{ id: string; label: string; start: string; end: string }[]>([])
 const timePeriodsSaving = ref(false)
 const timePeriodsSaved = ref(false)
 
@@ -141,7 +141,7 @@ function addPeriod() {
   editablePeriods.value.push({ id: '', label: '', start: '', end: '' })
 }
 
-function removePeriod(i) {
+function removePeriod(i: number) {
   editablePeriods.value.splice(i, 1)
 }
 
@@ -287,7 +287,7 @@ async function saveTimePeriods() {
               <span v-if="m.id === familyId" class="text-amber-400 text-sm font-normal">(main parent)</span>
             </span>
             <button
-              v-if="m.id !== currentUser.uid && m.id !== familyId"
+              v-if="m.id !== currentUser?.uid && m.id !== familyId"
               @click="removeAuthorizedParent(m.id)"
               class="btn-danger-text"
             >

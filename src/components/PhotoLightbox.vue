@@ -1,10 +1,13 @@
-<script setup>
-defineProps({
-  open: Boolean,
-  src: { type: String, default: null },
-  alt: { type: String, default: '' },
+<script setup lang="ts">
+withDefaults(defineProps<{
+  open: boolean
+  src?: string | undefined
+  alt?: string
+}>(), {
+  src: undefined,
+  alt: '',
 })
-const emit = defineEmits(['close'])
+const emit = defineEmits<{ close: [] }>()
 </script>
 
 <template>

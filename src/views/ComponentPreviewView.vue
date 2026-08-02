@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue'
 import { addHours, addMinutes } from 'date-fns'
 import ChoreCard from '../components/ChoreCard.vue'
@@ -21,14 +21,14 @@ const dummyRooms = [
 ]
 
 const icon = ref('mdi:broom')
-const photoFile = ref(null)
+const photoFile = ref<Blob | null>(null)
 
 const lightboxOpen = ref(false)
-const confettiRef = ref(null)
+const confettiRef = ref<any>(null)
 
 const formKind = ref('recurring-chore')
 
-function onFormSubmit(data) {
+function onFormSubmit(data: Record<string, any>) {
   console.log('form submit', data)
   alert('Submitted! Check the console for the payload.')
 }

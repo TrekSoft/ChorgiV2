@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue'
 import { children, childrenLoading } from '../composables/useChildren'
 import { isAdminMode } from '../composables/useAdminMode'
@@ -9,14 +9,14 @@ import EmptyState from '../components/EmptyState.vue'
 import ChildFormDialog from '../components/ChildFormDialog.vue'
 
 const dialogOpen = ref(false)
-const editingChild = ref(null)
+const editingChild = ref<Record<string, any> | null>(null)
 
 function openAdd() {
   editingChild.value = null
   dialogOpen.value = true
 }
 
-function openEdit(child) {
+function openEdit(child: Record<string, any>) {
   editingChild.value = child
   dialogOpen.value = true
 }

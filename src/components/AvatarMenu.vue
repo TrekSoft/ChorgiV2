@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { Icon } from '@iconify/vue'
@@ -13,7 +13,7 @@ const initials = computed(() => {
   const name = member.value?.name || ''
   return name
     .split(' ')
-    .map((p) => p[0])
+    .map((p: string) => p[0])
     .join('')
     .slice(0, 2)
     .toUpperCase()
@@ -27,7 +27,7 @@ function closeMenu() {
   menuOpen.value = false
 }
 
-function navigateTo(route) {
+function navigateTo(route: string) {
   if (!isAdminMode.value) return
   closeMenu()
   router.push(route)

@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import { Icon } from '@iconify/vue'
 import IconPicker from './IconPicker.vue'
@@ -7,20 +7,25 @@ import { FORM_KIND, CHORE_KIND, RECURRENCE_TYPE, RECURRENCE_MODE } from '../lib/
 import { dollarsToCents } from '../lib/format'
 import { timePeriods } from '../composables/useTimePeriods'
 
-const props = defineProps({
-  kind: { type: String, required: true },
-  initial: { type: Object, default: null },
-  children: { type: Array, default: () => [] },
-  rooms: { type: Array, default: () => [] },
-  saving: { type: Boolean, default: false },
+const props = withDefaults(defineProps<{
+  kind: string
+  initial?: Record<string, any> | null
+  children?: Record<string, any>[]
+  rooms?: Record<string, any>[]
+  saving?: boolean
+}>(), {
+  initial: null,
+  children: () => [],
+  rooms: () => [],
+  saving: false,
 })
-const emit = defineEmits(['submit', 'cancel'])
+const emit = defineEmits<{ submit: [data: Record<string, any>]; cancel: [] }>()
 
 const WEEKDAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
 const name = ref(props.initial?.name || '')
 const iconName = ref(props.initial?.iconName || null)
-const photoFile = ref(null)
+const photoFile = ref<Blob | null>(null)
 const assigneeIds = ref(props.initial?.assigneeIds || [])
 const assigneeId = ref(props.initial?.assigneeId || null)
 const date = ref(props.initial?.date || '')
@@ -46,7 +51,7 @@ if (props.initial?.timeWindow) {
   }
 }
 
-function formatTimeLabel(time) {
+function formatTimeLabel(time: string) {
   if (!time) return ''
   const [h, m] = time.split(':').map(Number)
   const period = h >= 12 ? 'pm' : 'am'
@@ -60,12 +65,12 @@ const showRoom = computed(() => props.kind === FORM_KIND.CLEANING_TASK)
 const showRecurrence = computed(() => props.kind === FORM_KIND.RECURRING_CHORE)
 const showTimeWindow = computed(() => props.kind === FORM_KIND.RECURRING_CHORE && recurrenceMode.value === RECURRENCE_MODE.DAILY)
 
-function toggleAssignee(id) {
+function toggleAssignee(id: string) {
   if (props.kind === FORM_KIND.CLEANING_TASK) {
     assigneeId.value = assigneeId.value === id ? null : id
   } else {
     assigneeIds.value = assigneeIds.value.includes(id)
-      ? assigneeIds.value.filter((a) => a !== id)
+      ? assigneeIds.value.filter((a: string) => a !== id)
       : [...assigneeIds.value, id]
   }
 }
@@ -78,9 +83,9 @@ function toggleAll() {
   assigneeIds.value = allAssigned.value ? [] : props.children.map((c) => c.id)
 }
 
-function toggleWeekday(day) {
+function toggleWeekday(day: number) {
   weekdays.value = weekdays.value.includes(day)
-    ? weekdays.value.filter((d) => d !== day)
+    ? weekdays.value.filter((d: number) => d !== day)
     : [...weekdays.value, day].sort()
 }
 
@@ -132,13 +137,13 @@ function submit() {
   }
 
   if (props.kind === FORM_KIND.RECURRING_CHORE) {
-    let recurrence = null
-    let timeWindow = null
+    let recurrence: Record<string, any> | null = null
+    let timeWindow: Record<string, any> | null = null
     if (recurrenceMode.value !== RECURRENCE_MODE.WEEKLY) {
       recurrence = { type: dailyPatternType.value }
       if (dailyPatternType.value === RECURRENCE_TYPE.WEEKDAYS) recurrence.days = weekdays.value
       if (dailyPatternType.value === RECURRENCE_TYPE.DAY_OF_MONTH) recurrence.day = Number(dayOfMonth.value)
-      timeWindow = {}
+      timeWindow = {} as Record<string, any>
       if (timeStart.value) timeWindow.start = timeStart.value
       if (timeEnd.value) timeWindow.end = timeEnd.value
       if (Object.keys(timeWindow).length === 0) timeWindow = null

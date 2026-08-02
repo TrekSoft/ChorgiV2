@@ -1,15 +1,17 @@
-<script setup>
+<script setup lang="ts">
 import { ref, watch, nextTick } from 'vue'
 import { verifyPin } from '../composables/usePinGate'
 
-const props = defineProps({
-  open: Boolean,
-  title: { type: String, default: 'Enter PIN' },
+const props = withDefaults(defineProps<{
+  open: boolean
+  title?: string
+}>(), {
+  title: 'Enter PIN',
 })
-const emit = defineEmits(['success', 'cancel'])
+const emit = defineEmits<{ success: []; cancel: [] }>()
 
 const digits = ref(['', '', '', ''])
-const inputs = ref([])
+const inputs = ref<any[]>([])
 const error = ref(false)
 
 watch(
@@ -24,14 +26,14 @@ watch(
   },
 )
 
-function onInput(index, event) {
-  const value = event.target.value.replace(/\D/g, '')
+function onInput(index: number, event: Event) {
+  const value = (event.target as HTMLInputElement).value.replace(/\D/g, '')
   digits.value[index] = value.slice(-1)
   if (value && index < 3) inputs.value[index + 1]?.focus()
   if (digits.value.every((d) => d !== '')) submit()
 }
 
-function onKeydown(index, event) {
+function onKeydown(index: number, event: KeyboardEvent) {
   if (event.key === 'Backspace' && !digits.value[index] && index > 0) {
     inputs.value[index - 1]?.focus()
   }

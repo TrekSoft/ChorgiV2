@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { ref, computed } from 'vue'
 import { format, addDays, subDays, parseISO } from 'date-fns'
 import AppHeader from '../components/AppHeader.vue'
@@ -33,15 +33,15 @@ function nextDay() {
 }
 
 const showDatePicker = ref(false)
-function onDatePick(e) {
-  const val = e.target.value
+function onDatePick(e: Event) {
+  const val = (e.target as HTMLInputElement).value
   if (val) {
     selectedDate.value = parseISO(val)
     showDatePicker.value = false
   }
 }
 
-function childName(childId) {
+function childName(childId: string) {
   const c = children.value.find((c) => c.id === childId)
   return c?.name || 'Unknown'
 }
@@ -77,7 +77,7 @@ const reportData = computed(() => {
           id: chore.id,
           name: chore.name,
           iconName: chore.iconName,
-          kind: CHORE_KIND.CHORE,
+          kind: CHORE_KIND.RECURRING,
           completed,
           late,
           overdue,
@@ -171,13 +171,13 @@ const reportData = computed(() => {
     const bonusEarned =
       choreEntries
         .filter((e) => e.completed && e.bonusCents)
-        .reduce((sum, e) => sum + e.bonusCents, 0) +
+        .reduce((sum, e) => sum + (e.bonusCents || 0), 0) +
       oneoffEntries
         .filter((e) => e.claimedByMe && e.completed && e.bonusCents)
-        .reduce((sum, e) => sum + e.bonusCents, 0) +
+        .reduce((sum, e) => sum + (e.bonusCents || 0), 0) +
       cleaningTasks
         .filter((e) => e.claimedByMe && e.completed && e.bonusCents)
-        .reduce((sum, e) => sum + e.bonusCents, 0)
+        .reduce((sum, e) => sum + (e.bonusCents || 0), 0)
 
     return {
       child,

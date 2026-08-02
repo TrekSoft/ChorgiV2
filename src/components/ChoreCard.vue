@@ -1,35 +1,51 @@
-<script setup>
+<script setup lang="ts">
 import { Icon } from '@iconify/vue'
 import CountdownLabel from './CountdownLabel.vue'
 import { CARD_VARIANT } from '../lib/constants'
 import { formatCents } from '../lib/format'
 
-const props = defineProps({
-  name: { type: String, required: true },
-  iconName: { type: String, default: null },
-  photoUrl: { type: String, default: null },
-  deadline: { type: Date, default: null },
-  completed: { type: Boolean, default: false },
-  late: { type: Boolean, default: false },
-  overdue: { type: Boolean, default: false },
-  missed: { type: Boolean, default: false },
-  oneoff: { type: Boolean, default: false },
-  claimedByName: { type: String, default: null },
-  claimedByPhoto: { type: String, default: null },
-  bonusCents: { type: Number, default: null },
-  disabled: { type: Boolean, default: false },
-  variant: { type: String, default: CARD_VARIANT.CHORE },
-  canUnassign: { type: Boolean, default: false },
-  unassignLabel: { type: String, default: 'Remove me' },
+const props = withDefaults(defineProps<{
+  name: string
+  iconName?: string | null
+  photoUrl?: string | null
+  deadline?: Date | null
+  completed?: boolean
+  late?: boolean
+  overdue?: boolean
+  missed?: boolean
+  oneoff?: boolean
+  claimedByName?: string | null
+  claimedByPhoto?: string | null
+  bonusCents?: number | null
+  disabled?: boolean
+  variant?: string
+  canUnassign?: boolean
+  unassignLabel?: string
+}>(), {
+  iconName: null,
+  photoUrl: null,
+  deadline: null,
+  completed: false,
+  late: false,
+  overdue: false,
+  missed: false,
+  oneoff: false,
+  claimedByName: null,
+  claimedByPhoto: null,
+  bonusCents: null,
+  disabled: false,
+  variant: CARD_VARIANT.CHORE,
+  canUnassign: false,
+  unassignLabel: 'Remove me',
 })
-const emit = defineEmits(['toggle', 'photo-click', 'unassign'])
+const emit = defineEmits<{ toggle: []; 'photo-click': []; unassign: [] }>()
 
 function onCardClick() {
   if (props.disabled) return
   emit('toggle')
 }
 
-function onPhotoClick(event) {
+function onPhotoClick(event: Event) {
   event.stopPropagation()
   emit('photo-click')
 }

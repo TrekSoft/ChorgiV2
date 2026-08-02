@@ -1,33 +1,41 @@
-<script setup>
+<script setup lang="ts">
 import { computed } from 'vue'
 import { Icon } from '@iconify/vue'
 import { format, parse } from 'date-fns'
 import { formatCents } from '../lib/format'
 
-const props = defineProps({
-  name: { type: String, required: true },
-  iconName: { type: String, default: null },
-  photoUrl: { type: String, default: null },
-  // { start?: 'HH:mm', end?: 'HH:mm' } | null
-  timeWindow: { type: Object, default: null },
-  weekly: { type: Boolean, default: false },
-  oneoff: { type: Boolean, default: false },
-  bonusCents: { type: Number, default: null },
-  // [{ id, name, photoURL? }] — empty means unassigned (claimable)
-  assignees: { type: Array, default: () => [] },
-  // true when every child is assigned — renders a single All chip
-  assignedToAll: { type: Boolean, default: false },
-  claimable: { type: Boolean, default: false },
-  draggable: { type: Boolean, default: false },
+const props = withDefaults(defineProps<{
+  name: string
+  iconName?: string | null
+  photoUrl?: string | null
+  timeWindow?: { start?: string; end?: string } | null
+  weekly?: boolean
+  oneoff?: boolean
+  bonusCents?: number | null
+  assignees?: { id: string; name: string; photoURL?: string | null }[]
+  assignedToAll?: boolean
+  claimable?: boolean
+  draggable?: boolean
+}>(), {
+  iconName: null,
+  photoUrl: null,
+  timeWindow: null,
+  weekly: false,
+  oneoff: false,
+  bonusCents: null,
+  assignees: () => [],
+  assignedToAll: false,
+  claimable: false,
+  draggable: false,
 })
-const emit = defineEmits(['click', 'photo-click'])
+const emit = defineEmits<{ click: []; 'photo-click': [] }>()
 
-function onPhotoClick(event) {
+function onPhotoClick(event: Event) {
   event.stopPropagation()
   emit('photo-click')
 }
 
-function formatTime(hhmm) {
+function formatTime(hhmm: string) {
   return format(parse(hhmm, 'HH:mm', new Date()), 'h:mm a')
 }
 

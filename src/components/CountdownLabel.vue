@@ -1,24 +1,24 @@
-<script setup>
+<script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { differenceInSeconds, differenceInMinutes, differenceInHours, differenceInDays } from 'date-fns'
 import { COUNTDOWN_TICK_INTERVAL_MS } from '../lib/constants'
 
-const props = defineProps({
-  deadline: { type: Date, required: true },
-  // when true, render as 'X min/hrs overdue' styling even if not yet past deadline
-  // (used for chores whose period already ended elsewhere in the app)
-  forceOverdueLabel: { type: Boolean, default: false },
+const props = withDefaults(defineProps<{
+  deadline: Date
+  forceOverdueLabel?: boolean
+}>(), {
+  forceOverdueLabel: false,
 })
 
 const now = ref(new Date())
-let timer = null
+let timer: ReturnType<typeof setInterval> | null = null
 
 onMounted(() => {
   timer = setInterval(() => {
     now.value = new Date()
   }, COUNTDOWN_TICK_INTERVAL_MS)
 })
-onUnmounted(() => clearInterval(timer))
+onUnmounted(() => { if (timer) clearInterval(timer) })
 
 const isOverdue = computed(() => props.forceOverdueLabel || now.value > props.deadline)
 

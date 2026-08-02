@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { currentUser } from '../composables/useAuth'
@@ -11,7 +11,7 @@ const router = useRouter()
 
 const name = ref('')
 const birthdate = ref('')
-const photoFile = ref(null)
+const photoFile = ref<Blob | null>(null)
 const pin = ref('')
 const pinConfirm = ref('')
 const saving = ref(false)
@@ -29,9 +29,9 @@ async function submit() {
   }
   saving.value = true
   try {
-    const uid = currentUser.value.uid
-    const familyId = isInvite.value ? pendingInvite.value.familyId : uid
-    let photoURL = null
+    const uid = currentUser.value!.uid
+    const familyId = isInvite.value ? pendingInvite.value!.familyId : uid
+    let photoURL: string | null = null
     if (photoFile.value) {
       photoURL = await uploadMemberPhoto(familyId, uid, photoFile.value)
     }
