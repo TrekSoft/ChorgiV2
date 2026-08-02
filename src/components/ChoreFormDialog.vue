@@ -87,7 +87,7 @@ async function onDelete() {
             </button>
           </div>
         </div>
-        <div class="px-4 pb-4 sm:px-6 sm:pb-6 flex-1 min-h-0 flex flex-col overflow-hidden">
+        <div class="px-4 sm:px-6 flex-1 min-h-0 flex flex-col overflow-hidden">
           <ChoreForm
             :kind="kind"
             :initial="initial"
