@@ -313,7 +313,7 @@ async function saveTimePeriods() {
           </li>
         </ul>
 
-        <div class="flex gap-2 pt-2">
+        <div class="flex flex-col sm:flex-row gap-2 pt-2">
           <input
             v-model="inviteEmail"
             type="email"
@@ -323,7 +323,7 @@ async function saveTimePeriods() {
           <button
             @click="sendInvite"
             :disabled="inviting"
-            class="btn-primary"
+            class="btn-primary sm:whitespace-nowrap"
           >
             Authorize
           </button>
