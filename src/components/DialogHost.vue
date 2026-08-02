@@ -36,39 +36,36 @@ function onCancel() {
   <Teleport to="body">
     <div
       v-if="state.open"
-      class="dialog-overlay !p-0 sm:!p-4"
+      class="dialog-overlay"
+      style="z-index: 100"
       @click.self="onCancel"
     >
-      <div class="dialog-container w-full h-full sm:h-auto sm:max-w-sm flex flex-col max-h-none sm:max-h-[90vh] overflow-hidden rounded-none sm:rounded-2xl">
-        <div class="px-4 py-3 sm:px-6 sm:py-4 flex items-center shrink-0 border-b border-amber-200">
-          <h2 class="text-lg sm:text-xl font-bold text-amber-900">{{ state.title }}</h2>
-        </div>
-        <div class="px-4 py-4 sm:px-6 sm:py-6 flex-1 flex flex-col justify-center gap-3">
-          <p class="text-amber-800 text-base">{{ state.message }}</p>
-          <input
-            v-if="state.mode === 'prompt'"
-            ref="inputRef"
-            v-model="state.inputValue"
-            type="text"
-            class="input-field"
-            :placeholder="state.placeholder"
-            @keydown.enter="onConfirm"
-            @keydown.escape="onCancel"
-          />
-        </div>
-        <div class="flex flex-col-reverse gap-2 pt-3 shrink-0 border-t border-amber-200 sm:flex-row sm:justify-end" style="padding-bottom: env(safe-area-inset-bottom)">
+      <div class="dialog-container p-6 w-full max-w-sm flex flex-col gap-4">
+        <h2 class="text-xl font-bold text-amber-900">{{ state.title }}</h2>
+        <p class="text-amber-800">{{ state.message }}</p>
+        <input
+          v-if="state.mode === 'prompt'"
+          ref="inputRef"
+          v-model="state.inputValue"
+          type="text"
+          class="input-field"
+          :placeholder="state.placeholder"
+          @keydown.enter="onConfirm"
+          @keydown.escape="onCancel"
+        />
+        <div class="flex justify-end gap-2 pt-2">
           <button
             v-if="state.cancelLabel"
             type="button"
             @click="onCancel"
-            class="btn-cancel w-full sm:w-auto py-3 sm:py-2"
+            class="btn-cancel"
           >
             {{ state.cancelLabel }}
           </button>
           <button
             type="button"
             @click="onConfirm"
-            class="w-full sm:w-auto py-3 sm:py-2 rounded-xl font-bold cursor-pointer disabled:opacity-50"
+            class="font-bold py-2 px-5 rounded-xl cursor-pointer"
             :class="state.danger
               ? 'bg-red-500 hover:bg-red-600 text-white'
               : 'bg-amber-500 hover:bg-amber-600 text-white'"
