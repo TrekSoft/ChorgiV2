@@ -23,13 +23,19 @@ async function addRoom() {
   newRoomName.value = ''
 }
 
-async function renameRoom(room: Room) {
-  const name = prompt('Room name', room.name)?.trim()
-  if (!name || name === room.name) return
-  await upsertRoom(room.id, { name, order: room.order })
-}
+const { confirm, prompt } = useDialog()
 
-const { confirm } = useDialog()
+async function renameRoom(room: Room) {
+  const name = await prompt({
+    title: 'Rename room',
+    message: `Rename "${room.name}" to:`,
+    confirmLabel: 'Rename',
+    defaultValue: room.name,
+    placeholder: 'Room name',
+  })
+  if (!name || name.trim() === room.name) return
+  await upsertRoom(room.id, { name: name.trim(), order: room.order })
+}
 
 async function deleteRoom(room: Room) {
   const roomTasks = tasksFor(room.id)

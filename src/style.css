@@ -122,12 +122,12 @@
   }
 }
 
-/* Hide scrollbar on mobile filter strip */
-.schedule-filter-scroll {
+/* Hide scrollbar while keeping scroll functionality */
+.hide-scrollbar {
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
-.schedule-filter-scroll::-webkit-scrollbar {
+.hide-scrollbar::-webkit-scrollbar {
   display: none;
 }
 

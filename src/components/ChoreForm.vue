@@ -178,7 +178,7 @@ function submit() {
 
 <template>
   <form @submit.prevent="submit" class="flex flex-col flex-1 min-h-0">
-    <div class="flex flex-col gap-3 sm:gap-4 overflow-y-auto flex-1 min-h-0">
+    <div class="flex flex-col gap-3 sm:gap-4 overflow-y-auto flex-1 min-h-0 hide-scrollbar">
     <label class="flex flex-col gap-1">
       <span class="form-label">Name</span>
       <input v-model="name" type="text" class="input-field" />

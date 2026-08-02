@@ -158,7 +158,7 @@ onMounted(() => {
     </div>
 
     <!-- child filter -->
-    <div class="flex gap-2 flex-nowrap overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0 sm:flex-wrap schedule-filter-scroll">
+    <div class="flex gap-2 flex-nowrap overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0 sm:flex-wrap hide-scrollbar">
       <button
         @click="filterChildId = null"
         class="pill shrink-0"
