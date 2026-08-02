@@ -137,7 +137,7 @@ input[type="time"] {
   -webkit-appearance: none !important;
   appearance: none !important;
   background-repeat: no-repeat;
-  background-position: right 6px center;
+  background-position: right 10px center;
   background-size: 16px 16px;
   padding-left: 12px;
   padding-right: 28px;
