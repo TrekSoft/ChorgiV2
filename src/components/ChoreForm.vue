@@ -296,7 +296,7 @@ function submit() {
           </select>
           <Icon icon="mdi:chevron-down" class="w-5 h-5 text-amber-500 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
         </div>
-        <button type="button" @click="useCustomTime = true; selectedPeriodId = ''" class="text-sm text-amber-600 hover:text-amber-700 whitespace-nowrap pb-2">Custom</button>
+        <button type="button" @click="useCustomTime = true; selectedPeriodId = ''" class="text-sm text-amber-600 hover:text-amber-700 whitespace-nowrap">Custom</button>
       </div>
       <div v-else class="flex flex-col gap-2">
         <div class="flex gap-3">
@@ -309,7 +309,7 @@ function submit() {
             <input v-model="timeEnd" type="time" class="input-field" />
           </label>
         </div>
-        <button type="button" @click="useCustomTime = false; selectedPeriodId = ''; timeStart = ''; timeEnd = ''" class="text-sm text-amber-600 hover:text-amber-700 self-start">← Presets</button>
+        <button type="button" @click="useCustomTime = false; selectedPeriodId = ''; timeStart = ''; timeEnd = ''" class="text-sm text-amber-600 hover:text-amber-700 self-start inline-flex items-center gap-1">← Presets</button>
       </div>
     </div>
 
