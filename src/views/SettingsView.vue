@@ -312,7 +312,10 @@ async function saveTimePeriods() {
             :key="invite.id"
             class="flex items-center justify-between bg-amber-50 rounded-xl px-4 py-2"
           >
-            <span class="text-amber-700">{{ invite.email }} <span class="text-amber-400 text-sm">(authorized, not signed in yet)</span></span>
+            <span class="text-amber-700">
+              {{ invite.email }}
+              <span class="block text-amber-400 text-sm">(authorized, not signed in yet)</span>
+            </span>
             <button
               @click="revokeInvite(invite.id)"
               class="btn-danger-text"

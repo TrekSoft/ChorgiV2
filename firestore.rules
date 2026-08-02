@@ -26,7 +26,9 @@ service cloud.firestore {
     match /userIndex/{uid} {
       allow read: if signedIn() && request.auth.uid == uid;
       allow create: if signedIn() && request.auth.uid == uid;
-      allow update, delete: if false;
+      allow update: if false;
+      allow delete: if signedIn()
+        && (request.auth.uid == uid || isMember(resource.data.familyId));
     }
 
     match /invites/{email} {

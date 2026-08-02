@@ -69,6 +69,27 @@ function bindFamily(id: string): void {
       family.value = snap.data() ?? null
       familyLoading.value = false
     },
+    (err) => {
+      console.error('Family snapshot error', err)
+      // Stale userIndex pointing at a family this user is no longer authorized for:
+      // delete the stale index and reload, which routes to onboarding / pending invite.
+      unsubscribeFamily?.()
+      unsubscribeFamily = null
+      unsubscribeMember?.()
+      unsubscribeMember = null
+      familyId.value = null
+      family.value = null
+      member.value = null
+      familyLoading.value = false
+      const user = currentUser.value
+      if (user) {
+        deleteDoc(doc(db, 'userIndex', user.uid))
+          .catch(() => {})
+          .finally(() => loadFamily(user))
+      } else {
+        needsOnboarding.value = true
+      }
+    },
   )
   const uid = currentUser.value!.uid
   unsubscribeMember = onSnapshot(
@@ -176,6 +197,7 @@ export async function removeAuthorizedParent(uid: string): Promise<void> {
   const batch = writeBatch(db)
   batch.update(doc(db, 'families', familyId.value!), { authorizedUids: arrayRemove(uid) })
   batch.delete(doc(db, 'families', familyId.value!, 'members', uid))
+  batch.delete(doc(db, 'userIndex', uid))
   await batch.commit()
 }
 
