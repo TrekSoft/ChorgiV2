@@ -58,6 +58,10 @@ async function doSignOut() {
         class="fixed inset-0 z-40"
       >
         <div @click.stop class="absolute right-4 top-20 bg-white rounded-2xl shadow-xl border border-amber-100 py-3 w-72 flex flex-col text-lg">
+        <div class="px-6 pb-3 flex items-center gap-2 text-sm font-bold uppercase tracking-wide text-amber-500">
+          <Icon icon="mdi:shield-lock" class="w-4 h-4" />
+          Admin mode only
+        </div>
         <button
           @click="navigateTo('/schedule')"
           :disabled="!isAdminMode"
