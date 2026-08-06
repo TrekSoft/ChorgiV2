@@ -146,7 +146,7 @@ function clear(event: Event) {
       @dragover.prevent="dragOver = true"
       @dragleave.prevent="dragOver = false"
       @drop.prevent="onDrop"
-      class="relative aspect-video w-full sm:w-1/2 drop-zone overflow-hidden"
+      class="relative aspect-video w-full drop-zone overflow-hidden"
       :class="dragOver ? 'border-amber-500 bg-amber-100' : 'border-amber-300 bg-amber-50 hover:bg-amber-100'"
     >
       <img v-if="localPreview" :src="localPreview" alt="Preview" class="w-full h-full object-cover" />

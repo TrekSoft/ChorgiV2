@@ -2,7 +2,7 @@ import { ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage
 import type { StorageReference } from 'firebase/storage'
 import { storage } from './firebase'
 
-export async function fileToResizedBlob(file: Blob, maxSize = 1024): Promise<Blob | null> {
+export async function fileToResizedBlob(file: Blob, maxSize = 1280): Promise<Blob | null> {
   const bitmap = await createImageBitmap(file)
   const scale = Math.min(1, maxSize / Math.max(bitmap.width, bitmap.height))
   const canvas = document.createElement('canvas')
