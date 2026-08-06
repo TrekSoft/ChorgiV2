@@ -39,6 +39,7 @@ export const CONFETTI_MODE = Object.freeze({
   CONFETTI: 'confetti',
   COINS: 'coins',
   FIREWORKS: 'fireworks',
+  BALLOONS: 'balloons',
 } as const)
 export type ConfettiMode = typeof CONFETTI_MODE[keyof typeof CONFETTI_MODE]
 

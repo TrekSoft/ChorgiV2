@@ -25,6 +25,7 @@ import {
   unclaimTask,
 } from '../composables/useCompletions'
 import { isAdminMode } from '../composables/useAdminMode'
+import { isBirthdayToday } from '../lib/birthday'
 import { useDialog } from '../composables/useDialog'
 import AppHeader from '../components/AppHeader.vue'
 import ChoreCard from '../components/ChoreCard.vue'
@@ -139,11 +140,12 @@ async function toggleChore(entry: AssignedEntry) {
   } else {
     await completeChore(entry.chore, child.value.id, now.value, weekStartsOn.value)
     completedThisSession = true
+    const birthdayMode = child.value.birthdate && isBirthdayToday(child.value.birthdate, now.value)
     if (entry.chore.bonusCents) {
       burst.value?.fire(CONFETTI_MODE.COINS)
       showToast(`+ $${formatCents(entry.chore.bonusCents)} bonus!`)
     } else {
-      burst.value?.fire(CONFETTI_MODE.CONFETTI)
+      burst.value?.fire(birthdayMode ? CONFETTI_MODE.BALLOONS : CONFETTI_MODE.CONFETTI)
     }
   }
 }

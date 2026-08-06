@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import confetti from 'canvas-confetti'
 import { CONFETTI_MODE, type ConfettiMode } from '../lib/constants'
-import { playPop, playCoin, playFireworks } from '../lib/sounds'
+import { playPop, playCoin, playFireworks, playBalloons } from '../lib/sounds'
 
 // Usage: const burstRef = ref(); burstRef.value.fire('confetti' | 'coins' | 'fireworks')
 function fireConfetti() {
@@ -50,9 +50,33 @@ function fireFireworks() {
   })()
 }
 
+function fireBalloons() {
+  playBalloons()
+  const colors = ['#ef4444', '#f59e0b', '#22c55e', '#3b82f6', '#a855f7', '#ec4899']
+  const count = 30
+  for (let i = 0; i < count; i++) {
+    const delay = i * 60
+    setTimeout(() => {
+      confetti({
+        particleCount: 1,
+        startVelocity: 30 + Math.random() * 20,
+        spread: 20,
+        angle: 90,
+        origin: { x: Math.random(), y: 1 },
+        colors: [colors[i % colors.length]],
+        scalar: 2.5 + Math.random(),
+        gravity: 0.4,
+        ticks: 300,
+        shapes: ['circle'],
+      })
+    }, delay)
+  }
+}
+
 function fire(mode: ConfettiMode = CONFETTI_MODE.CONFETTI) {
   if (mode === CONFETTI_MODE.COINS) fireCoins()
   else if (mode === CONFETTI_MODE.FIREWORKS) fireFireworks()
+  else if (mode === CONFETTI_MODE.BALLOONS) fireBalloons()
   else fireConfetti()
 }
 

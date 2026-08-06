@@ -81,3 +81,13 @@ export function playFireworks(): void {
     playTone(400 + Math.random() * 400, 0.3, 'sine', 0.04, delay + 0.1, 100)
   }
 }
+
+export function playBalloons(): void {
+  const ac = getCtx()
+  if (!ac) return
+  const notes = [523, 659, 784, 1047]
+  notes.forEach((freq, i) => {
+    playTone(freq, 0.3, 'triangle', 0.1, i * 0.12)
+  })
+  playNoiseBurst(0.08, 0.05, 0.5)
+}
