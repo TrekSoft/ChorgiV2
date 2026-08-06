@@ -69,6 +69,7 @@ async function submit() {
             @keydown="onKeydown(i, $event)"
             type="password"
             inputmode="numeric"
+            pattern="\d*"
             maxlength="1"
             class="w-14 h-16 text-center text-3xl font-bold border-2 rounded-xl focus:outline-none focus:border-amber-500"
             :class="error ? 'border-red-400' : 'border-amber-200'"

@@ -88,6 +88,7 @@ async function submit() {
               v-model="pin"
               type="password"
               inputmode="numeric"
+              pattern="\d*"
               maxlength="4"
               required
               class="border-2 border-amber-200 rounded-xl px-4 py-3 focus:outline-none focus:border-amber-500"
@@ -99,6 +100,7 @@ async function submit() {
               v-model="pinConfirm"
               type="password"
               inputmode="numeric"
+              pattern="\d*"
               maxlength="4"
               required
               class="border-2 border-amber-200 rounded-xl px-4 py-3 focus:outline-none focus:border-amber-500"

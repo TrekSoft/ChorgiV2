@@ -136,7 +136,7 @@ const timePeriodsSaved = ref(false)
 watch(
   timePeriods,
   (periods) => {
-    editablePeriods.value = periods.map(p => ({ ...p }))
+    editablePeriods.value = periods.map(p => ({ ...p })).sort((a, b) => a.start.localeCompare(b.start))
   },
   { immediate: true },
 )
@@ -206,11 +206,11 @@ async function saveTimePeriods() {
         <p class="text-amber-600 text-sm">This one PIN is shared by every parent on the account.</p>
         <label class="flex flex-col gap-1">
           <span class="form-label">New PIN</span>
-          <input v-model="newPin" type="password" inputmode="numeric" maxlength="4" class="input-field" />
+          <input v-model="newPin" type="password" inputmode="numeric" pattern="\d*" maxlength="4" class="input-field" />
         </label>
         <label class="flex flex-col gap-1">
           <span class="form-label">Confirm new PIN</span>
-          <input v-model="newPinConfirm" type="password" inputmode="numeric" maxlength="4" class="input-field" />
+          <input v-model="newPinConfirm" type="password" inputmode="numeric" pattern="\d*" maxlength="4" class="input-field" />
         </label>
         <p v-if="pinError" class="text-error">{{ pinError }}</p>
         <button

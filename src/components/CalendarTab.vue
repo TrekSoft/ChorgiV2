@@ -106,7 +106,8 @@ function openEdit(entry: ScheduleEntry) {
 }
 
 onMounted(() => {
-  // Only auto-scroll if the viewed week contains today
+  // Only auto-scroll on mobile (<1400px) if the viewed week contains today
+  if (window.innerWidth >= 1400) return
   const weekStart = startOfWeek(anchor.value, { weekStartsOn: weekStartsOn.value })
   const weekEnd = addDays(weekStart, 6)
   if (today >= weekStart && today <= weekEnd) {
@@ -118,10 +119,10 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="relative flex flex-col gap-4 pb-20 sm:pb-0">
+  <div class="relative flex flex-col gap-4 pb-20 min-[1400px]:pb-0">
     <div
       v-if="!choresLoading && chores.length === 0"
-      class="absolute top-10 right-[7rem] z-20 hidden sm:flex items-end gap-1 pointer-events-none select-none"
+      class="absolute top-10 right-[7rem] z-20 hidden min-[1400px]:flex items-end gap-1 pointer-events-none select-none"
     >
       <span class="font-handwritten text-3xl leading-none text-amber-600 -rotate-2 mb-3 text-right">
         Add recurring chores here<br />or one-off chores below
@@ -135,31 +136,31 @@ onMounted(() => {
     <div class="flex items-center gap-2">
       <button
         @click="prev"
-        class="w-9 h-9 sm:w-12 sm:h-12 rounded-full hover:bg-amber-100 text-amber-700 cursor-pointer flex items-center justify-center shrink-0"
+        class="w-9 h-9 min-[1400px]:w-12 min-[1400px]:h-12 rounded-full hover:bg-amber-100 text-amber-700 cursor-pointer flex items-center justify-center shrink-0"
         aria-label="Previous week"
       >
-        <Icon icon="mdi:chevron-left" class="w-5 h-5 sm:w-6 sm:h-6" />
+        <Icon icon="mdi:chevron-left" class="w-5 h-5 min-[1400px]:w-6 min-[1400px]:h-6" />
       </button>
-      <span class="font-bold text-amber-900 text-base sm:text-lg">{{ headerLabel }}</span>
+      <span class="font-bold text-amber-900 text-base min-[1400px]:text-lg">{{ headerLabel }}</span>
       <button
         @click="next"
-        class="w-9 h-9 sm:w-12 sm:h-12 rounded-full hover:bg-amber-100 text-amber-700 cursor-pointer flex items-center justify-center shrink-0"
+        class="w-9 h-9 min-[1400px]:w-12 min-[1400px]:h-12 rounded-full hover:bg-amber-100 text-amber-700 cursor-pointer flex items-center justify-center shrink-0"
         aria-label="Next week"
       >
-        <Icon icon="mdi:chevron-right" class="w-5 h-5 sm:w-6 sm:h-6" />
+        <Icon icon="mdi:chevron-right" class="w-5 h-5 min-[1400px]:w-6 min-[1400px]:h-6" />
       </button>
       <button @click="goToday" class="text-sm text-amber-600 font-medium hover:underline cursor-pointer ml-1 whitespace-nowrap">This week</button>
       <div class="flex-1"></div>
       <button
         @click="openAdd(FORM_KIND.RECURRING_CHORE)"
-        class="btn-primary hidden sm:block"
+        class="btn-primary hidden min-[1400px]:block"
       >
         + Recurring chore
       </button>
     </div>
 
     <!-- child filter -->
-    <div class="flex gap-2 flex-nowrap overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0 sm:flex-wrap hide-scrollbar">
+    <div class="flex gap-2 flex-nowrap overflow-x-auto -mx-4 px-4 min-[1400px]:mx-0 min-[1400px]:px-0 min-[1400px]:flex-wrap hide-scrollbar">
       <button
         @click="filterChildId = null"
         class="pill shrink-0"
@@ -179,12 +180,12 @@ onMounted(() => {
     </div>
 
     <!-- day columns -->
-    <div class="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-7">
+    <div class="grid gap-3 grid-cols-1 min-[1400px]:grid-cols-7">
       <div
         v-for="day in days"
         :key="day.toISOString()"
         :ref="(el) => { if (isToday(day)) todayCardRef = el as HTMLElement | null }"
-        class="flex flex-col gap-2 rounded-2xl border-2 p-2 sm:p-3 sm:min-h-32 scroll-mt-24"
+        class="flex flex-col gap-2 rounded-2xl border-2 p-2 min-[1400px]:p-3 min-[1400px]:min-h-32 scroll-mt-24"
         :class="isToday(day) ? 'border-amber-400 bg-white' : 'border-amber-200 bg-white/60'"
       >
         <div class="flex items-center justify-between">
@@ -225,7 +226,7 @@ onMounted(() => {
         <div class="flex gap-2 mt-auto pt-1">
           <button
             @click="openAdd(FORM_KIND.ONEOFF_CHORE, day)"
-            class="flex-1 text-xs font-bold border-2 border-dashed rounded-xl py-1.5 sm:py-2 hover:bg-amber-50 cursor-pointer"
+            class="flex-1 text-xs font-bold border-2 border-dashed rounded-xl py-1.5 min-[1400px]:py-2 hover:bg-amber-50 cursor-pointer"
             :class="isToday(day)
               ? 'border-amber-400 text-amber-700 bg-amber-50'
               : 'border-amber-200 text-amber-600'"

@@ -8,6 +8,10 @@ import { dollarsToCents } from '../lib/format'
 import { timePeriods } from '../composables/useTimePeriods'
 import type { Child, Room, ChoreFormInitial, ChoreFormPayload, RecurrencePattern, TimeWindow } from '../types/firebase'
 
+const sortedTimePeriods = computed(() =>
+  [...timePeriods.value].sort((a, b) => a.start.localeCompare(b.start)),
+)
+
 const props = withDefaults(defineProps<{
   kind: FormKind
   initial?: ChoreFormInitial | null
@@ -299,7 +303,7 @@ function submit() {
         <div class="relative flex-1">
           <select v-model="selectedPeriodId" class="input-field w-full appearance-none pr-10">
             <option value="">None</option>
-            <option v-for="period in timePeriods" :key="period.id" :value="period.id">
+            <option v-for="period in sortedTimePeriods" :key="period.id" :value="period.id">
               {{ period.label }} ({{ formatTimeLabel(period.start) }}–{{ formatTimeLabel(period.end) }})
             </option>
           </select>

@@ -19,7 +19,7 @@ function setTab(next: ScheduleTab) {
 <template>
       <div class="page-bg">
     <AppHeader />
-    <main class="w-full p-4 sm:p-6 flex flex-col gap-4">
+    <main class="w-full p-4 min-[1400px]:p-6 flex flex-col gap-4">
       <div class="flex items-center gap-4">
         <div class="flex rounded-full border-2 border-amber-200 overflow-hidden">
           <button
