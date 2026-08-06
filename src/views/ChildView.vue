@@ -4,6 +4,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { format } from 'date-fns'
 import { Icon } from '@iconify/vue'
 import { occursOn, deadlineFor, startsAt } from '../lib/recurrence'
+import { timePeriods } from '../composables/useTimePeriods'
 import { CHORE_KIND, CARD_VARIANT, CONFETTI_MODE, FORM_KIND, NOW_TICK_INTERVAL_MS, TOAST_DURATION_MS, WEEK_START_SUNDAY, type ConfettiMode, type FormKind } from '../lib/constants'
 import { DATE_FORMAT, formatCents } from '../lib/format'
 import { family } from '../composables/useFamily'
@@ -106,10 +107,10 @@ const assigned = computed(() => {
     if (chore.active === false) continue
     if (!(chore.assigneeIds || []).includes(child.value.id)) continue
     if (!occursOn(chore, now.value)) continue
-    const start = startsAt(chore, now.value)
+    const start = startsAt(chore, now.value, timePeriods.value)
     if (start && now.value < start) continue
     const completion = completions.value[completionIdFor(chore, child.value.id, now.value, weekStartsOn.value)]
-    const deadline = deadlineFor(chore, now.value, weekStartsOn.value)
+    const deadline = deadlineFor(chore, now.value, weekStartsOn.value, timePeriods.value)
     const completed = !!completion
     list.push({
       chore,

@@ -1,6 +1,10 @@
 import { describe, it, expect } from 'vitest'
 import { occursOn, deadlineFor, startsAt, periodKeyFor } from './recurrence'
-import type { Chore } from '../types/firebase'
+import type { Chore, TimePeriod } from '../types/firebase'
+
+const PERIODS: TimePeriod[] = [
+  { id: 'morning', label: 'Morning', start: '07:00', end: '12:00' },
+]
 
 function makeChore(partial: Partial<Chore> & Pick<Chore, 'kind'>): Chore {
   return { id: 'test', name: 'test', assigneeIds: [], active: true, ...partial } as Chore
@@ -101,6 +105,31 @@ describe('deadlineFor', () => {
     const deadline = deadlineFor(chore, '2026-03-16', 1)
     expect(deadline.getDate()).toBe(22)
   })
+
+  it('chore with timePeriodId uses the period current end time', () => {
+    const chore = makeChore({
+      kind: 'recurring',
+      recurrence: { type: 'daily' },
+      timePeriodId: 'morning',
+      timeWindow: { start: '07:00', end: '12:00' },
+    })
+    const updated = [{ ...PERIODS[0], end: '11:30' }]
+    const deadline = deadlineFor(chore, '2026-03-15', 0, updated)
+    expect(deadline.getHours()).toBe(11)
+    expect(deadline.getMinutes()).toBe(30)
+  })
+
+  it('chore with a deleted timePeriodId falls back to stored timeWindow', () => {
+    const chore = makeChore({
+      kind: 'recurring',
+      recurrence: { type: 'daily' },
+      timePeriodId: 'gone',
+      timeWindow: { end: '17:30' },
+    })
+    const deadline = deadlineFor(chore, '2026-03-15', 0, PERIODS)
+    expect(deadline.getHours()).toBe(17)
+    expect(deadline.getMinutes()).toBe(30)
+  })
 })
 
 describe('startsAt', () => {
@@ -123,6 +152,19 @@ describe('startsAt', () => {
   it('weekly chores ignore start time (no start restriction)', () => {
     const chore = makeChore({ kind: 'recurring', weekly: true, timeWindow: { start: '08:00' } })
     expect(startsAt(chore, '2026-03-15')).toBeNull()
+  })
+
+  it('chore with timePeriodId uses the period current start time', () => {
+    const chore = makeChore({
+      kind: 'recurring',
+      recurrence: { type: 'daily' },
+      timePeriodId: 'morning',
+      timeWindow: { start: '07:00', end: '12:00' },
+    })
+    const updated = [{ ...PERIODS[0], start: '06:45' }]
+    const start = startsAt(chore, '2026-03-15', updated)
+    expect(start!.getHours()).toBe(6)
+    expect(start!.getMinutes()).toBe(45)
   })
 })
 

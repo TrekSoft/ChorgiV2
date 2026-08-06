@@ -42,7 +42,15 @@ const timeEnd = ref(props.initial?.timeWindow?.end || '')
 const useCustomTime = ref(false)
 const selectedPeriodId = ref('')
 
-if (props.initial?.timeWindow) {
+const initPeriodId = props.initial?.timePeriodId
+if (initPeriodId && timePeriods.value.some(p => p.id === initPeriodId)) {
+  // chore is linked to a predefined period — select it directly
+  selectedPeriodId.value = initPeriodId
+  const period = timePeriods.value.find(p => p.id === initPeriodId)!
+  timeStart.value = period.start
+  timeEnd.value = period.end
+} else if (props.initial?.timeWindow) {
+  // legacy chore with no link: preselect a matching preset if the times line up
   const tw = props.initial.timeWindow
   const match = timePeriods.value.find(p => p.start === tw.start && p.end === tw.end)
   if (match) {
@@ -156,6 +164,7 @@ function submit() {
       weekly: recurrenceMode.value === RECURRENCE_MODE.WEEKLY,
       recurrence,
       timeWindow,
+      timePeriodId: recurrenceMode.value === RECURRENCE_MODE.WEEKLY ? null : selectedPeriodId.value || null,
     })
   } else if (props.kind === FORM_KIND.ONEOFF_CHORE) {
     emit('submit', {
@@ -298,6 +307,7 @@ function submit() {
         </div>
         <button type="button" @click="useCustomTime = true; selectedPeriodId = ''" class="text-sm text-amber-600 hover:text-amber-700 whitespace-nowrap">Custom</button>
       </div>
+      <p v-if="!useCustomTime && selectedPeriodId" class="form-hint">Linked — editing this period in Settings updates this chore automatically.</p>
       <div v-else class="flex flex-col gap-2">
         <div class="flex gap-3">
           <label class="flex flex-col gap-1 flex-1">

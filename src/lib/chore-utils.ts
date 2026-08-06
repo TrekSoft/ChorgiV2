@@ -1,6 +1,6 @@
 import { CHORE_KIND } from './constants'
 import { occursOn, startsAt } from './recurrence'
-import type { Chore, Task, Room, CleaningDay, Claim, Child } from '../types/firebase'
+import type { Chore, Task, Room, CleaningDay, Claim, Child, TimePeriod } from '../types/firebase'
 
 export function isActiveChore(chore: Chore): boolean {
   return chore.active !== false
@@ -19,11 +19,11 @@ export function isClaimableOneoff(chore: Chore, dateStr: string): boolean {
   )
 }
 
-export function assignedChoresForChild(chore: Chore, childId: string, date: Date | string, now: Date): boolean {
+export function assignedChoresForChild(chore: Chore, childId: string, date: Date | string, now: Date, periods: TimePeriod[] = []): boolean {
   if (!isActiveChore(chore)) return false
   if (!getAssigneeIds(chore).includes(childId)) return false
   if (!occursOn(chore, date)) return false
-  const start = startsAt(chore, date)
+  const start = startsAt(chore, date, periods)
   if (start && now < start) return false
   return true
 }

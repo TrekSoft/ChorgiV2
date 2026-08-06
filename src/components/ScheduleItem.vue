@@ -10,6 +10,7 @@ const props = withDefaults(defineProps<{
   iconName?: string | null
   photoUrl?: string | null
   timeWindow?: TimeWindow | null
+  timePeriodLabel?: string | null
   weekly?: boolean
   oneoff?: boolean
   bonusCents?: number | null
@@ -21,6 +22,7 @@ const props = withDefaults(defineProps<{
   iconName: null,
   photoUrl: null,
   timeWindow: null,
+  timePeriodLabel: null,
   weekly: false,
   oneoff: false,
   bonusCents: null,
@@ -41,6 +43,7 @@ function formatTime(hhmm: string) {
 }
 
 const timeLabel = computed(() => {
+  if (props.timePeriodLabel) return props.timePeriodLabel
   if (!props.timeWindow) return null
   const { start, end } = props.timeWindow
   if (start && end) return `${formatTime(start)} – ${formatTime(end)}`

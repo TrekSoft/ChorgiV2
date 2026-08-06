@@ -80,6 +80,7 @@ export interface ChoreDoc {
   weekly?: boolean
   recurrence?: RecurrencePattern | null
   timeWindow?: TimeWindow | null
+  timePeriodId?: string | null
   date?: DateString
   bonusCents?: number
   roomId?: string
@@ -207,6 +208,7 @@ export interface ChoreFormInitial {
   weekly?: boolean
   recurrence?: RecurrencePattern | null
   timeWindow?: TimeWindow | null
+  timePeriodId?: string | null
 }
 
 /** Payload emitted by ChoreForm on submit — covers all three form kinds. */
@@ -220,6 +222,7 @@ export interface ChoreFormPayload {
   weekly?: boolean
   recurrence?: RecurrencePattern | null
   timeWindow?: TimeWindow | null
+  timePeriodId?: string | null
   date?: string
   bonusCents?: number
   roomId?: string

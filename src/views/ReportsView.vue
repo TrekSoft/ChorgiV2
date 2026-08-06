@@ -14,6 +14,7 @@ import {
   claimIdFor,
 } from '../composables/useCompletions'
 import { occursOn, deadlineFor, startsAt } from '../lib/recurrence'
+import { timePeriods } from '../composables/useTimePeriods'
 import { CHORE_KIND, WEEK_START_SUNDAY } from '../lib/constants'
 import { DATE_FORMAT, formatCents } from '../lib/format'
 
@@ -59,7 +60,7 @@ const reportData = computed(() => {
       if (chore.active === false) return false
       if (!(chore.assigneeIds || []).includes(child.id)) return false
       if (!occursOn(chore, date)) return false
-      const start = startsAt(chore, date)
+      const start = startsAt(chore, date, timePeriods.value)
       if (start && date < start) return false
       return true
     })
@@ -68,7 +69,7 @@ const reportData = computed(() => {
       .map((chore) => {
         const compId = completionIdFor(chore, child.id, date, ws)
         const completion = completions.value[compId]
-        const deadline = deadlineFor(chore, date, ws)
+        const deadline = deadlineFor(chore, date, ws, timePeriods.value)
         const completed = !!completion
         const late = !!completion?.late
         const overdue = !completed && isToday.value && now > deadline

@@ -79,7 +79,7 @@ function onPayoutClick(event: Event) {
 <template>
   <div
     @click="open"
-    class="relative aspect-[10/9] rounded-3xl border-4 flex flex-col items-center justify-center gap-3 p-4 cursor-pointer select-none transition-transform active:scale-95"
+    class="relative aspect-[10/9] rounded-3xl border-4 flex flex-col items-center justify-center gap-3 lg:gap-2 p-4 lg:p-3 cursor-pointer select-none transition-transform active:scale-95"
     :class="birthdayToday ? 'border-pink-400 bg-pink-50' : 'border-amber-200 bg-white hover:border-amber-400'"
   >
     <button
@@ -94,16 +94,16 @@ function onPayoutClick(event: Event) {
       v-if="child.photoURL"
       :src="child.photoURL"
       alt=""
-      class="w-1/2 aspect-square rounded-full object-cover border-4 border-amber-200"
+      class="w-1/2 lg:w-2/5 aspect-square rounded-full object-cover border-4 border-amber-200"
     />
-    <div v-else class="w-1/2 aspect-square rounded-full bg-amber-100 flex items-center justify-center font-bold text-amber-500" style="font-size: 5rem">
+    <div v-else class="w-1/2 lg:w-2/5 aspect-square rounded-full bg-amber-100 flex items-center justify-center font-bold text-amber-500 text-[5rem] lg:text-[3.5rem]">
       {{ child.name?.[0]?.toUpperCase() }}
     </div>
 
-    <div class="text-5xl font-bold text-amber-900 text-center leading-tight">{{ child.name }}</div>
+    <div class="text-5xl lg:text-3xl xl:text-4xl font-bold text-amber-900 text-center leading-tight">{{ child.name }}</div>
 
-    <div v-if="birthdayToday" class="text-pink-600 font-bold text-2xl text-center">🎉 Happy Birthday! 🎉</div>
-    <div v-else class="text-xl text-amber-500">{{ daysUntil }} day{{ daysUntil === 1 ? '' : 's' }} until birthday</div>
+    <div v-if="birthdayToday" class="text-pink-600 font-bold text-2xl lg:text-xl text-center">🎉 Happy Birthday! 🎉</div>
+    <div v-else class="text-xl lg:text-base text-amber-500">{{ daysUntil }} day{{ daysUntil === 1 ? '' : 's' }} until birthday</div>
 
     <div class="flex items-center gap-2" @click.stop>
       <!-- Admin: payout button -->
@@ -113,21 +113,21 @@ function onPayoutClick(event: Event) {
       >
         <button
           @click.stop="onPayoutClick"
-          class="w-11 h-11 rounded-full bg-green-100 hover:bg-green-200 text-green-600 flex items-center justify-center cursor-pointer shrink-0"
+          class="w-11 h-11 lg:w-9 lg:h-9 rounded-full bg-green-100 hover:bg-green-200 text-green-600 flex items-center justify-center cursor-pointer shrink-0"
         >
-          <Icon icon="mdi:currency-usd" class="w-6 h-6" />
+          <Icon icon="mdi:currency-usd" class="w-6 h-6 lg:w-5 lg:h-5" />
         </button>
       </Tooltip>
 
       <!-- Allowance balance (inline edit in admin mode) -->
       <div
         v-if="!editingBalance"
-        class="flex items-center gap-2 bg-amber-50 rounded-full px-5 py-2"
+        class="flex items-center gap-2 lg:gap-1.5 bg-amber-50 rounded-full px-5 py-2 lg:px-4 lg:py-1.5"
         :class="isAdminMode ? 'cursor-pointer hover:bg-amber-100' : ''"
         @click.stop="onBalanceClick"
       >
-        <span class="text-3xl">🪙</span>
-        <span class="text-2xl font-bold text-amber-700">${{ formatCents(child.allowanceBalanceCents) }}</span>
+        <span class="text-3xl lg:text-2xl">🪙</span>
+        <span class="text-2xl lg:text-xl font-bold text-amber-700">${{ formatCents(child.allowanceBalanceCents) }}</span>
       </div>
       <div v-else class="flex items-center gap-1 bg-amber-50 rounded-full px-3 py-1">
         <span class="text-2xl font-bold text-amber-500">$</span>
@@ -158,13 +158,13 @@ function onPayoutClick(event: Event) {
         @click.stop="onMarkRemove"
         :disabled="(child.marksCount || 0) === 0"
         title="Remove mark"
-        class="w-9 h-9 rounded-full bg-red-200 text-red-700 font-bold text-lg flex items-center justify-center disabled:opacity-40 cursor-pointer shrink-0"
+        class="w-9 h-9 lg:w-8 lg:h-8 rounded-full bg-red-200 text-red-700 font-bold text-lg flex items-center justify-center disabled:opacity-40 cursor-pointer shrink-0"
       >−</button>
       <div
         v-if="((child.marksCount || 0) > 0 || isAdminMode) && !editingBalance"
-        class="flex items-center justify-center rounded-full text-white text-2xl font-bold shrink-0"
+        class="flex items-center justify-center rounded-full text-white text-2xl lg:text-xl font-bold shrink-0"
         :class="[
-          (child.marksCount || 0) > 0 ? 'bg-red-500 w-11 h-11' : 'bg-red-300 w-9 h-9 text-lg',
+          (child.marksCount || 0) > 0 ? 'bg-red-500 w-11 h-11 lg:w-9 lg:h-9' : 'bg-red-300 w-9 h-9 lg:w-8 lg:h-8 text-lg',
         ]"
       >
         {{ child.marksCount || 0 }}
@@ -173,7 +173,7 @@ function onPayoutClick(event: Event) {
         v-if="isAdminMode && !editingBalance"
         @click.stop="onMarkAdd"
         title="Add mark"
-        class="w-9 h-9 rounded-full bg-red-200 text-red-700 font-bold text-lg flex items-center justify-center cursor-pointer shrink-0"
+        class="w-9 h-9 lg:w-8 lg:h-8 rounded-full bg-red-200 text-red-700 font-bold text-lg flex items-center justify-center cursor-pointer shrink-0"
       >+</button>
     </div>
   </div>

@@ -9,6 +9,7 @@ import { family } from '../composables/useFamily'
 import { children } from '../composables/useChildren'
 import { chores, choresLoading } from '../composables/useChores'
 import { cleaningDays } from '../composables/useCleaning'
+import { resolveTimeWindow } from '../composables/useTimePeriods'
 import type { Chore, Child, ScheduleEntry, ChoreFormInitial } from '../types/firebase'
 import ScheduleItem from './ScheduleItem.vue'
 import PhotoLightbox from './PhotoLightbox.vue'
@@ -77,7 +78,7 @@ function entriesFor(day: Date): ScheduleEntry[] {
         children.value.length > 0 && (chore.assigneeIds || []).length >= children.value.length,
       claimable: chore.kind === CHORE_KIND.ONEOFF && (chore.assigneeIds || []).length === 0,
       // sort by start time (untimed chores last)
-      sortKey: chore.timeWindow?.start || '99:99',
+      sortKey: resolveTimeWindow(chore).timeWindow?.start || '99:99',
     })
   }
   entries.sort((a, b) => a.sortKey.localeCompare(b.sortKey))
@@ -209,7 +210,8 @@ onMounted(() => {
           :name="entry.item.name"
           :icon-name="entry.item.iconName"
           :photo-url="entry.item.photoURL"
-          :time-window="entry.item.timeWindow || null"
+          :time-window="resolveTimeWindow(entry.item).timeWindow"
+          :time-period-label="resolveTimeWindow(entry.item).label"
           :weekly="!!entry.item.weekly"
           :oneoff="entry.kind === FORM_KIND.ONEOFF_CHORE"
           :bonus-cents="entry.item.bonusCents || null"

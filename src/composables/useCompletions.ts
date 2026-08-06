@@ -13,6 +13,7 @@ import {
 import { db } from '../lib/firebase'
 import { familyId } from './useFamily'
 import { periodKeyFor, deadlineFor } from '../lib/recurrence'
+import { timePeriods } from './useTimePeriods'
 import { WEEK_START_SUNDAY } from '../lib/constants'
 import type { Completion, Claim, Chore } from '../types/firebase'
 import { completionConverter, claimConverter } from '../types/firebase'
@@ -79,7 +80,7 @@ export function claimIdFor(task: { id: string }, dateStr: string): string {
 
 export async function completeChore(chore: Chore, childId: string, date: Date | string, weekStartsOn: 0 | 1 = WEEK_START_SUNDAY): Promise<void> {
   const id = completionIdFor(chore, childId, date, weekStartsOn)
-  const late = new Date() > deadlineFor(chore, date, weekStartsOn)
+  const late = new Date() > deadlineFor(chore, date, weekStartsOn, timePeriods.value)
   await setDoc(doc(db, 'families', familyId.value!, 'completions', id), {
     completedAt: serverTimestamp(),
     late,
