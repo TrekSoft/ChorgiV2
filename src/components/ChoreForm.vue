@@ -31,6 +31,12 @@ const WEEKDAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 const name = ref(props.initial?.name || '')
 const iconName = ref(props.initial?.iconName || null)
 const photoFile = ref<Blob | null>(null)
+const photoRemoved = ref(false)
+
+function onPhotoChange(file: Blob | null) {
+  photoFile.value = file
+  photoRemoved.value = file === null
+}
 const assigneeIds = ref(props.initial?.assigneeIds || [])
 const assigneeId = ref(props.initial?.assigneeId || null)
 const date = ref(props.initial?.date || '')
@@ -147,6 +153,7 @@ function submit() {
     name: name.value.trim(),
     iconName: iconName.value,
     photoFile: photoFile.value,
+    photoRemoved: photoRemoved.value,
   }
 
   if (props.kind === FORM_KIND.RECURRING_CHORE) {
@@ -202,7 +209,7 @@ function submit() {
       <IconPicker v-model="iconName" />
     </div>
 
-    <PhotoUpload v-model="photoFile" label="Photo" :preview-url="initial?.photoURL" />
+    <PhotoUpload :model-value="photoFile" @update:model-value="onPhotoChange" label="Photo" :preview-url="initial?.photoURL" />
 
     <div class="flex flex-col gap-2">
       <span class="form-label">

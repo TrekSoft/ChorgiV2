@@ -41,7 +41,7 @@ const isChore = computed(() => props.kind === FORM_KIND.RECURRING_CHORE || props
 async function onSubmit(data: ChoreFormPayload) {
   saving.value = true
   try {
-    const payload = { ...data, photoURL: props.item?.photoURL || null }
+    const payload = { ...data, photoURL: data.photoRemoved ? null : (props.item?.photoURL || null) }
     if (isChore.value) {
       await upsertChore(props.item?.id || null, payload)
     } else {

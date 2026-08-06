@@ -216,6 +216,7 @@ export interface ChoreFormPayload {
   name: string
   iconName: string | null
   photoFile: Blob | null
+  photoRemoved: boolean
   kind: ChoreKind
   assigneeIds?: string[]
   assigneeId?: string | null
