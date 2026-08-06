@@ -67,7 +67,7 @@ async function submit() {
             :value="digits[i]"
             @input="onInput(i, $event)"
             @keydown="onKeydown(i, $event)"
-            type="password"
+            type="text"
             inputmode="numeric"
             pattern="\d*"
             maxlength="1"

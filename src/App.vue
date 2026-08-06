@@ -3,7 +3,10 @@ import { watch } from 'vue'
 import { familyId } from './composables/useFamily'
 import { children, childrenLoading } from './composables/useChildren'
 import { accrueDailyAllowance } from './composables/useAllowance'
+import { useAdminModeTimeout } from './composables/useAdminMode'
 import DialogHost from './components/DialogHost.vue'
+
+useAdminModeTimeout()
 
 let accrued = false
 watch(familyId, (id) => {
