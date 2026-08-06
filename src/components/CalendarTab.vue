@@ -112,7 +112,10 @@ onMounted(() => {
   const weekEnd = addDays(weekStart, 6)
   if (today >= weekStart && today <= weekEnd) {
     nextTick(() => {
-      todayCardRef.value?.scrollIntoView({ block: 'start', behavior: 'smooth' })
+      const el = todayCardRef.value
+      if (!el) return
+      const top = el.getBoundingClientRect().top + window.scrollY - 120
+      window.scrollTo({ top, behavior: 'smooth' })
     })
   }
 })
@@ -185,7 +188,7 @@ onMounted(() => {
         v-for="day in days"
         :key="day.toISOString()"
         :ref="(el) => { if (isToday(day)) todayCardRef = el as HTMLElement | null }"
-        class="flex flex-col gap-2 rounded-2xl border-2 p-2 min-[1400px]:p-3 min-[1400px]:min-h-32 scroll-mt-24"
+        class="flex flex-col gap-2 rounded-2xl border-2 p-2 min-[1400px]:p-3 min-[1400px]:min-h-32 scroll-mt-36"
         :class="isToday(day) ? 'border-amber-400 bg-white' : 'border-amber-200 bg-white/60'"
       >
         <div class="flex items-center justify-between">
