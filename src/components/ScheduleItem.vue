@@ -9,6 +9,8 @@ const props = withDefaults(defineProps<{
   name: string
   iconName?: string | null
   photoUrl?: string | null
+  videoUrl?: string | null
+  videoThumbUrl?: string | null
   timeWindow?: TimeWindow | null
   timePeriodLabel?: string | null
   weekly?: boolean
@@ -21,6 +23,8 @@ const props = withDefaults(defineProps<{
 }>(), {
   iconName: null,
   photoUrl: null,
+  videoUrl: null,
+  videoThumbUrl: null,
   timeWindow: null,
   timePeriodLabel: null,
   weekly: false,
@@ -31,11 +35,16 @@ const props = withDefaults(defineProps<{
   claimable: false,
   draggable: false,
 })
-const emit = defineEmits<{ click: []; 'photo-click': [] }>()
+const emit = defineEmits<{ click: []; 'photo-click': []; 'video-click': [] }>()
 
 function onPhotoClick(event: Event) {
   event.stopPropagation()
   emit('photo-click')
+}
+
+function onVideoClick(event: Event) {
+  event.stopPropagation()
+  emit('video-click')
 }
 
 function formatTime(hhmm: string) {
@@ -59,7 +68,21 @@ const timeLabel = computed(() => {
     class="flex items-center gap-2 rounded-xl border-2 border-amber-200 bg-white p-2 cursor-pointer hover:border-amber-400 transition-colors select-none"
   >
     <button
-      v-if="photoUrl"
+      v-if="videoUrl"
+      type="button"
+      @click="onVideoClick"
+      class="relative w-10 h-10 rounded-lg overflow-hidden border border-amber-200 shrink-0 cursor-pointer"
+    >
+      <img v-if="videoThumbUrl" :src="videoThumbUrl" alt="" class="w-full h-full object-cover" />
+      <div v-else class="w-full h-full bg-stone-800"></div>
+      <div class="absolute inset-0 flex items-center justify-center">
+        <div class="w-5 h-5 rounded-full bg-black/50 flex items-center justify-center">
+          <Icon icon="mdi:play" class="w-3 h-3 text-white" />
+        </div>
+      </div>
+    </button>
+    <button
+      v-else-if="photoUrl"
       type="button"
       @click="onPhotoClick"
       class="w-10 h-10 rounded-lg overflow-hidden border border-amber-200 shrink-0 cursor-zoom-in"

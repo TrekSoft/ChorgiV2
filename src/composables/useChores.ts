@@ -3,6 +3,7 @@ import { collection, onSnapshot, doc, setDoc, deleteDoc, updateDoc, serverTimest
 import { db } from '../lib/firebase'
 import { familyId } from './useFamily'
 import { uploadFamilyPhoto } from '../lib/photo'
+import { uploadFamilyVideo } from '../lib/video'
 import type { Chore, ChoreDoc } from '../types/firebase'
 import { choreConverter } from '../types/firebase'
 
@@ -32,21 +33,31 @@ watch(
   { immediate: true },
 )
 
-export interface ChoreUpsertData extends Partial<Omit<ChoreDoc, 'photoURL'>> {
+export interface ChoreUpsertData extends Partial<Omit<ChoreDoc, 'photoURL' | 'videoURL' | 'videoThumbURL'>> {
   photoFile?: Blob | null
   photoURL?: string | null
+  videoFile?: Blob | null
+  videoURL?: string | null
+  videoThumbURL?: string | null
 }
 
 export async function upsertChore(choreId: string | null, data: ChoreUpsertData): Promise<string> {
   const id = choreId || crypto.randomUUID()
-  const { photoFile, ...rest } = data
+  const { photoFile, videoFile, ...rest } = data
   let photoURL: string | null = rest.photoURL || null
   if (photoFile) {
     photoURL = await uploadFamilyPhoto(familyId.value!, `chores/${id}`, photoFile)
   }
+  let videoURL: string | null = rest.videoURL || null
+  let videoThumbURL: string | null = rest.videoThumbURL || null
+  if (videoFile) {
+    const uploaded = await uploadFamilyVideo(familyId.value!, `chores/${id}`, videoFile)
+    videoURL = uploaded.videoURL
+    videoThumbURL = uploaded.videoThumbURL
+  }
   await setDoc(
     doc(db, 'families', familyId.value!, 'chores', id),
-    { ...rest, photoURL, active: rest.active ?? true, updatedAt: serverTimestamp() },
+    { ...rest, photoURL, videoURL, videoThumbURL, active: rest.active ?? true, updatedAt: serverTimestamp() },
     { merge: true },
   )
   return id

@@ -90,6 +90,7 @@ async function withPending(id: string, write: () => Promise<void>, celebrate: ()
 }
 
 const lightboxSrc = ref<string | null>(null)
+const lightboxVideoSrc = ref<string | null>(null)
 
 // --- admin mode: edit a chore/task straight from its card ---
 const editDialogOpen = ref(false)
@@ -394,6 +395,8 @@ async function onTaskUnclaim(task: ClaimableItem) {
             :name="entry.chore.name"
             :icon-name="entry.chore.iconName"
             :photo-url="entry.chore.photoURL"
+            :video-url="entry.chore.videoURL"
+            :video-thumb-url="entry.chore.videoThumbURL"
             :deadline="entry.deadline"
             :completed="entry.completed"
             :pending="isPending(entry.chore.id)"
@@ -406,6 +409,7 @@ async function onTaskUnclaim(task: ClaimableItem) {
             @toggle="toggleChore(entry)"
             @edit="openChoreEdit(entry.chore)"
             @photo-click="lightboxSrc = entry.chore.photoURL || null"
+            @video-click="lightboxVideoSrc = entry.chore.videoURL || null"
           />
         </section>
 
@@ -425,6 +429,8 @@ async function onTaskUnclaim(task: ClaimableItem) {
               :name="task.name"
               :icon-name="task.iconName"
               :photo-url="task.photoURL"
+              :video-url="task.videoURL"
+              :video-thumb-url="task.videoThumbURL"
               :bonus-cents="task.bonusCents || null"
               oneoff
               :variant="CARD_VARIANT.TASK"
@@ -436,6 +442,7 @@ async function onTaskUnclaim(task: ClaimableItem) {
               @toggle="onTaskTap(task)"
               @edit="openChoreEdit(task)"
               @photo-click="lightboxSrc = task.photoURL || null"
+              @video-click="lightboxVideoSrc = task.videoURL || null"
               @unassign="onTaskUnclaim(task)"
             />
           </div>
@@ -448,6 +455,8 @@ async function onTaskUnclaim(task: ClaimableItem) {
               :name="task.name"
               :icon-name="task.iconName"
               :photo-url="task.photoURL"
+              :video-url="task.videoURL"
+              :video-thumb-url="task.videoThumbURL"
               :variant="CARD_VARIANT.TASK"
               v-bind="taskCardProps(task)"
               :pending="isPending(task.id)"
@@ -457,6 +466,7 @@ async function onTaskUnclaim(task: ClaimableItem) {
               @toggle="onTaskTap(task)"
               @edit="openTaskEdit(task)"
               @photo-click="lightboxSrc = task.photoURL || null"
+              @video-click="lightboxVideoSrc = task.videoURL || null"
               @unassign="onTaskUnclaim(task)"
             />
           </div>
@@ -484,6 +494,11 @@ async function onTaskUnclaim(task: ClaimableItem) {
     />
 
     <ConfettiBurst ref="burst" />
-    <PhotoLightbox :open="!!lightboxSrc" :src="lightboxSrc || undefined" @close="lightboxSrc = null" />
+    <PhotoLightbox
+      :open="!!lightboxSrc || !!lightboxVideoSrc"
+      :src="lightboxSrc || undefined"
+      :video-src="lightboxVideoSrc || undefined"
+      @close="lightboxSrc = null; lightboxVideoSrc = null"
+    />
   </div>
 </template>
