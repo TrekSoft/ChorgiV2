@@ -4,8 +4,18 @@ import { CONFETTI_MODE, type ConfettiMode } from '../lib/constants'
 import { playPop, playCoin, playFireworks, playBalloons } from '../lib/sounds'
 
 // Usage: const burstRef = ref(); burstRef.value.fire('confetti' | 'coins' | 'fireworks')
+
+// Audio can fail (blocked autoplay, no AudioContext); never let it swallow the visuals
+function playSafely(play: () => void) {
+  try {
+    play()
+  } catch {
+    /* sound is optional */
+  }
+}
+
 function fireConfetti() {
-  playPop()
+  playSafely(playPop)
   confetti({
     particleCount: 120,
     spread: 80,
@@ -14,7 +24,7 @@ function fireConfetti() {
 }
 
 function fireCoins() {
-  playCoin()
+  playSafely(playCoin)
   confetti({
     particleCount: 60,
     spread: 60,
@@ -26,7 +36,7 @@ function fireCoins() {
 }
 
 function fireFireworks() {
-  playFireworks()
+  playSafely(playFireworks)
   const duration = 2000
   const end = Date.now() + duration
   const colors = ['#f59e0b', '#ec4899', '#8b5cf6', '#22c55e']
@@ -51,7 +61,7 @@ function fireFireworks() {
 }
 
 function fireBalloons() {
-  playBalloons()
+  playSafely(playBalloons)
   const colors = ['#ef4444', '#f59e0b', '#22c55e', '#3b82f6', '#a855f7', '#ec4899']
   const count = 30
   for (let i = 0; i < count; i++) {

@@ -138,7 +138,6 @@ async function toggleChore(entry: AssignedEntry) {
   if (entry.completed) {
     await uncompleteChore(entry.chore, child.value.id, now.value, weekStartsOn.value)
   } else {
-    await completeChore(entry.chore, child.value.id, now.value, weekStartsOn.value)
     completedThisSession = true
     const birthdayMode = child.value.birthdate && isBirthdayToday(child.value.birthdate, now.value)
     if (entry.chore.bonusCents) {
@@ -147,6 +146,7 @@ async function toggleChore(entry: AssignedEntry) {
     } else {
       burst.value?.fire(birthdayMode ? CONFETTI_MODE.BALLOONS : CONFETTI_MODE.CONFETTI)
     }
+    await completeChore(entry.chore, child.value.id, now.value, weekStartsOn.value)
   }
 }
 
@@ -247,16 +247,16 @@ async function onTaskTap(task: ClaimableItem) {
   if (isPreAssigned(task)) {
     const claim = claimFor(task)
     if (!claim) {
+      burst.value?.fire(CONFETTI_MODE.CONFETTI)
       await claimTask(task, child.value.id, todayStr.value)
       await completeClaim(task, todayStr.value)
-      burst.value?.fire(CONFETTI_MODE.CONFETTI)
       return
     }
     if (claim.completed) {
       await uncompleteClaim(task, todayStr.value)
     } else {
-      await completeClaim(task, todayStr.value)
       burst.value?.fire(CONFETTI_MODE.CONFETTI)
+      await completeClaim(task, todayStr.value)
     }
     return
   }
@@ -270,13 +270,13 @@ async function onTaskTap(task: ClaimableItem) {
     if (claim.completed) {
       await uncompleteClaim(task, todayStr.value)
     } else {
-      await completeClaim(task, todayStr.value)
       if (task.bonusCents) {
         burst.value?.fire(CONFETTI_MODE.COINS)
         showToast(`+ $${formatCents(task.bonusCents)} bonus!`)
       } else {
         burst.value?.fire(CONFETTI_MODE.CONFETTI)
       }
+      await completeClaim(task, todayStr.value)
     }
     return
   }
