@@ -306,19 +306,21 @@ function submit() {
 
     <div v-if="showTimeWindow" class="flex flex-col gap-1">
       <span class="form-label">Time window <span class="form-hint">(optional)</span></span>
-      <div v-if="!useCustomTime" class="flex items-center gap-2">
-        <div class="relative flex-1">
-          <select v-model="selectedPeriodId" class="input-field w-full appearance-none pr-10">
-            <option value="">None</option>
-            <option v-for="period in sortedTimePeriods" :key="period.id" :value="period.id">
-              {{ period.label }} ({{ formatTimeLabel(period.start) }}–{{ formatTimeLabel(period.end) }})
-            </option>
-          </select>
-          <Icon icon="mdi:chevron-down" class="w-5 h-5 text-amber-500 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+      <div v-if="!useCustomTime" class="flex flex-col gap-2">
+        <div class="flex items-center gap-2">
+          <div class="relative flex-1">
+            <select v-model="selectedPeriodId" class="input-field w-full appearance-none pr-10">
+              <option value="">None</option>
+              <option v-for="period in sortedTimePeriods" :key="period.id" :value="period.id">
+                {{ period.label }} ({{ formatTimeLabel(period.start) }}–{{ formatTimeLabel(period.end) }})
+              </option>
+            </select>
+            <Icon icon="mdi:chevron-down" class="w-5 h-5 text-amber-500 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+          </div>
+          <button type="button" @click="useCustomTime = true; selectedPeriodId = ''" class="text-sm text-amber-600 hover:text-amber-700 whitespace-nowrap">Custom</button>
         </div>
-        <button type="button" @click="useCustomTime = true; selectedPeriodId = ''" class="text-sm text-amber-600 hover:text-amber-700 whitespace-nowrap">Custom</button>
+        <p v-if="selectedPeriodId" class="form-hint">Linked — editing this period in Settings updates this chore automatically.</p>
       </div>
-      <p v-if="!useCustomTime && selectedPeriodId" class="form-hint">Linked — editing this period in Settings updates this chore automatically.</p>
       <div v-else class="flex flex-col gap-2">
         <div class="flex gap-3">
           <label class="flex flex-col gap-1 flex-1">
