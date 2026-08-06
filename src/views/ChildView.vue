@@ -5,7 +5,7 @@ import { format } from 'date-fns'
 import { Icon } from '@iconify/vue'
 import { occursOn, deadlineFor, startsAt } from '../lib/recurrence'
 import { timePeriods } from '../composables/useTimePeriods'
-import { CHORE_KIND, CARD_VARIANT, CONFETTI_MODE, FORM_KIND, NOW_TICK_INTERVAL_MS, TOAST_DURATION_MS, WEEK_START_SUNDAY, type ConfettiMode, type FormKind } from '../lib/constants'
+import { CHORE_KIND, CARD_VARIANT, CONFETTI_MODE, FORM_KIND, NOW_TICK_INTERVAL_MS, OFFLINE_MESSAGE, TOAST_DURATION_MS, WEEK_START_SUNDAY, type ConfettiMode, type FormKind } from '../lib/constants'
 import { DATE_FORMAT, formatCents } from '../lib/format'
 import { family } from '../composables/useFamily'
 import { children } from '../composables/useChildren'
@@ -59,14 +59,34 @@ watch(() => route.params.id, () => {
 const todayStr = computed(() => format(now.value, DATE_FORMAT))
 
 const burst = ref<{ fire: (mode?: ConfettiMode) => void } | null>(null)
-const toast = ref<string | null>(null)
+const toast = ref<{ message: string; error: boolean } | null>(null)
 let toastTimer: ReturnType<typeof setTimeout> | null = null
-function showToast(message: string) {
-  toast.value = message
+function showToast(message: string, error = false) {
+  toast.value = { message, error }
   if (toastTimer) clearTimeout(toastTimer)
   toastTimer = setTimeout(() => {
     toast.value = null
   }, TOAST_DURATION_MS)
+}
+
+// ids of chores/tasks with an in-flight write; their cards show a spinner until the server acks
+const pendingIds = ref<string[]>([])
+function isPending(id: string) {
+  return pendingIds.value.includes(id)
+}
+
+/** Run a completion write, celebrating only once it lands and showing an offline toast if it doesn't. */
+async function withPending(id: string, write: () => Promise<void>, celebrate: () => void) {
+  if (isPending(id)) return
+  pendingIds.value = [...pendingIds.value, id]
+  try {
+    await write()
+    celebrate()
+  } catch {
+    showToast(OFFLINE_MESSAGE, true)
+  } finally {
+    pendingIds.value = pendingIds.value.filter((p) => p !== id)
+  }
 }
 
 const lightboxSrc = ref<string | null>(null)
@@ -138,15 +158,21 @@ async function toggleChore(entry: AssignedEntry) {
   if (entry.completed) {
     await uncompleteChore(entry.chore, child.value.id, now.value, weekStartsOn.value)
   } else {
-    await completeChore(entry.chore, child.value.id, now.value, weekStartsOn.value)
-    completedThisSession = true
+    const childId = child.value.id
     const birthdayMode = child.value.birthdate && isBirthdayToday(child.value.birthdate, now.value)
-    if (entry.chore.bonusCents) {
-      burst.value?.fire(CONFETTI_MODE.COINS)
-      showToast(`+ $${formatCents(entry.chore.bonusCents)} bonus!`)
-    } else {
-      burst.value?.fire(birthdayMode ? CONFETTI_MODE.BALLOONS : CONFETTI_MODE.CONFETTI)
-    }
+    await withPending(
+      entry.chore.id,
+      () => completeChore(entry.chore, childId, now.value, weekStartsOn.value),
+      () => {
+        completedThisSession = true
+        if (entry.chore.bonusCents) {
+          burst.value?.fire(CONFETTI_MODE.COINS)
+          showToast(`+ $${formatCents(entry.chore.bonusCents)} bonus!`)
+        } else {
+          burst.value?.fire(birthdayMode ? CONFETTI_MODE.BALLOONS : CONFETTI_MODE.CONFETTI)
+        }
+      },
+    )
   }
 }
 
@@ -247,22 +273,32 @@ async function onTaskTap(task: ClaimableItem) {
   if (isPreAssigned(task)) {
     const claim = claimFor(task)
     if (!claim) {
-      await claimTask(task, child.value.id, todayStr.value)
-      await completeClaim(task, todayStr.value)
-      burst.value?.fire(CONFETTI_MODE.CONFETTI)
+      const childId = child.value.id
+      await withPending(
+        task.id,
+        async () => {
+          await claimTask(task, childId, todayStr.value)
+          await completeClaim(task, todayStr.value)
+        },
+        () => burst.value?.fire(CONFETTI_MODE.CONFETTI),
+      )
       return
     }
     if (claim.completed) {
       await uncompleteClaim(task, todayStr.value)
     } else {
-      await completeClaim(task, todayStr.value)
-      burst.value?.fire(CONFETTI_MODE.CONFETTI)
+      await withPending(
+        task.id,
+        () => completeClaim(task, todayStr.value),
+        () => burst.value?.fire(CONFETTI_MODE.CONFETTI),
+      )
     }
     return
   }
   const claim = claimFor(task)
   if (!claim) {
-    await claimTask(task, child.value.id, todayStr.value)
+    const childId = child.value.id
+    await withPending(task.id, () => claimTask(task, childId, todayStr.value), () => {})
     return
   }
   const mine = claim.childId === child.value.id
@@ -270,13 +306,18 @@ async function onTaskTap(task: ClaimableItem) {
     if (claim.completed) {
       await uncompleteClaim(task, todayStr.value)
     } else {
-      await completeClaim(task, todayStr.value)
-      if (task.bonusCents) {
-        burst.value?.fire(CONFETTI_MODE.COINS)
-        showToast(`+ $${formatCents(task.bonusCents)} bonus!`)
-      } else {
-        burst.value?.fire(CONFETTI_MODE.CONFETTI)
-      }
+      await withPending(
+        task.id,
+        () => completeClaim(task, todayStr.value),
+        () => {
+          if (task.bonusCents) {
+            burst.value?.fire(CONFETTI_MODE.COINS)
+            showToast(`+ $${formatCents(task.bonusCents)} bonus!`)
+          } else {
+            burst.value?.fire(CONFETTI_MODE.CONFETTI)
+          }
+        },
+      )
     }
     return
   }
@@ -355,6 +396,7 @@ async function onTaskUnclaim(task: ClaimableItem) {
             :photo-url="entry.chore.photoURL"
             :deadline="entry.deadline"
             :completed="entry.completed"
+            :pending="isPending(entry.chore.id)"
             :late="entry.late"
             :overdue="entry.overdue"
             :oneoff="entry.chore.kind === CHORE_KIND.ONEOFF"
@@ -387,6 +429,7 @@ async function onTaskUnclaim(task: ClaimableItem) {
               oneoff
               :variant="CARD_VARIANT.TASK"
               v-bind="taskCardProps(task)"
+              :pending="isPending(task.id)"
               :can-unassign="canUnclaim(task)"
               :unassign-label="unclaimLabel(task)"
               :editable="isAdminMode"
@@ -407,6 +450,7 @@ async function onTaskUnclaim(task: ClaimableItem) {
               :photo-url="task.photoURL"
               :variant="CARD_VARIANT.TASK"
               v-bind="taskCardProps(task)"
+              :pending="isPending(task.id)"
               :can-unassign="canUnclaim(task)"
               :unassign-label="unclaimLabel(task)"
               :editable="isAdminMode"
@@ -425,9 +469,10 @@ async function onTaskUnclaim(task: ClaimableItem) {
     <Teleport to="body">
       <div
         v-if="toast"
-        class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[70] bg-amber-500 text-white font-bold text-lg px-6 py-3 rounded-full shadow-lg"
+        class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[70] text-white font-bold text-lg px-6 py-3 rounded-full shadow-lg"
+        :class="toast.error ? 'bg-red-500' : 'bg-amber-500'"
       >
-        {{ toast }}
+        {{ toast.message }}
       </div>
     </Teleport>
 

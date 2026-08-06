@@ -69,3 +69,6 @@ export const ADMIN_TIMEOUT_MS = 30 * 60 * 1000
 export const NOW_TICK_INTERVAL_MS = 15_000
 export const COUNTDOWN_TICK_INTERVAL_MS = 30_000
 export const TOAST_DURATION_MS = 3000
+// Firestore queues writes offline instead of rejecting, so give an ack a deadline
+export const WRITE_ACK_TIMEOUT_MS = 8000
+export const OFFLINE_MESSAGE = 'No internet, try again later'
