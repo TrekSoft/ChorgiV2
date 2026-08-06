@@ -259,7 +259,7 @@ onMounted(() => {
 
     <!-- sticky bottom action bar (mobile only) -->
     <div
-      class="fixed bottom-0 inset-x-0 z-30 sm:hidden bg-white/95 backdrop-blur border-t-2 border-amber-200 p-3 flex gap-2"
+      class="fixed bottom-0 inset-x-0 z-30 min-[1400px]:hidden bg-white/95 backdrop-blur border-t-2 border-amber-200 p-3 flex gap-2"
       style="padding-bottom: calc(0.75rem + env(safe-area-inset-bottom))"
     >
       <button class="btn-primary flex-1" @click="openAdd(FORM_KIND.ONEOFF_CHORE, today)">+ Chore today</button>

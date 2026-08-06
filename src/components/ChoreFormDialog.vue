@@ -76,11 +76,11 @@ async function onDelete() {
 
 <template>
   <Teleport to="body">
-    <div v-if="open" class="dialog-overlay !p-0 sm:!p-4" @click.self="emit('close')">
-      <div class="dialog-container w-full h-full sm:h-auto max-w-lg flex flex-col max-h-none sm:max-h-[90vh] overflow-hidden rounded-none sm:rounded-2xl">
+    <div v-if="open" class="dialog-overlay !p-0 min-[1400px]:!p-4" @click.self="emit('close')">
+      <div class="dialog-container w-full h-full min-[1400px]:h-auto max-w-lg flex flex-col max-h-none min-[1400px]:max-h-[90vh] overflow-hidden rounded-none min-[1400px]:rounded-2xl">
         <!-- dialog grows to fill available height; inner form handles scrolling -->
-        <div class="px-4 py-3 sm:px-6 sm:py-4 flex items-center justify-between shrink-0 border-b border-amber-200">
-          <h2 class="text-lg sm:text-xl font-bold text-amber-900">{{ title }}</h2>
+        <div class="px-4 py-3 min-[1400px]:px-6 min-[1400px]:py-4 flex items-center justify-between shrink-0 border-b border-amber-200">
+          <h2 class="text-lg min-[1400px]:text-xl font-bold text-amber-900">{{ title }}</h2>
           <div class="flex items-center gap-2">
             <button
               v-if="item"
@@ -91,7 +91,7 @@ async function onDelete() {
             </button>
           </div>
         </div>
-        <div class="px-4 pt-3 pb-4 sm:px-6 sm:pt-4 sm:pb-6 flex-1 min-h-0 flex flex-col overflow-hidden">
+        <div class="px-4 pt-3 pb-4 min-[1400px]:px-6 min-[1400px]:pt-4 min-[1400px]:pb-6 flex-1 min-h-0 flex flex-col overflow-hidden">
           <ChoreForm
             :kind="kind"
             :initial="initial"
