@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, nextTick } from 'vue'
+import { ref, computed, onMounted, nextTick, watch } from 'vue'
 import { format, addDays, addWeeks, startOfWeek, eachDayOfInterval, isToday } from 'date-fns'
 import { Icon } from '@iconify/vue'
 import { occursOn } from '../lib/recurrence'
@@ -105,20 +105,22 @@ function openEdit(entry: ScheduleEntry) {
   dialogOpen.value = true
 }
 
-onMounted(() => {
-  // Only auto-scroll on mobile (<1400px) if the viewed week contains today
+function scrollToToday() {
   if (window.innerWidth >= 1400) return
   const weekStart = startOfWeek(anchor.value, { weekStartsOn: weekStartsOn.value })
   const weekEnd = addDays(weekStart, 6)
-  if (today >= weekStart && today <= weekEnd) {
-    nextTick(() => {
-      const el = todayCardRef.value
-      if (!el) return
-      const top = el.getBoundingClientRect().top + window.scrollY - 120
-      window.scrollTo({ top, behavior: 'smooth' })
-    })
-  }
-})
+  if (today < weekStart || today > weekEnd) return
+  nextTick(() => {
+    const el = todayCardRef.value
+    if (!el) return
+    const top = el.getBoundingClientRect().top + window.scrollY - 120
+    window.scrollTo({ top, behavior: 'smooth' })
+  })
+}
+
+watch(choresLoading, (loading) => {
+  if (!loading) scrollToToday()
+}, { immediate: true })
 </script>
 
 <template>
