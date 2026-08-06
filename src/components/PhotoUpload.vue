@@ -56,14 +56,9 @@ function onEditDone(blob: Blob) {
   currentObjectUrl = URL.createObjectURL(blob)
   localPreview.value = currentObjectUrl
   emit('update:modelValue', blob)
-  editing.value = false
-  if (editSrc.value) {
-    URL.revokeObjectURL(editSrc.value)
-    editSrc.value = null
-  }
 }
 
-function onEditCancel() {
+function onEditorClose() {
   editing.value = false
   if (editSrc.value) {
     URL.revokeObjectURL(editSrc.value)
@@ -94,7 +89,18 @@ function clear(event: Event) {
     <span class="form-label">
       {{ label }} <span v-if="optional" class="form-hint">(optional)</span>
     </span>
+
+    <div v-if="editing && editSrc" class="flex flex-col gap-2">
+      <PhotoEditor
+        :src="editSrc"
+        circular
+        @done="onEditDone"
+      />
+      <button type="button" @click="onEditorClose" class="btn-primary py-2 w-full">Done</button>
+    </div>
+
     <div
+      v-else
       @click="pick"
       @dragover.prevent="dragOver = true"
       @dragleave.prevent="dragOver = false"
@@ -126,12 +132,13 @@ function clear(event: Event) {
       {{ label }} <span v-if="optional" class="form-hint">(optional)</span>
     </span>
 
-    <PhotoEditor
-      v-if="editing && editSrc"
-      :src="editSrc"
-      @done="onEditDone"
-      @cancel="onEditCancel"
-    />
+    <div v-if="editing && editSrc" class="flex flex-col gap-2">
+      <PhotoEditor
+        :src="editSrc"
+        @done="onEditDone"
+      />
+      <button type="button" @click="onEditorClose" class="btn-primary py-2 w-full">Done</button>
+    </div>
 
     <template v-else>
     <div

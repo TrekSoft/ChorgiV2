@@ -5,11 +5,13 @@ import { Icon } from '@iconify/vue'
 const props = withDefaults(defineProps<{
   src: string
   maxWidth?: number
+  circular?: boolean
 }>(), {
   maxWidth: 1280,
+  circular: false,
 })
 
-const emit = defineEmits<{ done: [blob: Blob]; cancel: [] }>()
+const emit = defineEmits<{ done: [blob: Blob] }>()
 
 const containerRef = ref<HTMLDivElement | null>(null)
 const imgRef = ref<HTMLImageElement | null>(null)
@@ -17,7 +19,6 @@ const scale = ref(1)
 const minScale = ref(1)
 const tx = ref(0)
 const ty = ref(0)
-const imgReady = ref(false)
 const iw = ref(0)
 const ih = ref(0)
 
@@ -37,7 +38,7 @@ function onImgLoad() {
   scale.value = minScale.value
   tx.value = 0
   ty.value = 0
-  imgReady.value = true
+  render()
 }
 
 function clamp() {
@@ -79,7 +80,10 @@ function onPointerMove(e: PointerEvent) {
 }
 
 function onPointerUp() {
-  dragging = false
+  if (dragging) {
+    dragging = false
+    scheduleRender()
+  }
 }
 
 let touchPan: { x: number; y: number } | null = null
@@ -116,6 +120,9 @@ function onTouchMove(e: TouchEvent) {
 }
 
 function onTouchEnd() {
+  if (touchPan || pinchDist > 0) {
+    scheduleRender()
+  }
   touchPan = null
   pinchDist = 0
 }
@@ -123,29 +130,45 @@ function onTouchEnd() {
 function onWheel(e: WheelEvent) {
   e.preventDefault()
   setScale(scale.value * (e.deltaY > 0 ? 0.92 : 1.08))
+  scheduleRender()
 }
 
 function onSliderInput(e: Event) {
   const val = Number((e.target as HTMLInputElement).value)
   setScale(minScale.value * (val / 100))
+  scheduleRender()
 }
 
 function reset() {
   scale.value = minScale.value
   tx.value = 0
   ty.value = 0
+  scheduleRender()
 }
 
-function done() {
-  if (!containerRef.value || !imgRef.value) return
+let renderTimer: ReturnType<typeof setTimeout> | null = null
+
+function scheduleRender() {
+  if (renderTimer) clearTimeout(renderTimer)
+  renderTimer = setTimeout(render, 200)
+}
+
+function render() {
+  if (!containerRef.value || !imgRef.value || !iw.value) return
   const cw = containerRef.value.clientWidth
   const ch = containerRef.value.clientHeight
-  const outW = props.maxWidth
-  const outH = Math.round((outW * ch) / cw)
+  const size = props.circular ? Math.min(cw, ch) : cw
+  const outW = Math.min(props.maxWidth, size * 2)
+  const outH = props.circular ? outW : Math.round((outW * ch) / cw)
   const canvas = document.createElement('canvas')
   canvas.width = outW
   canvas.height = outH
   const ctx = canvas.getContext('2d')!
+  if (props.circular) {
+    ctx.beginPath()
+    ctx.arc(outW / 2, outH / 2, outW / 2, 0, Math.PI * 2)
+    ctx.clip()
+  }
   ctx.fillStyle = 'white'
   ctx.fillRect(0, 0, outW, outH)
   const s = outW / cw
@@ -165,12 +188,15 @@ function done() {
 </script>
 
 <template>
-  <div class="flex flex-col gap-3">
-    <p class="text-sm text-amber-600 font-medium">Pinch or drag to adjust, then tap Done</p>
+  <div class="flex flex-col gap-2">
+    <p class="text-xs text-amber-600 font-medium">Pinch or drag to adjust</p>
     <div
       ref="containerRef"
-      class="relative aspect-video w-full overflow-hidden rounded-2xl border-2 border-amber-200 bg-black touch-none select-none cursor-grab"
-      :class="{ 'cursor-grabbing': dragging }"
+      :class="[
+        'relative overflow-hidden border-2 border-amber-200 bg-black touch-none select-none cursor-grab',
+        circular ? 'rounded-full w-32 h-32 mx-auto' : 'rounded-2xl aspect-video w-full',
+        { 'cursor-grabbing': dragging },
+      ]"
       @pointerdown="onPointerDown"
       @pointermove="onPointerMove"
       @pointerup="onPointerUp"
@@ -190,8 +216,8 @@ function done() {
         draggable="false"
       />
     </div>
-    <div class="flex items-center gap-3">
-      <Icon icon="mdi:magnify-minus" class="w-5 h-5 text-amber-500 shrink-0" />
+    <div class="flex items-center gap-2">
+      <Icon icon="mdi:magnify-minus" class="w-4 h-4 text-amber-500 shrink-0" />
       <input
         type="range"
         :min="100"
@@ -200,7 +226,7 @@ function done() {
         @input="onSliderInput"
         class="flex-1 accent-amber-500"
       />
-      <Icon icon="mdi:magnify-plus" class="w-5 h-5 text-amber-500 shrink-0" />
+      <Icon icon="mdi:magnify-plus" class="w-4 h-4 text-amber-500 shrink-0" />
       <button
         type="button"
         @click="reset"
@@ -208,10 +234,6 @@ function done() {
       >
         Reset
       </button>
-    </div>
-    <div class="flex gap-2">
-      <button type="button" @click="emit('cancel')" class="btn-cancel flex-1 py-2">Cancel</button>
-      <button type="button" @click="done" class="btn-primary flex-1 py-2">Done</button>
     </div>
   </div>
 </template>
