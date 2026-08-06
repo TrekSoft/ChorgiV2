@@ -11,6 +11,7 @@ import {
 import { db } from '../lib/firebase'
 import { familyId } from './useFamily'
 import { uploadFamilyPhoto } from '../lib/photo'
+import { uploadFamilyVideo } from '../lib/video'
 import type { Task, TaskDoc } from '../types/firebase'
 import { taskConverter } from '../types/firebase'
 
@@ -42,22 +43,32 @@ watch(
   { immediate: true },
 )
 
-export interface TaskUpsertData extends Partial<Omit<TaskDoc, 'photoURL'>> {
+export interface TaskUpsertData extends Partial<Omit<TaskDoc, 'photoURL' | 'videoURL' | 'videoThumbURL'>> {
   photoFile?: Blob | null
   photoURL?: string | null
+  videoFile?: Blob | null
+  videoURL?: string | null
+  videoThumbURL?: string | null
 }
 
 export async function upsertTask(taskId: string | null, data: TaskUpsertData): Promise<string> {
   const id = taskId || crypto.randomUUID()
-  const { photoFile, ...rest } = data
+  const { photoFile, videoFile, ...rest } = data
   let photoURL: string | null = rest.photoURL || null
   if (photoFile) {
     photoURL = await uploadFamilyPhoto(familyId.value!, `tasks/${id}`, photoFile)
   }
+  let videoURL: string | null = rest.videoURL || null
+  let videoThumbURL: string | null = rest.videoThumbURL || null
+  if (videoFile) {
+    const uploaded = await uploadFamilyVideo(familyId.value!, `tasks/${id}`, videoFile)
+    videoURL = uploaded.videoURL
+    videoThumbURL = uploaded.videoThumbURL
+  }
   const order = rest.order ?? tasks.value.length
   await setDoc(
     doc(db, 'families', familyId.value!, 'tasks', id),
-    { ...rest, photoURL, order, updatedAt: serverTimestamp() },
+    { ...rest, photoURL, videoURL, videoThumbURL, order, updatedAt: serverTimestamp() },
     { merge: true },
   )
   return id

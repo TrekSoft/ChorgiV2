@@ -103,6 +103,7 @@ function assigneesFor(task: Task) {
 }
 
 const lightboxSrc = ref<string | null>(null)
+const lightboxVideoSrc = ref<string | null>(null)
 
 // --- task dialog ---
 const taskDialogOpen = ref(false)
@@ -183,10 +184,13 @@ function openEditTask(task: Task) {
               :name="task.name"
               :icon-name="task.iconName"
               :photo-url="task.photoURL"
+              :video-url="task.videoURL"
+              :video-thumb-url="task.videoThumbURL"
               :assignees="assigneesFor(task)"
               draggable
               @click="openEditTask(task)"
               @photo-click="lightboxSrc = task.photoURL || null"
+              @video-click="lightboxVideoSrc = task.videoURL || null"
             />
           </div>
 
@@ -212,6 +216,11 @@ function openEditTask(task: Task) {
       @close="taskDialogOpen = false"
     />
 
-    <PhotoLightbox :open="!!lightboxSrc" :src="lightboxSrc || undefined" @close="lightboxSrc = null" />
+    <PhotoLightbox
+      :open="!!lightboxSrc || !!lightboxVideoSrc"
+      :src="lightboxSrc || undefined"
+      :video-src="lightboxVideoSrc || undefined"
+      @close="lightboxSrc = null; lightboxVideoSrc = null"
+    />
   </div>
 </template>

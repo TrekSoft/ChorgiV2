@@ -3,6 +3,7 @@ import { ref, computed, watch } from 'vue'
 import { Icon } from '@iconify/vue'
 import IconPicker from './IconPicker.vue'
 import PhotoUpload from './PhotoUpload.vue'
+import VideoUpload from './VideoUpload.vue'
 import { FORM_KIND, CHORE_KIND, RECURRENCE_TYPE, RECURRENCE_MODE, type FormKind } from '../lib/constants'
 import { dollarsToCents } from '../lib/format'
 import { timePeriods } from '../composables/useTimePeriods'
@@ -32,10 +33,17 @@ const name = ref(props.initial?.name || '')
 const iconName = ref(props.initial?.iconName || null)
 const photoFile = ref<Blob | null>(null)
 const photoRemoved = ref(false)
+const videoFile = ref<Blob | null>(null)
+const videoRemoved = ref(false)
 
 function onPhotoChange(file: Blob | null) {
   photoFile.value = file
   photoRemoved.value = file === null
+}
+
+function onVideoChange(file: Blob | null) {
+  videoFile.value = file
+  videoRemoved.value = file === null
 }
 const assigneeIds = ref(props.initial?.assigneeIds || [])
 const assigneeId = ref(props.initial?.assigneeId || null)
@@ -154,6 +162,8 @@ function submit() {
     iconName: iconName.value,
     photoFile: photoFile.value,
     photoRemoved: photoRemoved.value,
+    videoFile: videoFile.value,
+    videoRemoved: videoRemoved.value,
   }
 
   if (props.kind === FORM_KIND.RECURRING_CHORE) {
@@ -210,6 +220,14 @@ function submit() {
     </div>
 
     <PhotoUpload :model-value="photoFile" @update:model-value="onPhotoChange" label="Photo" :preview-url="initial?.photoURL" />
+
+    <VideoUpload
+      :model-value="videoFile"
+      @update:model-value="onVideoChange"
+      label="Video"
+      :preview-url="initial?.videoThumbURL"
+      :video-url="initial?.videoURL"
+    />
 
     <div class="flex flex-col gap-2">
       <span class="form-label">

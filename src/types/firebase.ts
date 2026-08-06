@@ -76,6 +76,8 @@ export interface ChoreDoc {
   name: string
   iconName?: string | null
   photoURL?: string | null
+  videoURL?: string | null
+  videoThumbURL?: string | null
   assigneeIds: string[]
   weekly?: boolean
   recurrence?: RecurrencePattern | null
@@ -95,6 +97,8 @@ export interface TaskDoc {
   name: string
   iconName?: string | null
   photoURL?: string | null
+  videoURL?: string | null
+  videoThumbURL?: string | null
   roomId: string
   order: number
   assigneeId?: string | null
@@ -200,6 +204,8 @@ export interface ChoreFormInitial {
   name?: string
   iconName?: string | null
   photoURL?: string | null
+  videoURL?: string | null
+  videoThumbURL?: string | null
   assigneeIds?: string[]
   assigneeId?: string | null
   date?: string
@@ -217,6 +223,8 @@ export interface ChoreFormPayload {
   iconName: string | null
   photoFile: Blob | null
   photoRemoved: boolean
+  videoFile: Blob | null
+  videoRemoved: boolean
   kind: ChoreKind
   assigneeIds?: string[]
   assigneeId?: string | null
@@ -236,6 +244,8 @@ export interface ClaimableItem {
   kind: ChoreKind
   iconName?: string | null
   photoURL?: string | null
+  videoURL?: string | null
+  videoThumbURL?: string | null
   bonusCents?: number
   assigneeId?: string | null
 }

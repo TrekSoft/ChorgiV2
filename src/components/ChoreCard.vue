@@ -8,6 +8,8 @@ const props = withDefaults(defineProps<{
   name: string
   iconName?: string | null
   photoUrl?: string | null
+  videoUrl?: string | null
+  videoThumbUrl?: string | null
   deadline?: Date | null
   completed?: boolean
   late?: boolean
@@ -25,6 +27,8 @@ const props = withDefaults(defineProps<{
 }>(), {
   iconName: null,
   photoUrl: null,
+  videoUrl: null,
+  videoThumbUrl: null,
   deadline: null,
   completed: false,
   late: false,
@@ -40,7 +44,7 @@ const props = withDefaults(defineProps<{
   unassignLabel: 'Remove me',
   editable: false,
 })
-const emit = defineEmits<{ toggle: []; 'photo-click': []; unassign: []; edit: [] }>()
+const emit = defineEmits<{ toggle: []; 'photo-click': []; 'video-click': []; unassign: []; edit: [] }>()
 
 function onCardClick() {
   if (props.editable) {
@@ -65,6 +69,15 @@ function onPhotoClick(event: Event) {
     return
   }
   emit('photo-click')
+}
+
+function onVideoClick(event: Event) {
+  event.stopPropagation()
+  if (props.editable) {
+    emit('edit')
+    return
+  }
+  emit('video-click')
 }
 
 function onUnassignClick() {
@@ -103,7 +116,21 @@ function onUnassignClick() {
       ]"
     >
       <button
-        v-if="photoUrl"
+        v-if="videoUrl"
+        type="button"
+        @click="onVideoClick"
+        class="relative w-14 h-14 rounded-xl overflow-hidden border-2 border-amber-200 shrink-0 cursor-pointer"
+      >
+        <img v-if="videoThumbUrl" :src="videoThumbUrl" alt="" class="w-full h-full object-cover" />
+        <div v-else class="w-full h-full bg-stone-800"></div>
+        <div class="absolute inset-0 flex items-center justify-center">
+          <div class="w-7 h-7 rounded-full bg-black/50 flex items-center justify-center">
+            <Icon icon="mdi:play" class="w-4 h-4 text-white" />
+          </div>
+        </div>
+      </button>
+      <button
+        v-else-if="photoUrl"
         type="button"
         @click="onPhotoClick"
         class="w-14 h-14 rounded-xl overflow-hidden border-2 border-amber-200 shrink-0 cursor-pointer"

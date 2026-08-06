@@ -2,9 +2,11 @@
 withDefaults(defineProps<{
   open: boolean
   src?: string | undefined
+  videoSrc?: string | undefined
   alt?: string
 }>(), {
   src: undefined,
+  videoSrc: undefined,
   alt: '',
 })
 const emit = defineEmits<{ close: [] }>()
@@ -24,7 +26,16 @@ const emit = defineEmits<{ close: [] }>()
       >
         ×
       </button>
-      <img :src="src" :alt="alt" class="max-w-full max-h-full object-contain rounded-xl" @click.stop />
+      <video
+        v-if="videoSrc"
+        :src="videoSrc"
+        controls
+        autoplay
+        playsinline
+        class="max-w-full max-h-full rounded-xl"
+        @click.stop
+      />
+      <img v-else :src="src" :alt="alt" class="max-w-full max-h-full object-contain rounded-xl" @click.stop />
     </div>
   </Teleport>
 </template>

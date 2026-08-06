@@ -19,6 +19,7 @@ import CleaningDayDialog from './CleaningDayDialog.vue'
 const anchor = ref(new Date())
 const filterChildId = ref<string | null>(null)
 const lightboxSrc = ref<string | null>(null)
+const lightboxVideoSrc = ref<string | null>(null)
 const todayCardRef = ref<HTMLElement | null>(null)
 const today = new Date()
 
@@ -216,6 +217,8 @@ watch(choresLoading, (loading) => {
           :name="entry.item.name"
           :icon-name="entry.item.iconName"
           :photo-url="entry.item.photoURL"
+          :video-url="entry.item.videoURL"
+          :video-thumb-url="entry.item.videoThumbURL"
           :time-window="resolveTimeWindow(entry.item).timeWindow"
           :time-period-label="resolveTimeWindow(entry.item).label"
           :weekly="!!entry.item.weekly"
@@ -226,6 +229,7 @@ watch(choresLoading, (loading) => {
           :claimable="entry.claimable"
           @click="openEdit(entry)"
           @photo-click="lightboxSrc = entry.item.photoURL || null"
+          @video-click="lightboxVideoSrc = entry.item.videoURL || null"
         />
 
         <div class="flex gap-2 mt-auto pt-1">
@@ -250,7 +254,12 @@ watch(choresLoading, (loading) => {
       @close="dialogOpen = false"
     />
 
-    <PhotoLightbox :open="!!lightboxSrc" :src="lightboxSrc || undefined" @close="lightboxSrc = null" />
+    <PhotoLightbox
+      :open="!!lightboxSrc || !!lightboxVideoSrc"
+      :src="lightboxSrc || undefined"
+      :video-src="lightboxVideoSrc || undefined"
+      @close="lightboxSrc = null; lightboxVideoSrc = null"
+    />
 
     <CleaningDayDialog
       :open="cleaningDialogOpen"

@@ -5,6 +5,7 @@ import ChoreCard from '../components/ChoreCard.vue'
 import ChoreForm from '../components/ChoreForm.vue'
 import IconPicker from '../components/IconPicker.vue'
 import PhotoUpload from '../components/PhotoUpload.vue'
+import VideoUpload from '../components/VideoUpload.vue'
 import PhotoLightbox from '../components/PhotoLightbox.vue'
 import CountdownLabel from '../components/CountdownLabel.vue'
 import ConfettiBurst from '../components/ConfettiBurst.vue'
@@ -24,6 +25,7 @@ const dummyRooms = [
 
 const icon = ref('mdi:broom')
 const photoFile = ref<Blob | null>(null)
+const videoFile = ref<Blob | null>(null)
 
 const lightboxOpen = ref(false)
 const confettiRef = ref<{ fire: (mode?: ConfettiMode) => void } | null>(null)
@@ -122,6 +124,11 @@ function onUnassign() {
     <section class="flex flex-col gap-3">
       <h2 class="text-xl font-bold text-amber-800">PhotoUpload</h2>
       <PhotoUpload v-model="photoFile" label="Chore photo" />
+    </section>
+
+    <section class="flex flex-col gap-3">
+      <h2 class="text-xl font-bold text-amber-800">VideoUpload</h2>
+      <VideoUpload v-model="videoFile" label="Chore video" />
     </section>
 
     <section class="flex flex-col gap-3">
