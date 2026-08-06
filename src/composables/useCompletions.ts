@@ -14,7 +14,7 @@ import { db } from '../lib/firebase'
 import { familyId } from './useFamily'
 import { periodKeyFor, deadlineFor } from '../lib/recurrence'
 import { timePeriods } from './useTimePeriods'
-import { WEEK_START_SUNDAY } from '../lib/constants'
+import { WEEK_START_SUNDAY, WRITE_ACK_TIMEOUT_MS } from '../lib/constants'
 import type { Completion, Claim, Chore } from '../types/firebase'
 import { completionConverter, claimConverter } from '../types/firebase'
 
@@ -47,6 +47,8 @@ watch(
       (snap) => {
         const map: Record<string, Completion> = {}
         snap.docs.forEach((d) => {
+          // a completion only counts once the server acks it, so the UI can stay in a loading state
+          if (d.metadata.hasPendingWrites) return
           map[d.id] = d.data()
         })
         completions.value = map
@@ -59,6 +61,7 @@ watch(
       (snap) => {
         const map: Record<string, Claim> = {}
         snap.docs.forEach((d) => {
+          if (d.metadata.hasPendingWrites) return
           map[d.id] = d.data()
         })
         claims.value = map
@@ -69,6 +72,21 @@ watch(
   },
   { immediate: true },
 )
+
+/** Firestore never rejects writes while offline — it queues them — so treat a missing ack as a failure. */
+async function withAckTimeout(work: Promise<unknown>): Promise<void> {
+  let timer: ReturnType<typeof setTimeout> | undefined
+  try {
+    await Promise.race([
+      work,
+      new Promise((_, reject) => {
+        timer = setTimeout(() => reject(new Error('Write was not acknowledged')), WRITE_ACK_TIMEOUT_MS)
+      }),
+    ])
+  } finally {
+    clearTimeout(timer)
+  }
+}
 
 export function completionIdFor(chore: Chore, childId: string, date: Date | string, weekStartsOn: 0 | 1 = WEEK_START_SUNDAY): string {
   return `${periodKeyFor(chore, date, weekStartsOn)}_${chore.id}_${childId}`
@@ -81,10 +99,12 @@ export function claimIdFor(task: { id: string }, dateStr: string): string {
 export async function completeChore(chore: Chore, childId: string, date: Date | string, weekStartsOn: 0 | 1 = WEEK_START_SUNDAY): Promise<void> {
   const id = completionIdFor(chore, childId, date, weekStartsOn)
   const late = new Date() > deadlineFor(chore, date, weekStartsOn, timePeriods.value)
-  await setDoc(doc(db, 'families', familyId.value!, 'completions', id), {
-    completedAt: serverTimestamp(),
-    late,
-  })
+  await withAckTimeout(
+    setDoc(doc(db, 'families', familyId.value!, 'completions', id), {
+      completedAt: serverTimestamp(),
+      late,
+    }),
+  )
   if (chore.bonusCents) {
     await updateDoc(doc(db, 'families', familyId.value!, 'children', childId), {
       allowanceBalanceCents: increment(chore.bonusCents),
@@ -104,20 +124,22 @@ export async function uncompleteChore(chore: Chore, childId: string, date: Date 
 }
 
 export async function claimTask(task: { id: string }, childId: string, dateStr: string): Promise<void> {
-  await setDoc(doc(db, 'families', familyId.value!, 'claims', claimIdFor(task, dateStr)), {
+  await withAckTimeout(setDoc(doc(db, 'families', familyId.value!, 'claims', claimIdFor(task, dateStr)), {
     childId,
     claimedAt: serverTimestamp(),
     completed: false,
-  })
+  }))
 }
 
 export async function completeClaim(task: { id: string; bonusCents?: number }, dateStr: string): Promise<void> {
   const claim = claims.value[claimIdFor(task, dateStr)]
   if (!claim || claim.completed) return
-  await updateDoc(doc(db, 'families', familyId.value!, 'claims', claimIdFor(task, dateStr)), {
-    completed: true,
-    completedAt: serverTimestamp(),
-  })
+  await withAckTimeout(
+    updateDoc(doc(db, 'families', familyId.value!, 'claims', claimIdFor(task, dateStr)), {
+      completed: true,
+      completedAt: serverTimestamp(),
+    }),
+  )
   if (task.bonusCents) {
     await updateDoc(doc(db, 'families', familyId.value!, 'children', claim.childId), {
       allowanceBalanceCents: increment(task.bonusCents),

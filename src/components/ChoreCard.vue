@@ -18,6 +18,7 @@ const props = withDefaults(defineProps<{
   claimedByPhoto?: string | null
   bonusCents?: number | null
   disabled?: boolean
+  pending?: boolean
   variant?: CardVariant
   canUnassign?: boolean
   unassignLabel?: string
@@ -35,6 +36,7 @@ const props = withDefaults(defineProps<{
   claimedByPhoto: null,
   bonusCents: null,
   disabled: false,
+  pending: false,
   variant: CARD_VARIANT.CHORE,
   canUnassign: false,
   unassignLabel: 'Remove me',
@@ -47,14 +49,14 @@ function onCardClick() {
     emit('edit')
     return
   }
-  if (props.disabled) return
+  if (props.disabled || props.pending) return
   emit('toggle')
 }
 
 function onCheckClick(event: Event) {
   if (!props.editable) return
   event.stopPropagation()
-  if (props.disabled) return
+  if (props.disabled || props.pending) return
   emit('toggle')
 }
 
@@ -98,7 +100,7 @@ function onUnassignClick() {
       @click="onCardClick"
       class="flex items-center gap-3 p-3 sm:p-4 flex-1 min-w-0"
       :class="[
-        disabled && !editable ? 'cursor-default' : 'cursor-pointer active:scale-[0.98]',
+        (disabled || pending) && !editable ? 'cursor-default' : 'cursor-pointer active:scale-[0.98]',
         disabled ? 'bg-stone-100' : completed ? 'bg-green-50' : overdue ? 'bg-red-50' : 'bg-white',
       ]"
     >
@@ -134,6 +136,7 @@ function onUnassignClick() {
 
         <div class="text-sm mt-0.5 flex items-center gap-2 flex-wrap">
           <span v-if="missed" class="text-red-400 font-semibold">Missed</span>
+          <span v-else-if="pending" class="text-amber-500 font-semibold">Saving…</span>
           <template v-else-if="claimedByName">
             <img
               v-if="claimedByPhoto"
@@ -152,11 +155,12 @@ function onUnassignClick() {
         @click="onCheckClick"
         class="w-9 h-9 rounded-full border-2 flex items-center justify-center shrink-0"
         :class="[
+          pending ? 'border-amber-300 text-amber-500' :
           completed ? 'bg-green-500 border-green-500 text-white' : disabled ? 'border-stone-300 text-transparent' : 'border-amber-300 text-transparent',
-          editable && !disabled ? 'cursor-pointer hover:border-amber-500' : '',
+          editable && !disabled && !pending ? 'cursor-pointer hover:border-amber-500' : '',
         ]"
       >
-        <Icon icon="mdi:check" class="w-5 h-5" />
+        <Icon :icon="pending ? 'mdi:loading' : 'mdi:check'" class="w-5 h-5" :class="pending ? 'animate-spin' : ''" />
       </div>
     </div>
   </div>
