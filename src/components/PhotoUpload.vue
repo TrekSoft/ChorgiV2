@@ -2,6 +2,7 @@
 import { ref, watch } from 'vue'
 import { Icon } from '@iconify/vue'
 import PhotoLightbox from './PhotoLightbox.vue'
+import PhotoEditor from './PhotoEditor.vue'
 
 const props = withDefaults(defineProps<{
   modelValue?: Blob | null
@@ -22,6 +23,16 @@ const inputEl = ref<HTMLInputElement | null>(null)
 const localPreview = ref<string | undefined>(props.previewUrl ?? undefined)
 const dragOver = ref(false)
 const lightboxOpen = ref(false)
+const editing = ref(false)
+const editSrc = ref<string | null>(null)
+let currentObjectUrl: string | null = null
+
+function cleanupObjectUrl() {
+  if (currentObjectUrl) {
+    URL.revokeObjectURL(currentObjectUrl)
+    currentObjectUrl = null
+  }
+}
 
 watch(
   () => props.previewUrl,
@@ -36,8 +47,28 @@ function pick() {
 
 function handleFile(file: File | undefined) {
   if (!file || !file.type.startsWith('image/')) return
-  localPreview.value = URL.createObjectURL(file)
-  emit('update:modelValue', file)
+  editSrc.value = URL.createObjectURL(file)
+  editing.value = true
+}
+
+function onEditDone(blob: Blob) {
+  cleanupObjectUrl()
+  currentObjectUrl = URL.createObjectURL(blob)
+  localPreview.value = currentObjectUrl
+  emit('update:modelValue', blob)
+  editing.value = false
+  if (editSrc.value) {
+    URL.revokeObjectURL(editSrc.value)
+    editSrc.value = null
+  }
+}
+
+function onEditCancel() {
+  editing.value = false
+  if (editSrc.value) {
+    URL.revokeObjectURL(editSrc.value)
+    editSrc.value = null
+  }
 }
 
 function onChange(event: Event) {
@@ -51,6 +82,7 @@ function onDrop(event: DragEvent) {
 
 function clear(event: Event) {
   event.stopPropagation()
+  cleanupObjectUrl()
   localPreview.value = undefined
   emit('update:modelValue', null)
 }
@@ -93,6 +125,15 @@ function clear(event: Event) {
     <span class="form-label">
       {{ label }} <span v-if="optional" class="form-hint">(optional)</span>
     </span>
+
+    <PhotoEditor
+      v-if="editing && editSrc"
+      :src="editSrc"
+      @done="onEditDone"
+      @cancel="onEditCancel"
+    />
+
+    <template v-else>
     <div
       @click="localPreview ? (lightboxOpen = true) : pick()"
       @dragover.prevent="dragOver = true"
@@ -118,5 +159,6 @@ function clear(event: Event) {
     </div>
     <input ref="inputEl" type="file" accept="image/*" class="hidden" @change="onChange" />
     <PhotoLightbox :open="lightboxOpen" :src="localPreview" @close="lightboxOpen = false" />
+    </template>
   </div>
 </template>
