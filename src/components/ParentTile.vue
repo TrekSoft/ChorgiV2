@@ -16,7 +16,7 @@ function open() {
 <template>
   <div
     @click="open"
-    class="relative aspect-square rounded-3xl border-4 flex flex-col items-center justify-center gap-3 p-4 cursor-pointer select-none transition-transform active:scale-95 border-sky-200 bg-white hover:border-sky-400"
+    class="relative h-full rounded-3xl border-4 flex flex-col items-center justify-center gap-3 p-4 cursor-pointer select-none transition-transform active:scale-95 border-sky-200 bg-white hover:border-sky-400"
   >
     <img
       v-if="photoURL"
