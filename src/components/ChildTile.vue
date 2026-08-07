@@ -79,7 +79,7 @@ function onPayoutClick(event: Event) {
 <template>
   <div
     @click="open"
-    class="relative aspect-[10/9] rounded-3xl border-4 flex flex-col items-center justify-center gap-3 lg:gap-2 p-4 lg:p-3 cursor-pointer select-none transition-transform active:scale-95"
+    class="relative aspect-square rounded-3xl border-4 flex flex-col items-center justify-center gap-3 lg:gap-2 p-4 lg:p-3 cursor-pointer select-none transition-transform active:scale-95"
     :class="birthdayToday ? 'border-pink-400 bg-pink-50' : 'border-amber-200 bg-white hover:border-amber-400'"
   >
     <button

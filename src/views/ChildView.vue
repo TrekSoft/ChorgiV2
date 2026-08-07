@@ -157,6 +157,14 @@ let completedThisSession = false
 async function toggleChore(entry: AssignedEntry) {
   if (!child.value) return
   if (entry.completed) {
+    const ok = await confirm({
+      title: 'Mark as not done?',
+      message: `Are you sure you want to uncheck "${entry.chore.name}"?`,
+      confirmLabel: 'Uncheck',
+      cancelLabel: 'Keep it done',
+      danger: true,
+    })
+    if (!ok) return
     await uncompleteChore(entry.chore, child.value.id, now.value, weekStartsOn.value)
   } else {
     const childId = child.value.id

@@ -361,7 +361,7 @@ function submit() {
 
     <label v-if="showBonus" class="flex flex-col gap-1">
       <span class="form-label">Bonus amount ($) <span class="form-hint">(optional)</span></span>
-      <input v-model="bonusAmount" type="number" min="0" step="0.25" class="input-field" />
+      <input v-model="bonusAmount" type="number" min="0" step="any" class="input-field" />
     </label>
 
     </div>
