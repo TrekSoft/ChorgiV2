@@ -8,7 +8,7 @@ import { DATE_FORMAT } from '../lib/format'
 import { family } from '../composables/useFamily'
 import { children } from '../composables/useChildren'
 import { chores, choresLoading } from '../composables/useChores'
-import { claims, claimIdFor } from '../composables/useCompletions'
+import { claims, claimIdFor, completions, completionIdFor } from '../composables/useCompletions'
 import { cleaningDays } from '../composables/useCleaning'
 import { resolveTimeWindow } from '../composables/useTimePeriods'
 import type { Chore, Child, ScheduleEntry, ChoreFormInitial } from '../types/firebase'
@@ -77,6 +77,15 @@ function entriesFor(day: Date): ScheduleEntry[] {
       if (claim?.completed) {
         const completedDate = claim.completedAt?.toDate()
         if (completedDate && format(completedDate, DATE_FORMAT) !== format(day, DATE_FORMAT)) continue
+      }
+      // Also check completions for assigned no-deadline one-offs
+      const assigneeIds = chore.assigneeIds || []
+      for (const assigneeId of assigneeIds) {
+        const completion = completions.value[completionIdFor(chore, assigneeId, 'anytime')]
+        if (completion) {
+          const completedDate = completion.completedAt?.toDate()
+          if (completedDate && format(completedDate, DATE_FORMAT) !== format(day, DATE_FORMAT)) continue
+        }
       }
     }
     entries.push({
