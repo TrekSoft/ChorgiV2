@@ -105,7 +105,7 @@ function onPayoutClick(event: Event) {
     <div v-if="birthdayToday" class="text-pink-600 font-bold text-2xl text-center">🎉 Happy Birthday! 🎉</div>
     <div v-else class="text-xl text-amber-500">{{ daysUntil }} day{{ daysUntil === 1 ? '' : 's' }} until birthday</div>
 
-    <div class="flex items-center gap-2" @click.stop>
+    <div class="flex flex-wrap items-center justify-center gap-2 max-w-full" @click.stop>
       <!-- Admin: payout button -->
       <Tooltip
         v-if="isAdminMode && !editingBalance"
@@ -113,7 +113,7 @@ function onPayoutClick(event: Event) {
       >
         <button
           @click.stop="onPayoutClick"
-          class="w-11 h-11 rounded-full bg-green-100 hover:bg-green-200 text-green-600 flex items-center justify-center cursor-pointer shrink-0"
+          class="w-11 h-11 rounded-full bg-amber-100 border-2 border-amber-300 hover:bg-amber-200 flex items-center justify-center shrink-0"
         >
           <Icon icon="mdi:currency-usd" class="w-6 h-6" />
         </button>
@@ -122,7 +122,7 @@ function onPayoutClick(event: Event) {
       <!-- Allowance balance (inline edit in admin mode) -->
       <div
         v-if="!editingBalance"
-        class="flex items-center gap-2 bg-amber-50 rounded-full px-5 py-2"
+        class="flex items-center gap-2 bg-amber-50 rounded-full px-4 py-2 shrink-0"
         :class="isAdminMode ? 'cursor-pointer hover:bg-amber-100' : ''"
         @click.stop="onBalanceClick"
       >
