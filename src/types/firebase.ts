@@ -251,6 +251,7 @@ export interface ClaimableItem {
   videoThumbURL?: string | null
   bonusCents?: number
   assigneeId?: string | null
+  noDeadline?: boolean
 }
 
 /** A calendar day entry in CalendarTab. */

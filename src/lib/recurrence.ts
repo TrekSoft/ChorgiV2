@@ -29,6 +29,7 @@ export function occursOn(chore: Chore, dateOrString: Date | string): boolean {
   const date = toDate(dateOrString)
 
   if (chore.kind === CHORE_KIND.ONEOFF) {
+    if (chore.noDeadline) return true
     return chore.date === format(date, DATE_FORMAT)
   }
 
@@ -113,6 +114,10 @@ export function periodKeyFor(chore: Chore, dateOrString: Date | string, weekStar
   if (chore.kind === CHORE_KIND.RECURRING && chore.weekly) {
     const weekStart = startOfWeek(date, { weekStartsOn })
     return format(weekStart, WEEK_KEY_FORMAT, { weekStartsOn })
+  }
+
+  if (chore.kind === CHORE_KIND.ONEOFF && chore.noDeadline) {
+    return 'anytime'
   }
 
   return format(date, DATE_FORMAT)

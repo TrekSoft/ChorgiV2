@@ -129,6 +129,11 @@ const assigned = computed(() => {
     const start = startsAt(chore, now.value, timePeriods.value)
     if (start && now.value < start) continue
     const completion = completions.value[completionIdFor(chore, meAssigneeId.value, now.value, weekStartsOn.value)]
+    // No-deadline one-offs: hide if completed on a previous day
+    if (chore.noDeadline && chore.kind === CHORE_KIND.ONEOFF && completion) {
+      const completedDate = completion.completedAt?.toDate()
+      if (completedDate && format(completedDate, DATE_FORMAT) !== todayStr.value) continue
+    }
     const deadline = chore.noDeadline ? null : deadlineFor(chore, now.value, weekStartsOn.value, timePeriods.value)
     const completed = !!completion
     list.push({
@@ -175,8 +180,12 @@ async function toggleChore(entry: AssignedEntry) {
 }
 
 // --- right pane: claimable tasks ---
+function claimDateStr(task: ClaimableItem): string {
+  return task.noDeadline ? 'anytime' : todayStr.value
+}
+
 function claimFor(task: ClaimableItem) {
-  return claims.value[claimIdFor(task, todayStr.value)] || null
+  return claims.value[claimIdFor(task, claimDateStr(task))] || null
 }
 
 function claimChild(claim: Claim | null) {
@@ -184,13 +193,20 @@ function claimChild(claim: Claim | null) {
 }
 
 const claimableChores = computed(() =>
-  chores.value.filter(
-    (c) =>
-      c.kind === CHORE_KIND.ONEOFF &&
-      c.active !== false &&
-      (c.assigneeIds || []).length === 0 &&
-      c.date === todayStr.value,
-  ),
+  chores.value.filter((c) => {
+    if (c.kind !== CHORE_KIND.ONEOFF) return false
+    if (c.active === false) return false
+    if ((c.assigneeIds || []).length > 0) return false
+    if (c.noDeadline) {
+      const claim = claims.value[claimIdFor(c, 'anytime')]
+      if (claim?.completed) {
+        const completedDate = claim.completedAt?.toDate()
+        if (completedDate && format(completedDate, DATE_FORMAT) !== todayStr.value) return false
+      }
+      return true
+    }
+    return c.date === todayStr.value
+  }),
 )
 
 const cleaningSections = computed(() => {
@@ -264,19 +280,19 @@ async function onTaskTap(task: ClaimableItem) {
       await withPending(
         task.id,
         async () => {
-          await claimTask(task, meAssigneeId.value, todayStr.value)
-          await completeClaim(task, todayStr.value)
+          await claimTask(task, meAssigneeId.value, claimDateStr(task))
+          await completeClaim(task, claimDateStr(task))
         },
         () => burst.value?.fire(CONFETTI_MODE.CONFETTI),
       )
       return
     }
     if (claim.completed) {
-      await uncompleteClaim(task, todayStr.value)
+      await uncompleteClaim(task, claimDateStr(task))
     } else {
       await withPending(
         task.id,
-        () => completeClaim(task, todayStr.value),
+        () => completeClaim(task, claimDateStr(task)),
         () => burst.value?.fire(CONFETTI_MODE.CONFETTI),
       )
     }
@@ -284,17 +300,17 @@ async function onTaskTap(task: ClaimableItem) {
   }
   const claim = claimFor(task)
   if (!claim) {
-    await withPending(task.id, () => claimTask(task, meAssigneeId.value, todayStr.value), () => {})
+    await withPending(task.id, () => claimTask(task, meAssigneeId.value, claimDateStr(task)), () => {})
     return
   }
   const mine = claim.childId === meAssigneeId.value
   if (mine) {
     if (claim.completed) {
-      await uncompleteClaim(task, todayStr.value)
+      await uncompleteClaim(task, claimDateStr(task))
     } else {
       await withPending(
         task.id,
-        () => completeClaim(task, todayStr.value),
+        () => completeClaim(task, claimDateStr(task)),
         () => {
           if (task.bonusCents) {
             burst.value?.fire(CONFETTI_MODE.COINS)
@@ -316,7 +332,7 @@ async function onTaskTap(task: ClaimableItem) {
       danger: true,
     })
     if (ok) {
-      await unclaimTask(task, todayStr.value)
+      await unclaimTask(task, claimDateStr(task))
     }
   }
 }
@@ -326,7 +342,7 @@ async function onTaskUnclaim(task: ClaimableItem) {
   if (!claim || claim.completed) return
   const mine = claim.childId === meAssigneeId.value
   if (mine) {
-    await unclaimTask(task, todayStr.value)
+    await unclaimTask(task, claimDateStr(task))
   } else if (isAdminMode.value) {
     const owner = claimChild(claim)
     const ok = await confirm({
@@ -336,7 +352,7 @@ async function onTaskUnclaim(task: ClaimableItem) {
       danger: true,
     })
     if (ok) {
-      await unclaimTask(task, todayStr.value)
+      await unclaimTask(task, claimDateStr(task))
     }
   }
 }

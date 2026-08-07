@@ -106,13 +106,20 @@ const reportData = computed(() => {
       if (chore.kind !== CHORE_KIND.ONEOFF) return false
       if (chore.active === false) return false
       if ((chore.assigneeIds || []).length > 0) return false
-      if (chore.date !== dateStr) return false
-      return true
+      if (chore.noDeadline) {
+        const claim = claims.value[claimIdFor(chore, 'anytime')]
+        if (claim?.completed) {
+          const completedDate = claim.completedAt?.toDate()
+          if (completedDate && format(completedDate, DATE_FORMAT) !== dateStr) return false
+        }
+        return true
+      }
+      return chore.date === dateStr
     })
 
     const oneoffEntries = claimableOneoffs
       .map((chore) => {
-        const claimId = claimIdFor(chore, dateStr)
+        const claimId = chore.noDeadline ? claimIdFor(chore, 'anytime') : claimIdFor(chore, dateStr)
         const claim = claims.value[claimId]
         const isMine = claim?.childId === child.id
         return {

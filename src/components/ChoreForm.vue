@@ -53,7 +53,7 @@ const date = ref(props.initial?.date || '')
 const bonusAmount = ref(props.initial ? String((props.initial.bonusCents || 0) / 100) : '0')
 const roomId = ref(props.initial?.roomId || (props.rooms[0]?.id ?? ''))
 
-const recurrenceMode = ref(props.initial?.noDeadline ? RECURRENCE_MODE.ANYTIME : props.initial?.weekly ? RECURRENCE_MODE.WEEKLY : RECURRENCE_MODE.DAILY)
+const recurrenceMode = ref(props.initial?.weekly ? RECURRENCE_MODE.WEEKLY : RECURRENCE_MODE.DAILY)
 const dailyPatternType = ref(props.initial?.recurrence?.type || RECURRENCE_TYPE.DAILY)
 const weekdays = ref(props.initial?.recurrence?.days || [1, 2, 3, 4, 5])
 const dayOfMonth = ref(props.initial?.recurrence?.day || 1)
@@ -88,7 +88,8 @@ function formatTimeLabel(time: string) {
   return m === 0 ? `${displayH}${period}` : `${displayH}:${String(m).padStart(2, '0')}${period}`
 }
 
-const showDate = computed(() => props.kind === FORM_KIND.ONEOFF_CHORE)
+const oneoffNoDeadline = ref(props.initial?.noDeadline || false)
+const showDate = computed(() => props.kind === FORM_KIND.ONEOFF_CHORE && !oneoffNoDeadline.value)
 const showBonus = computed(() => props.kind === FORM_KIND.ONEOFF_CHORE)
 const showRoom = computed(() => props.kind === FORM_KIND.CLEANING_TASK)
 const showRecurrence = computed(() => props.kind === FORM_KIND.RECURRING_CHORE)
@@ -200,7 +201,6 @@ function submit() {
       kind: CHORE_KIND.RECURRING,
       assigneeIds: assigneeIds.value,
       weekly: recurrenceMode.value === RECURRENCE_MODE.WEEKLY,
-      noDeadline: recurrenceMode.value === RECURRENCE_MODE.ANYTIME,
       recurrence,
       timeWindow,
       timePeriodId: recurrenceMode.value === RECURRENCE_MODE.DAILY ? selectedPeriodId.value || null : null,
@@ -210,7 +210,8 @@ function submit() {
       ...base,
       kind: CHORE_KIND.ONEOFF,
       assigneeIds: assigneeIds.value,
-      date: date.value,
+      noDeadline: oneoffNoDeadline.value,
+      date: oneoffNoDeadline.value ? undefined : date.value,
       bonusCents: dollarsToCents(bonusAmount.value),
     })
   } else if (props.kind === FORM_KIND.CLEANING_TASK) {
@@ -315,14 +316,6 @@ function submit() {
         >
           Weekly (any day)
         </button>
-        <button
-          type="button"
-          @click="recurrenceMode = RECURRENCE_MODE.ANYTIME"
-          class="pill"
-          :class="recurrenceMode === RECURRENCE_MODE.ANYTIME ? 'pill-selected' : 'pill-unselected'"
-        >
-          Anytime
-        </button>
       </div>
 
       <template v-if="recurrenceMode === RECURRENCE_MODE.DAILY">
@@ -389,6 +382,11 @@ function submit() {
         <button type="button" @click="useCustomTime = false; selectedPeriodId = ''; timeStart = ''; timeEnd = ''" class="text-sm text-amber-600 hover:text-amber-700 self-start inline-flex items-center gap-1">← Presets</button>
       </div>
     </div>
+
+    <label v-if="kind === FORM_KIND.ONEOFF_CHORE" class="flex items-center gap-2 cursor-pointer">
+      <input type="checkbox" v-model="oneoffNoDeadline" class="w-4 h-4 rounded border-amber-300 text-amber-600 focus:ring-amber-500" />
+      <span class="form-label cursor-pointer">No deadline (shows every day until completed)</span>
+    </label>
 
     <label v-if="showDate" class="flex flex-col gap-1">
       <span class="form-label">Date</span>

@@ -8,6 +8,7 @@ import { DATE_FORMAT } from '../lib/format'
 import { family } from '../composables/useFamily'
 import { children } from '../composables/useChildren'
 import { chores, choresLoading } from '../composables/useChores'
+import { claims, claimIdFor } from '../composables/useCompletions'
 import { cleaningDays } from '../composables/useCleaning'
 import { resolveTimeWindow } from '../composables/useTimePeriods'
 import type { Chore, Child, ScheduleEntry, ChoreFormInitial } from '../types/firebase'
@@ -70,6 +71,14 @@ function entriesFor(day: Date): ScheduleEntry[] {
     if (chore.active === false) continue
     if (!occursOn(chore, day)) continue
     if (!matchesFilter(chore)) continue
+    // No-deadline one-offs: hide if completed on a different day
+    if (chore.noDeadline && chore.kind === CHORE_KIND.ONEOFF) {
+      const claim = claims.value[claimIdFor(chore, 'anytime')]
+      if (claim?.completed) {
+        const completedDate = claim.completedAt?.toDate()
+        if (completedDate && format(completedDate, DATE_FORMAT) !== format(day, DATE_FORMAT)) continue
+      }
+    }
     entries.push({
       key: `chore-${chore.id}`,
       kind: chore.kind === CHORE_KIND.ONEOFF ? FORM_KIND.ONEOFF_CHORE : FORM_KIND.RECURRING_CHORE,

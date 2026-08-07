@@ -62,8 +62,15 @@ describe('occursOn', () => {
     expect(occursOn(chore, '2026-03-21')).toBe(true)
   })
 
-  it('no-deadline chores occur every day', () => {
+  it('no-deadline recurring chores occur every day', () => {
     const chore = makeChore({ kind: 'recurring', noDeadline: true })
+    expect(occursOn(chore, '2026-03-15')).toBe(true)
+    expect(occursOn(chore, '2026-03-16')).toBe(true)
+    expect(occursOn(chore, '2026-03-21')).toBe(true)
+  })
+
+  it('no-deadline one-off chores occur every day', () => {
+    const chore = makeChore({ kind: 'oneoff', noDeadline: true })
     expect(occursOn(chore, '2026-03-15')).toBe(true)
     expect(occursOn(chore, '2026-03-16')).toBe(true)
     expect(occursOn(chore, '2026-03-21')).toBe(true)
@@ -138,8 +145,15 @@ describe('deadlineFor', () => {
     expect(deadline.getMinutes()).toBe(30)
   })
 
-  it('no-deadline chore deadline defaults to end of day', () => {
+  it('no-deadline recurring chore deadline defaults to end of day', () => {
     const chore = makeChore({ kind: 'recurring', noDeadline: true })
+    const deadline = deadlineFor(chore, '2026-03-15')
+    expect(deadline.getHours()).toBe(23)
+    expect(deadline.getMinutes()).toBe(59)
+  })
+
+  it('no-deadline one-off chore deadline defaults to end of day', () => {
+    const chore = makeChore({ kind: 'oneoff', noDeadline: true })
     const deadline = deadlineFor(chore, '2026-03-15')
     expect(deadline.getHours()).toBe(23)
     expect(deadline.getMinutes()).toBe(59)
@@ -209,9 +223,16 @@ describe('periodKeyFor', () => {
     expect(thisWeek).not.toBe(nextWeek)
   })
 
-  it('no-deadline chore period key is the date (daily reset)', () => {
+  it('no-deadline recurring chore period key is the date (daily reset)', () => {
     const chore = makeChore({ kind: 'recurring', noDeadline: true })
     expect(periodKeyFor(chore, '2026-03-15')).toBe('2026-03-15')
     expect(periodKeyFor(chore, '2026-03-16')).toBe('2026-03-16')
+  })
+
+  it('no-deadline one-off chore period key is stable (anytime)', () => {
+    const chore = makeChore({ kind: 'oneoff', noDeadline: true })
+    expect(periodKeyFor(chore, '2026-03-15')).toBe('anytime')
+    expect(periodKeyFor(chore, '2026-03-16')).toBe('anytime')
+    expect(periodKeyFor(chore, '2026-03-21')).toBe('anytime')
   })
 })
