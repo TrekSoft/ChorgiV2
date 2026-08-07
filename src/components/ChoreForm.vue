@@ -383,15 +383,34 @@ function submit() {
       </div>
     </div>
 
-    <label v-if="kind === FORM_KIND.ONEOFF_CHORE" class="flex items-center gap-2 cursor-pointer">
-      <input type="checkbox" v-model="oneoffNoDeadline" class="w-4 h-4 rounded border-amber-300 text-amber-600 focus:ring-amber-500" />
-      <span class="form-label cursor-pointer">No deadline (shows every day until completed)</span>
-    </label>
-
-    <label v-if="showDate" class="flex flex-col gap-1">
-      <span class="form-label">Date</span>
-      <input v-model="date" type="date" class="input-field" />
-    </label>
+    <div v-if="kind === FORM_KIND.ONEOFF_CHORE" class="flex flex-col gap-2">
+      <div class="flex items-center justify-between">
+        <span class="form-label">Date</span>
+        <button
+          type="button"
+          @click="oneoffNoDeadline = !oneoffNoDeadline"
+          class="text-xs font-medium px-2.5 py-1 rounded-full transition-colors"
+          :class="oneoffNoDeadline
+            ? 'bg-indigo-100 text-indigo-700'
+            : 'bg-amber-100 text-amber-700 hover:bg-amber-200'"
+        >
+          <Icon
+            :icon="oneoffNoDeadline ? 'mdi:calendar-remove' : 'mdi:calendar-blank'"
+            class="w-3.5 h-3.5 inline -mt-0.5 mr-1"
+          />
+          {{ oneoffNoDeadline ? 'No deadline' : 'Specific date' }}
+        </button>
+      </div>
+      <input
+        v-if="!oneoffNoDeadline"
+        v-model="date"
+        type="date"
+        class="input-field"
+      />
+      <p v-else class="text-sm text-amber-600 bg-amber-50 rounded-lg px-3 py-2.5 border border-amber-200">
+        Shows every day until completed.
+      </p>
+    </div>
 
     <label v-if="showBonus" class="flex flex-col gap-1">
       <span class="form-label">Bonus amount ($) <span class="form-hint">(optional)</span></span>
