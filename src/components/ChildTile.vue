@@ -153,7 +153,7 @@ function onPayoutClick(event: Event) {
       </div>
 
       <!-- Marks: minus (parent) + count + plus (parent) -->
-      <div v-if="((child.marksCount || 0) > 0 || isAdminMode) && !editingBalance" class="flex items-center justify-center gap-2 w-full">
+      <div v-if="((child.marksCount || 0) > 0 || isAdminMode) && !editingBalance" class="flex items-center justify-center gap-2" :class="isAdminMode ? 'w-full' : ''">
         <button
           v-if="isAdminMode"
           @click.stop="onMarkRemove"
