@@ -33,6 +33,5 @@ function open() {
 
     <div class="text-4xl font-bold text-sky-900 text-center leading-tight">{{ name }}</div>
     <div class="text-xl text-sky-500">My chores</div>
-    <div class="h-11" aria-hidden="true"></div>
   </div>
 </template>
