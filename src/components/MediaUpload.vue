@@ -28,7 +28,8 @@ const emit = defineEmits<{
 }>()
 
 const inputEl = ref<HTMLInputElement | null>(null)
-const captureInputEl = ref<HTMLInputElement | null>(null)
+const capturePhotoEl = ref<HTMLInputElement | null>(null)
+const captureVideoEl = ref<HTMLInputElement | null>(null)
 const dragOver = ref(false)
 const lightboxOpen = ref(false)
 const editing = ref(false)
@@ -100,7 +101,12 @@ function pickFromLibrary() {
 
 function pickFromCamera() {
   showChooser.value = false
-  captureInputEl.value?.click()
+  capturePhotoEl.value?.click()
+}
+
+function pickFromVideo() {
+  showChooser.value = false
+  captureVideoEl.value?.click()
 }
 
 function handleFile(file: File | undefined) {
@@ -223,7 +229,8 @@ function clear(event: Event) {
         </button>
       </div>
       <input ref="inputEl" type="file" accept="image/*,video/*" class="hidden" @change="onChange" />
-      <input ref="captureInputEl" type="file" accept="image/*,video/*" capture="environment" class="hidden" @change="onChange" />
+      <input ref="capturePhotoEl" type="file" accept="image/*" capture="environment" class="hidden" @change="onChange" />
+      <input ref="captureVideoEl" type="file" accept="video/*" capture="environment" class="hidden" @change="onChange" />
 
       <!-- Chooser action sheet -->
       <Teleport to="body">
@@ -236,7 +243,11 @@ function clear(event: Event) {
             </button>
             <button type="button" @click="pickFromCamera" class="flex items-center gap-3 w-full px-4 py-3 rounded-xl hover:bg-amber-50 transition-colors text-left">
               <Icon icon="mdi:camera" class="w-6 h-6 text-amber-500 shrink-0" />
-              <span class="font-medium">Take photo or video</span>
+              <span class="font-medium">Take photo</span>
+            </button>
+            <button type="button" @click="pickFromVideo" class="flex items-center gap-3 w-full px-4 py-3 rounded-xl hover:bg-amber-50 transition-colors text-left">
+              <Icon icon="mdi:video" class="w-6 h-6 text-amber-500 shrink-0" />
+              <span class="font-medium">Record video</span>
             </button>
             <button type="button" @click="showChooser = false" class="text-center py-2 text-stone-500 font-medium">Cancel</button>
           </div>
