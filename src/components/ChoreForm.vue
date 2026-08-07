@@ -2,8 +2,7 @@
 import { ref, computed, watch } from 'vue'
 import { Icon } from '@iconify/vue'
 import IconPicker from './IconPicker.vue'
-import PhotoUpload from './PhotoUpload.vue'
-import VideoUpload from './VideoUpload.vue'
+import MediaUpload from './MediaUpload.vue'
 import { FORM_KIND, CHORE_KIND, RECURRENCE_TYPE, RECURRENCE_MODE, type FormKind } from '../lib/constants'
 import { dollarsToCents } from '../lib/format'
 import { timePeriods } from '../composables/useTimePeriods'
@@ -219,14 +218,15 @@ function submit() {
       <IconPicker v-model="iconName" />
     </div>
 
-    <PhotoUpload :model-value="photoFile" @update:model-value="onPhotoChange" label="Photo" :preview-url="initial?.photoURL" />
-
-    <VideoUpload
-      :model-value="videoFile"
-      @update:model-value="onVideoChange"
-      label="Video"
-      :preview-url="initial?.videoThumbURL"
+    <MediaUpload
+      :photo-file="photoFile"
+      :video-file="videoFile"
+      :photo-preview-url="initial?.photoURL"
+      :video-preview-url="initial?.videoThumbURL"
       :video-url="initial?.videoURL"
+      label="Photo or video"
+      @update:photo-file="onPhotoChange"
+      @update:video-file="onVideoChange"
     />
 
     <div class="flex flex-col gap-2">
