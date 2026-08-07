@@ -259,7 +259,7 @@ function submit() {
           type="button"
           @click="toggleMe"
           class="pill font-bold"
-          :class="meAssigned ? 'border-sky-500 bg-sky-100 text-sky-800' : 'border-sky-200 text-sky-600 hover:bg-sky-50'"
+          :class="meAssigned ? 'pill-selected-parent' : 'pill-unselected-parent'"
         >
           Me
         </button>

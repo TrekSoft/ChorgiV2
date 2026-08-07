@@ -84,6 +84,14 @@
     @apply border-amber-200 text-amber-600 hover:bg-amber-50;
   }
 
+  .pill-selected-parent {
+    @apply border-sky-500 bg-sky-100 text-sky-800;
+  }
+
+  .pill-unselected-parent {
+    @apply border-sky-200 text-sky-600 hover:bg-sky-50;
+  }
+
   /* Badge (status chips: one-off, late, weekly, claimable, bonus) */
   .badge {
     @apply text-xs font-bold uppercase tracking-wide px-2 py-0.5 rounded-full;
