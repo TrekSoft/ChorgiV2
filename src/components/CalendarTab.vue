@@ -3,9 +3,10 @@ import { ref, computed, onMounted, nextTick, watch } from 'vue'
 import { format, addDays, addWeeks, startOfWeek, eachDayOfInterval, isToday } from 'date-fns'
 import { Icon } from '@iconify/vue'
 import { occursOn } from '../lib/recurrence'
-import { CHORE_KIND, FORM_KIND, WEEK_START_SUNDAY, type FormKind } from '../lib/constants'
+import { CHORE_KIND, FORM_KIND, WEEK_START_SUNDAY, PARENT_ASSIGNEE_PREFIX, type FormKind } from '../lib/constants'
 import { DATE_FORMAT } from '../lib/format'
 import { family } from '../composables/useFamily'
+import { currentUser } from '../composables/useAuth'
 import { children } from '../composables/useChildren'
 import { chores, choresLoading } from '../composables/useChores'
 import { claims, claimIdFor, completions, completionIdFor } from '../composables/useCompletions'
@@ -18,6 +19,8 @@ import ChoreFormDialog from './ChoreFormDialog.vue'
 import CleaningDayDialog from './CleaningDayDialog.vue'
 
 const anchor = ref(new Date())
+const ME_FILTER = '__me__'
+const meAssigneeId = computed(() => PARENT_ASSIGNEE_PREFIX + (currentUser.value?.uid || ''))
 const filterChildId = ref<string | null>(null)
 const lightboxSrc = ref<string | null>(null)
 const lightboxVideoSrc = ref<string | null>(null)
@@ -54,6 +57,9 @@ function goToday() {
 
 function matchesFilter(chore: Chore) {
   if (!filterChildId.value) return true
+  if (filterChildId.value === ME_FILTER) {
+    return (chore.assigneeIds || []).includes(meAssigneeId.value)
+  }
   // unassigned one-off chores are claimable by any kid, so they show under every filter
   if (chore.kind === CHORE_KIND.ONEOFF && (chore.assigneeIds || []).length === 0) return true
   return (chore.assigneeIds || []).includes(filterChildId.value)
@@ -189,6 +195,13 @@ watch(choresLoading, (loading) => {
 
     <!-- child filter -->
     <div class="flex gap-2 flex-nowrap overflow-x-auto -mx-4 px-4 min-[1400px]:mx-0 min-[1400px]:px-0 min-[1400px]:flex-wrap hide-scrollbar">
+      <button
+        @click="filterChildId = ME_FILTER"
+        class="pill shrink-0"
+        :class="filterChildId === ME_FILTER ? 'pill-selected-parent' : 'pill-unselected-parent'"
+      >
+        Me
+      </button>
       <button
         @click="filterChildId = null"
         class="pill shrink-0"
