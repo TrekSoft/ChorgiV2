@@ -137,6 +137,11 @@ function onEditDone(blob: Blob) {
   localPhotoPreview.value = currentPhotoUrl
   emit('update:photoFile', blob)
   emit('update:videoFile', null)
+  editing.value = false
+  if (editSrc.value) {
+    URL.revokeObjectURL(editSrc.value)
+    editSrc.value = null
+  }
 }
 
 function onEditorClose() {
@@ -182,7 +187,6 @@ function clear(event: Event) {
         :src="editSrc"
         @done="onEditDone"
       />
-      <button type="button" @click="onEditorClose" class="btn-primary py-2 w-full">Done</button>
     </div>
 
     <!-- Drop zone / preview -->
