@@ -52,6 +52,7 @@ export type ScheduleTab = typeof SCHEDULE_TAB[keyof typeof SCHEDULE_TAB]
 export const RECURRENCE_MODE = Object.freeze({
   DAILY: 'daily',
   WEEKLY: 'weekly',
+  ANYTIME: 'anytime',
 } as const)
 export type RecurrenceMode = typeof RECURRENCE_MODE[keyof typeof RECURRENCE_MODE]
 

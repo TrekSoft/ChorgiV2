@@ -135,20 +135,20 @@ const assigned = computed(() => {
     const start = startsAt(chore, now.value, timePeriods.value)
     if (start && now.value < start) continue
     const completion = completions.value[completionIdFor(chore, child.value.id, now.value, weekStartsOn.value)]
-    const deadline = deadlineFor(chore, now.value, weekStartsOn.value, timePeriods.value)
+    const deadline = chore.noDeadline ? null : deadlineFor(chore, now.value, weekStartsOn.value, timePeriods.value)
     const completed = !!completion
     list.push({
       chore,
       completed,
       late: !!completion?.late,
-      overdue: !completed && now.value > deadline,
+      overdue: !completed && !chore.noDeadline && !!deadline && now.value > deadline,
       deadline,
     })
   }
   // On first load, snapshot the natural order (overdue, then actionable, then completed by deadline)
   if (initialOrder.length === 0 && list.length > 0) {
     const rank = (e: AssignedEntry) => (e.overdue ? 0 : e.completed ? 2 : 1)
-    const sorted = [...list].sort((a, b) => rank(a) - rank(b) || a.deadline.getTime() - b.deadline.getTime())
+    const sorted = [...list].sort((a, b) => rank(a) - rank(b) || (a.deadline?.getTime() ?? Infinity) - (b.deadline?.getTime() ?? Infinity))
     snapshotOrder(sorted)
   }
   // Keep the initial order stable; new chores (not in snapshot) go to the end

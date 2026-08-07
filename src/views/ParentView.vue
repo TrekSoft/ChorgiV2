@@ -129,19 +129,19 @@ const assigned = computed(() => {
     const start = startsAt(chore, now.value, timePeriods.value)
     if (start && now.value < start) continue
     const completion = completions.value[completionIdFor(chore, meAssigneeId.value, now.value, weekStartsOn.value)]
-    const deadline = deadlineFor(chore, now.value, weekStartsOn.value, timePeriods.value)
+    const deadline = chore.noDeadline ? null : deadlineFor(chore, now.value, weekStartsOn.value, timePeriods.value)
     const completed = !!completion
     list.push({
       chore,
       completed,
       late: !!completion?.late,
-      overdue: !completed && now.value > deadline,
+      overdue: !completed && !chore.noDeadline && !!deadline && now.value > deadline,
       deadline,
     })
   }
   if (initialOrder.length === 0 && list.length > 0) {
     const rank = (e: AssignedEntry) => (e.overdue ? 0 : e.completed ? 2 : 1)
-    const sorted = [...list].sort((a, b) => rank(a) - rank(b) || a.deadline.getTime() - b.deadline.getTime())
+    const sorted = [...list].sort((a, b) => rank(a) - rank(b) || (a.deadline?.getTime() ?? Infinity) - (b.deadline?.getTime() ?? Infinity))
     snapshotOrder(sorted)
   }
   return list.sort((a, b) => orderIndex(a.chore.id) - orderIndex(b.chore.id))

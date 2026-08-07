@@ -72,8 +72,8 @@ const reportData = computed(() => {
         const deadline = deadlineFor(chore, date, ws, timePeriods.value)
         const completed = !!completion
         const late = !!completion?.late
-        const overdue = !completed && isToday.value && now > deadline
-        const missed = !completed && isPast && now > deadline
+        const overdue = !completed && !chore.noDeadline && isToday.value && now > deadline
+        const missed = !completed && !chore.noDeadline && isPast && now > deadline
         return {
           id: chore.id,
           name: chore.name,
@@ -86,11 +86,12 @@ const reportData = computed(() => {
           bonusCents: chore.bonusCents || null,
           deadline,
           isWeekly: chore.kind === CHORE_KIND.RECURRING && chore.weekly,
+          isNoDeadline: !!chore.noDeadline,
         }
       })
       .filter((e) => {
-        // Hide incomplete weekly chores on past days where the deadline hasn't passed
-        if (e.isWeekly && !e.completed && isPast && !e.missed) return false
+        // Hide incomplete weekly/no-deadline chores on past days where the deadline hasn't passed
+        if ((e.isWeekly || e.isNoDeadline) && !e.completed && isPast && !e.missed) return false
         // Hide chores completed on time (only show late, overdue, missed)
         if (e.completed && !e.late) return false
         return true

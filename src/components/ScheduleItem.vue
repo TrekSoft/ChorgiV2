@@ -14,6 +14,7 @@ const props = withDefaults(defineProps<{
   timeWindow?: TimeWindow | null
   timePeriodLabel?: string | null
   weekly?: boolean
+  noDeadline?: boolean
   oneoff?: boolean
   bonusCents?: number | null
   assignees?: { id: string; name: string; photoURL?: string | null }[]
@@ -28,6 +29,7 @@ const props = withDefaults(defineProps<{
   timeWindow: null,
   timePeriodLabel: null,
   weekly: false,
+  noDeadline: false,
   oneoff: false,
   bonusCents: null,
   assignees: () => [],
@@ -101,6 +103,9 @@ const timeLabel = computed(() => {
         </span>
         <span v-if="weekly" class="badge-sm text-teal-600 bg-teal-100">
           weekly
+        </span>
+        <span v-if="noDeadline" class="badge-sm text-indigo-600 bg-indigo-100">
+          anytime
         </span>
         <span v-if="bonusCents" class="badge-sm text-amber-700 bg-amber-100">
           + ${{ formatCents(bonusCents) }}

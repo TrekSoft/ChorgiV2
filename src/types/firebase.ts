@@ -80,6 +80,7 @@ export interface ChoreDoc {
   videoThumbURL?: string | null
   assigneeIds: string[]
   weekly?: boolean
+  noDeadline?: boolean
   recurrence?: RecurrencePattern | null
   timeWindow?: TimeWindow | null
   timePeriodId?: string | null
@@ -212,6 +213,7 @@ export interface ChoreFormInitial {
   bonusCents?: number
   roomId?: string
   weekly?: boolean
+  noDeadline?: boolean
   recurrence?: RecurrencePattern | null
   timeWindow?: TimeWindow | null
   timePeriodId?: string | null
@@ -229,6 +231,7 @@ export interface ChoreFormPayload {
   assigneeIds?: string[]
   assigneeId?: string | null
   weekly?: boolean
+  noDeadline?: boolean
   recurrence?: RecurrencePattern | null
   timeWindow?: TimeWindow | null
   timePeriodId?: string | null
@@ -267,7 +270,7 @@ export interface AssignedEntry {
   completed: boolean
   late: boolean
   overdue: boolean
-  deadline: Date
+  deadline: Date | null
 }
 
 // ── FirestoreDataConverter factory ──────────────────────────────────────────

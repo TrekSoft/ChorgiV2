@@ -222,6 +222,7 @@ watch(choresLoading, (loading) => {
           :time-window="resolveTimeWindow(entry.item).timeWindow"
           :time-period-label="resolveTimeWindow(entry.item).label"
           :weekly="!!entry.item.weekly"
+          :no-deadline="!!entry.item.noDeadline"
           :oneoff="entry.kind === FORM_KIND.ONEOFF_CHORE"
           :bonus-cents="entry.item.bonusCents || null"
           :assignees="entry.assignees"

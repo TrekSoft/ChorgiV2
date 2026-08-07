@@ -53,7 +53,7 @@ const date = ref(props.initial?.date || '')
 const bonusAmount = ref(props.initial ? String((props.initial.bonusCents || 0) / 100) : '0')
 const roomId = ref(props.initial?.roomId || (props.rooms[0]?.id ?? ''))
 
-const recurrenceMode = ref(props.initial?.weekly ? RECURRENCE_MODE.WEEKLY : RECURRENCE_MODE.DAILY)
+const recurrenceMode = ref(props.initial?.noDeadline ? RECURRENCE_MODE.ANYTIME : props.initial?.weekly ? RECURRENCE_MODE.WEEKLY : RECURRENCE_MODE.DAILY)
 const dailyPatternType = ref(props.initial?.recurrence?.type || RECURRENCE_TYPE.DAILY)
 const weekdays = ref(props.initial?.recurrence?.days || [1, 2, 3, 4, 5])
 const dayOfMonth = ref(props.initial?.recurrence?.day || 1)
@@ -134,7 +134,7 @@ function toggleWeekday(day: number) {
 }
 
 watch(recurrenceMode, (mode) => {
-  if (mode === RECURRENCE_MODE.WEEKLY) {
+  if (mode !== RECURRENCE_MODE.DAILY) {
     timeStart.value = ''
     timeEnd.value = ''
     selectedPeriodId.value = ''
@@ -186,7 +186,7 @@ function submit() {
   if (props.kind === FORM_KIND.RECURRING_CHORE) {
     let recurrence: RecurrencePattern | null = null
     let timeWindow: TimeWindow | null = null
-    if (recurrenceMode.value !== RECURRENCE_MODE.WEEKLY) {
+    if (recurrenceMode.value === RECURRENCE_MODE.DAILY) {
       recurrence = { type: dailyPatternType.value }
       if (dailyPatternType.value === RECURRENCE_TYPE.WEEKDAYS) recurrence.days = weekdays.value
       if (dailyPatternType.value === RECURRENCE_TYPE.DAY_OF_MONTH) recurrence.day = Number(dayOfMonth.value)
@@ -200,9 +200,10 @@ function submit() {
       kind: CHORE_KIND.RECURRING,
       assigneeIds: assigneeIds.value,
       weekly: recurrenceMode.value === RECURRENCE_MODE.WEEKLY,
+      noDeadline: recurrenceMode.value === RECURRENCE_MODE.ANYTIME,
       recurrence,
       timeWindow,
-      timePeriodId: recurrenceMode.value === RECURRENCE_MODE.WEEKLY ? null : selectedPeriodId.value || null,
+      timePeriodId: recurrenceMode.value === RECURRENCE_MODE.DAILY ? selectedPeriodId.value || null : null,
     })
   } else if (props.kind === FORM_KIND.ONEOFF_CHORE) {
     emit('submit', {
@@ -313,6 +314,14 @@ function submit() {
           :class="recurrenceMode === RECURRENCE_MODE.WEEKLY ? 'pill-selected' : 'pill-unselected'"
         >
           Weekly (any day)
+        </button>
+        <button
+          type="button"
+          @click="recurrenceMode = RECURRENCE_MODE.ANYTIME"
+          class="pill"
+          :class="recurrenceMode === RECURRENCE_MODE.ANYTIME ? 'pill-selected' : 'pill-unselected'"
+        >
+          Anytime
         </button>
       </div>
 

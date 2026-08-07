@@ -34,6 +34,7 @@ export function occursOn(chore: Chore, dateOrString: Date | string): boolean {
 
   // recurring
   if (chore.weekly) return true
+  if (chore.noDeadline) return true
 
   const pattern = chore.recurrence
   if (!pattern) return false

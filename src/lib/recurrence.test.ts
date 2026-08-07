@@ -61,6 +61,13 @@ describe('occursOn', () => {
     expect(occursOn(chore, '2026-03-15')).toBe(true)
     expect(occursOn(chore, '2026-03-21')).toBe(true)
   })
+
+  it('no-deadline chores occur every day', () => {
+    const chore = makeChore({ kind: 'recurring', noDeadline: true })
+    expect(occursOn(chore, '2026-03-15')).toBe(true)
+    expect(occursOn(chore, '2026-03-16')).toBe(true)
+    expect(occursOn(chore, '2026-03-21')).toBe(true)
+  })
 })
 
 describe('deadlineFor', () => {
@@ -130,6 +137,13 @@ describe('deadlineFor', () => {
     expect(deadline.getHours()).toBe(17)
     expect(deadline.getMinutes()).toBe(30)
   })
+
+  it('no-deadline chore deadline defaults to end of day', () => {
+    const chore = makeChore({ kind: 'recurring', noDeadline: true })
+    const deadline = deadlineFor(chore, '2026-03-15')
+    expect(deadline.getHours()).toBe(23)
+    expect(deadline.getMinutes()).toBe(59)
+  })
 })
 
 describe('startsAt', () => {
@@ -193,5 +207,11 @@ describe('periodKeyFor', () => {
     const thisWeek = periodKeyFor(chore, '2026-03-21', 0)
     const nextWeek = periodKeyFor(chore, '2026-03-22', 0)
     expect(thisWeek).not.toBe(nextWeek)
+  })
+
+  it('no-deadline chore period key is the date (daily reset)', () => {
+    const chore = makeChore({ kind: 'recurring', noDeadline: true })
+    expect(periodKeyFor(chore, '2026-03-15')).toBe('2026-03-15')
+    expect(periodKeyFor(chore, '2026-03-16')).toBe('2026-03-16')
   })
 })
