@@ -4,8 +4,8 @@ import { children, childrenLoading } from '../composables/useChildren'
 import { isAdminMode } from '../composables/useAdminMode'
 import AppHeader from '../components/AppHeader.vue'
 import ChildTile from '../components/ChildTile.vue'
+import ParentTile from '../components/ParentTile.vue'
 import AddChildTile from '../components/AddChildTile.vue'
-import EmptyState from '../components/EmptyState.vue'
 import ChildFormDialog from '../components/ChildFormDialog.vue'
 import type { Child } from '../types/firebase'
 
@@ -43,13 +43,9 @@ function closeDialog() {
       </svg>
     </div>
     <main class="p-4 sm:p-6">
-      <EmptyState
-        v-if="!childrenLoading && children.length === 0 && !isAdminMode"
-        title="No children yet"
-        subtitle="Toggle on Admin mode in the nav bar, then add a child here to get started."
-      />
-      <div v-else class="grid gap-4 sm:gap-6 grid-cols-1 sm:[grid-template-columns:repeat(2,minmax(0,28rem))] lg:[grid-template-columns:repeat(4,minmax(0,28rem))] justify-center">
+      <div v-if="!childrenLoading" class="grid gap-4 sm:gap-6 grid-cols-1 sm:[grid-template-columns:repeat(2,minmax(0,28rem))] lg:[grid-template-columns:repeat(4,minmax(0,28rem))] justify-center">
         <ChildTile v-for="child in children" :key="child.id" :child="child" @edit="openEdit" />
+        <ParentTile />
         <AddChildTile v-if="isAdminMode" @click="openAdd" />
       </div>
     </main>

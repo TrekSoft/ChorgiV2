@@ -8,6 +8,7 @@ import SettingsView from './views/SettingsView.vue'
 import ScheduleView from './views/ScheduleView.vue'
 import ReportsView from './views/ReportsView.vue'
 import ChildView from './views/ChildView.vue'
+import ParentView from './views/ParentView.vue'
 import ComponentPreviewView from './views/ComponentPreviewView.vue'
 import ConnectionErrorView from './views/ConnectionErrorView.vue'
 import { currentUser, authReadyPromise } from './composables/useAuth'
@@ -22,6 +23,7 @@ const routes: RouteRecordRaw[] = [
   { path: '/schedule', name: 'schedule', component: ScheduleView },
   { path: '/reports', name: 'reports', component: ReportsView },
   { path: '/child/:id', name: 'child', component: ChildView },
+  { path: '/parent', name: 'parent', component: ParentView },
   { path: '/dev/components', name: 'dev-components', component: ComponentPreviewView },
   { path: '/connection-error', name: 'connection-error', component: ConnectionErrorView },
 ]

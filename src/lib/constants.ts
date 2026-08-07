@@ -55,6 +55,8 @@ export const RECURRENCE_MODE = Object.freeze({
 } as const)
 export type RecurrenceMode = typeof RECURRENCE_MODE[keyof typeof RECURRENCE_MODE]
 
+export const PARENT_ASSIGNEE_PREFIX = '__parent_'
+
 export const WEEK_START_SUNDAY = 0
 export const WEEK_START_MONDAY = 1
 

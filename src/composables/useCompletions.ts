@@ -14,7 +14,7 @@ import { db } from '../lib/firebase'
 import { familyId } from './useFamily'
 import { periodKeyFor, deadlineFor } from '../lib/recurrence'
 import { timePeriods } from './useTimePeriods'
-import { WEEK_START_SUNDAY, WRITE_ACK_TIMEOUT_MS } from '../lib/constants'
+import { WEEK_START_SUNDAY, WRITE_ACK_TIMEOUT_MS, PARENT_ASSIGNEE_PREFIX } from '../lib/constants'
 import type { Completion, Claim, Chore } from '../types/firebase'
 import { completionConverter, claimConverter } from '../types/firebase'
 
@@ -105,7 +105,7 @@ export async function completeChore(chore: Chore, childId: string, date: Date | 
       late,
     }),
   )
-  if (chore.bonusCents) {
+  if (chore.bonusCents && !childId.startsWith(PARENT_ASSIGNEE_PREFIX)) {
     await updateDoc(doc(db, 'families', familyId.value!, 'children', childId), {
       allowanceBalanceCents: increment(chore.bonusCents),
     })
@@ -116,7 +116,7 @@ export async function uncompleteChore(chore: Chore, childId: string, date: Date 
   const id = completionIdFor(chore, childId, date, weekStartsOn)
   const wasCompleted = !!completions.value[id]
   await deleteDoc(doc(db, 'families', familyId.value!, 'completions', id))
-  if (wasCompleted && chore.bonusCents) {
+  if (wasCompleted && chore.bonusCents && !childId.startsWith(PARENT_ASSIGNEE_PREFIX)) {
     await updateDoc(doc(db, 'families', familyId.value!, 'children', childId), {
       allowanceBalanceCents: increment(-chore.bonusCents),
     })
@@ -140,7 +140,7 @@ export async function completeClaim(task: { id: string; bonusCents?: number }, d
       completedAt: serverTimestamp(),
     }),
   )
-  if (task.bonusCents) {
+  if (task.bonusCents && !claim.childId.startsWith(PARENT_ASSIGNEE_PREFIX)) {
     await updateDoc(doc(db, 'families', familyId.value!, 'children', claim.childId), {
       allowanceBalanceCents: increment(task.bonusCents),
     })
@@ -154,7 +154,7 @@ export async function uncompleteClaim(task: { id: string; bonusCents?: number },
     completed: false,
     completedAt: null,
   })
-  if (task.bonusCents) {
+  if (task.bonusCents && !claim.childId.startsWith(PARENT_ASSIGNEE_PREFIX)) {
     await updateDoc(doc(db, 'families', familyId.value!, 'children', claim.childId), {
       allowanceBalanceCents: increment(-task.bonusCents),
     })
@@ -168,7 +168,7 @@ export async function unclaimTask(task: { id: string; bonusCents?: number }, dat
   const claimRef = doc(db, 'families', familyId.value!, 'claims', claimIdFor(task, dateStr))
   if (claim.completed) {
     batch.update(claimRef, { completed: false, completedAt: null })
-    if (task.bonusCents) {
+    if (task.bonusCents && !claim.childId.startsWith(PARENT_ASSIGNEE_PREFIX)) {
       batch.update(doc(db, 'families', familyId.value!, 'children', claim.childId), {
         allowanceBalanceCents: increment(-task.bonusCents),
       })

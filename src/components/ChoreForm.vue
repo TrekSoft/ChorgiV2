@@ -3,10 +3,13 @@ import { ref, computed, watch } from 'vue'
 import { Icon } from '@iconify/vue'
 import IconPicker from './IconPicker.vue'
 import MediaUpload from './MediaUpload.vue'
-import { FORM_KIND, CHORE_KIND, RECURRENCE_TYPE, RECURRENCE_MODE, type FormKind } from '../lib/constants'
+import { FORM_KIND, CHORE_KIND, RECURRENCE_TYPE, RECURRENCE_MODE, PARENT_ASSIGNEE_PREFIX, type FormKind } from '../lib/constants'
 import { dollarsToCents } from '../lib/format'
 import { timePeriods } from '../composables/useTimePeriods'
+import { currentUser } from '../composables/useAuth'
 import type { Child, Room, ChoreFormInitial, ChoreFormPayload, RecurrencePattern, TimeWindow } from '../types/firebase'
+
+const meAssigneeId = computed(() => PARENT_ASSIGNEE_PREFIX + (currentUser.value?.uid || ''))
 
 const sortedTimePeriods = computed(() =>
   [...timePeriods.value].sort((a, b) => a.start.localeCompare(b.start)),
@@ -101,12 +104,27 @@ function toggleAssignee(id: string) {
   }
 }
 
+const meAssigned = computed(() => assigneeIds.value.includes(meAssigneeId.value))
+
+function toggleMe() {
+  if (meAssigned.value) {
+    assigneeIds.value = assigneeIds.value.filter((a: string) => a !== meAssigneeId.value)
+  } else {
+    assigneeIds.value = [...assigneeIds.value, meAssigneeId.value]
+  }
+}
+
 const allAssigned = computed(
-  () => props.children.length > 0 && assigneeIds.value.length === props.children.length,
+  () => props.children.length > 0 && props.children.every((c) => assigneeIds.value.includes(c.id)),
 )
 
 function toggleAll() {
-  assigneeIds.value = allAssigned.value ? [] : props.children.map((c) => c.id)
+  const currentlyAll = props.children.every((c) => assigneeIds.value.includes(c.id))
+  if (currentlyAll) {
+    assigneeIds.value = assigneeIds.value.filter((a) => !props.children.some((c) => c.id === a))
+  } else {
+    assigneeIds.value = [...assigneeIds.value, ...props.children.map((c) => c.id)]
+  }
 }
 
 function toggleWeekday(day: number) {
@@ -236,6 +254,15 @@ function submit() {
         <span v-else-if="kind === FORM_KIND.CLEANING_TASK" class="form-hint">(optional)</span>
       </span>
       <div class="flex flex-wrap gap-2">
+        <button
+          v-if="kind !== FORM_KIND.CLEANING_TASK"
+          type="button"
+          @click="toggleMe"
+          class="pill font-bold"
+          :class="meAssigned ? 'pill-selected' : 'pill-unselected'"
+        >
+          Me
+        </button>
         <button
           v-if="kind !== FORM_KIND.CLEANING_TASK"
           type="button"
