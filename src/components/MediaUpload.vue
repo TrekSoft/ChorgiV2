@@ -28,10 +28,12 @@ const emit = defineEmits<{
 }>()
 
 const inputEl = ref<HTMLInputElement | null>(null)
+const captureInputEl = ref<HTMLInputElement | null>(null)
 const dragOver = ref(false)
 const lightboxOpen = ref(false)
 const editing = ref(false)
 const editSrc = ref<string | null>(null)
+const showChooser = ref(false)
 
 let currentPhotoUrl: string | null = null
 let currentThumbUrl: string | null = null
@@ -88,7 +90,17 @@ const thumbSrc = computed(() => localThumbPreview.value || props.videoPreviewUrl
 const playSrc = computed(() => localVideoPreview.value || props.videoUrl || null)
 
 function pick() {
+  showChooser.value = true
+}
+
+function pickFromLibrary() {
+  showChooser.value = false
   inputEl.value?.click()
+}
+
+function pickFromCamera() {
+  showChooser.value = false
+  captureInputEl.value?.click()
 }
 
 function handleFile(file: File | undefined) {
@@ -211,6 +223,26 @@ function clear(event: Event) {
         </button>
       </div>
       <input ref="inputEl" type="file" accept="image/*,video/*" class="hidden" @change="onChange" />
+      <input ref="captureInputEl" type="file" accept="image/*,video/*" capture="environment" class="hidden" @change="onChange" />
+
+      <!-- Chooser action sheet -->
+      <Teleport to="body">
+        <div v-if="showChooser" class="fixed inset-0 z-50 flex items-end sm:items-center justify-center" @click="showChooser = false">
+          <div class="absolute inset-0 bg-black/40" />
+          <div class="relative bg-white rounded-t-2xl sm:rounded-2xl w-full sm:max-w-xs p-4 flex flex-col gap-2 shadow-xl">
+            <button type="button" @click="pickFromLibrary" class="flex items-center gap-3 w-full px-4 py-3 rounded-xl hover:bg-amber-50 transition-colors text-left">
+              <Icon icon="mdi:image-multiple" class="w-6 h-6 text-amber-500 shrink-0" />
+              <span class="font-medium">Choose from library</span>
+            </button>
+            <button type="button" @click="pickFromCamera" class="flex items-center gap-3 w-full px-4 py-3 rounded-xl hover:bg-amber-50 transition-colors text-left">
+              <Icon icon="mdi:camera" class="w-6 h-6 text-amber-500 shrink-0" />
+              <span class="font-medium">Take photo or video</span>
+            </button>
+            <button type="button" @click="showChooser = false" class="text-center py-2 text-stone-500 font-medium">Cancel</button>
+          </div>
+        </div>
+      </Teleport>
+
       <PhotoLightbox
         :open="lightboxOpen"
         :src="hasPhoto ? localPhotoPreview : undefined"
