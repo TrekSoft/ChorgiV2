@@ -389,16 +389,21 @@ function submit() {
         <button
           type="button"
           @click="oneoffNoDeadline = !oneoffNoDeadline"
-          class="text-xs font-medium px-2.5 py-1 rounded-full transition-colors"
-          :class="oneoffNoDeadline
-            ? 'bg-indigo-100 text-indigo-700'
-            : 'bg-amber-100 text-amber-700 hover:bg-amber-200'"
+          class="flex items-center gap-2 cursor-pointer select-none"
+          role="switch"
+          :aria-checked="oneoffNoDeadline"
+          aria-label="Toggle no deadline"
         >
-          <Icon
-            :icon="oneoffNoDeadline ? 'mdi:calendar-remove' : 'mdi:calendar-blank'"
-            class="w-3.5 h-3.5 inline -mt-0.5 mr-1"
-          />
-          {{ oneoffNoDeadline ? 'No deadline' : 'Specific date' }}
+          <span class="text-sm font-bold" :class="oneoffNoDeadline ? 'text-indigo-600' : 'text-amber-400'">No deadline</span>
+          <span
+            class="relative w-12 h-7 rounded-full transition-colors duration-200"
+            :class="oneoffNoDeadline ? 'bg-indigo-500' : 'bg-amber-200'"
+          >
+            <span
+              class="absolute top-0.5 left-0.5 w-6 h-6 rounded-full bg-white shadow transition-transform duration-200"
+              :class="oneoffNoDeadline ? 'translate-x-5' : ''"
+            ></span>
+          </span>
         </button>
       </div>
       <input
