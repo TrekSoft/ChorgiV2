@@ -211,7 +211,7 @@ function submit() {
       kind: CHORE_KIND.ONEOFF,
       assigneeIds: assigneeIds.value,
       noDeadline: oneoffNoDeadline.value,
-      date: oneoffNoDeadline.value ? undefined : date.value,
+      date: oneoffNoDeadline.value ? null : date.value,
       bonusCents: dollarsToCents(bonusAmount.value),
     })
   } else if (props.kind === FORM_KIND.CLEANING_TASK) {

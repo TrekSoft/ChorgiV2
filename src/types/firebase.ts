@@ -84,7 +84,7 @@ export interface ChoreDoc {
   recurrence?: RecurrencePattern | null
   timeWindow?: TimeWindow | null
   timePeriodId?: string | null
-  date?: DateString
+  date?: DateString | null
   bonusCents?: number
   roomId?: string
   order?: number
@@ -209,7 +209,7 @@ export interface ChoreFormInitial {
   videoThumbURL?: string | null
   assigneeIds?: string[]
   assigneeId?: string | null
-  date?: string
+  date?: string | null
   bonusCents?: number
   roomId?: string
   weekly?: boolean
@@ -235,7 +235,7 @@ export interface ChoreFormPayload {
   recurrence?: RecurrencePattern | null
   timeWindow?: TimeWindow | null
   timePeriodId?: string | null
-  date?: string
+  date?: string | null
   bonusCents?: number
   roomId?: string
 }
