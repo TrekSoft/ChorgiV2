@@ -28,6 +28,7 @@ import {
 import { isAdminMode } from '../composables/useAdminMode'
 import { currentUser } from '../composables/useAuth'
 import { useDialog } from '../composables/useDialog'
+import { useIdleTimeout } from '../composables/useIdleTimeout'
 import AppHeader from '../components/AppHeader.vue'
 import ChoreCard from '../components/ChoreCard.vue'
 import EmptyState from '../components/EmptyState.vue'
@@ -38,6 +39,8 @@ import type { Chore, Task, Claim, Child, ClaimableItem, AssignedEntry } from '..
 
 const router = useRouter()
 const { confirm } = useDialog()
+
+useIdleTimeout()
 
 const meAssigneeId = computed(() => PARENT_ASSIGNEE_PREFIX + (currentUser.value?.uid || ''))
 const parentName = computed(() => member.value?.name || 'Me')

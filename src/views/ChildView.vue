@@ -27,6 +27,7 @@ import {
 import { isAdminMode } from '../composables/useAdminMode'
 import { isBirthdayToday } from '../lib/birthday'
 import { useDialog } from '../composables/useDialog'
+import { useIdleTimeout } from '../composables/useIdleTimeout'
 import AppHeader from '../components/AppHeader.vue'
 import ChoreCard from '../components/ChoreCard.vue'
 import EmptyState from '../components/EmptyState.vue'
@@ -40,6 +41,8 @@ const router = useRouter()
 const child = computed(() => children.value.find((c) => c.id === route.params.id))
 
 const { confirm } = useDialog()
+
+useIdleTimeout()
 
 const weekStartsOn = computed(() => family.value?.weekStartsOn ?? WEEK_START_SUNDAY)
 
