@@ -35,6 +35,7 @@ const lightboxOpen = ref(false)
 const editing = ref(false)
 const editSrc = ref<string | null>(null)
 const showChooser = ref(false)
+const cleared = ref(false)
 
 let currentPhotoUrl: string | null = null
 let currentThumbUrl: string | null = null
@@ -71,24 +72,26 @@ onUnmounted(() => {
 watch(() => props.photoFile, (val) => {
   if (!val) {
     cleanupPhotoUrl()
-    localPhotoPreview.value = props.photoPreviewUrl ?? undefined
+    if (!cleared.value) localPhotoPreview.value = props.photoPreviewUrl ?? undefined
   }
 })
 
 watch(() => props.videoFile, (val) => {
   if (!val) {
     cleanupVideoUrls()
-    localThumbPreview.value = props.videoPreviewUrl ?? null
-    localVideoPreview.value = props.videoUrl ?? null
+    if (!cleared.value) {
+      localThumbPreview.value = props.videoPreviewUrl ?? null
+      localVideoPreview.value = props.videoUrl ?? null
+    }
   }
 })
 
 const hasPhoto = computed(() => !!localPhotoPreview.value)
-const hasVideo = computed(() => !!(localVideoPreview.value || props.videoUrl))
+const hasVideo = computed(() => !!(localVideoPreview.value || (!cleared.value && props.videoUrl)))
 const hasMedia = computed(() => hasPhoto.value || hasVideo.value)
 
-const thumbSrc = computed(() => localThumbPreview.value || props.videoPreviewUrl || null)
-const playSrc = computed(() => localVideoPreview.value || props.videoUrl || null)
+const thumbSrc = computed(() => localThumbPreview.value || (!cleared.value ? props.videoPreviewUrl : null) || null)
+const playSrc = computed(() => localVideoPreview.value || (!cleared.value ? props.videoUrl : null) || null)
 
 function pick() {
   showChooser.value = true
@@ -111,6 +114,7 @@ function pickFromVideo() {
 
 function handleFile(file: File | undefined) {
   if (!file) return
+  cleared.value = false
   if (file.type.startsWith('image/')) {
     editSrc.value = URL.createObjectURL(file)
     editing.value = true
@@ -160,6 +164,7 @@ function onDrop(event: DragEvent) {
 
 function clear(event: Event) {
   event.stopPropagation()
+  cleared.value = true
   cleanupPhotoUrl()
   cleanupVideoUrls()
   localPhotoPreview.value = undefined
