@@ -35,7 +35,7 @@ function closeDialog() {
       class="absolute top-[6.25rem] right-[9rem] z-20 hidden sm:flex items-end gap-1 pointer-events-none select-none"
     >
       <span class="font-handwritten text-3xl leading-none text-amber-600 -rotate-2 mb-3 text-right">
-        Click here to enter<br />Admin mode
+        Click here to enter<br />Parent mode
       </span>
       <svg class="w-20 h-14 shrink-0 text-amber-500" viewBox="0 0 80 56" fill="none">
         <path d="M8 50 C 28 48, 54 40, 68 13" stroke="currentColor" stroke-width="2.5" stroke-dasharray="7 6" stroke-linecap="round" />

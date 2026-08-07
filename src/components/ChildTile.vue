@@ -119,7 +119,7 @@ function onPayoutClick(event: Event) {
         </button>
       </Tooltip>
 
-      <!-- Allowance balance (inline edit in admin mode) -->
+      <!-- Allowance balance (inline edit in parent mode) -->
       <div
         v-if="!editingBalance"
         class="flex items-center gap-2 bg-amber-50 rounded-full px-4 py-2 shrink-0"
@@ -152,29 +152,30 @@ function onPayoutClick(event: Event) {
         >✕</button>
       </div>
 
-      <!-- Marks: minus (admin) + count + plus (admin) -->
-      <button
-        v-if="isAdminMode && !editingBalance"
-        @click.stop="onMarkRemove"
-        :disabled="(child.marksCount || 0) === 0"
-        title="Remove mark"
-        class="w-9 h-9 rounded-full bg-red-200 text-red-700 font-bold text-lg flex items-center justify-center disabled:opacity-40 cursor-pointer shrink-0"
-      >−</button>
-      <div
-        v-if="((child.marksCount || 0) > 0 || isAdminMode) && !editingBalance"
-        class="flex items-center justify-center rounded-full text-white text-2xl font-bold shrink-0"
-        :class="[
-          (child.marksCount || 0) > 0 ? 'bg-red-500 w-11 h-11' : 'bg-red-300 w-9 h-9 text-lg',
-        ]"
-      >
-        {{ child.marksCount || 0 }}
+      <!-- Marks: minus (parent) + count + plus (parent) -->
+      <div v-if="((child.marksCount || 0) > 0 || isAdminMode) && !editingBalance" class="flex items-center justify-center gap-2 w-full">
+        <button
+          v-if="isAdminMode"
+          @click.stop="onMarkRemove"
+          :disabled="(child.marksCount || 0) === 0"
+          title="Remove mark"
+          class="w-9 h-9 rounded-full bg-red-200 text-red-700 font-bold text-lg flex items-center justify-center disabled:opacity-40 cursor-pointer shrink-0"
+        >−</button>
+        <div
+          class="flex items-center justify-center rounded-full text-white text-2xl font-bold shrink-0"
+          :class="[
+            (child.marksCount || 0) > 0 ? 'bg-red-500 w-11 h-11' : 'bg-red-300 w-9 h-9 text-lg',
+          ]"
+        >
+          {{ child.marksCount || 0 }}
+        </div>
+        <button
+          v-if="isAdminMode"
+          @click.stop="onMarkAdd"
+          title="Add mark"
+          class="w-9 h-9 rounded-full bg-red-200 text-red-700 font-bold text-lg flex items-center justify-center cursor-pointer shrink-0"
+        >+</button>
       </div>
-      <button
-        v-if="isAdminMode && !editingBalance"
-        @click.stop="onMarkAdd"
-        title="Add mark"
-        class="w-9 h-9 rounded-full bg-red-200 text-red-700 font-bold text-lg flex items-center justify-center cursor-pointer shrink-0"
-      >+</button>
     </div>
   </div>
 </template>

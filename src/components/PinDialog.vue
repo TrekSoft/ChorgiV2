@@ -82,7 +82,7 @@ async function submit() {
             type="checkbox"
             class="w-4 h-4 rounded border-amber-300 text-amber-500 focus:ring-amber-400 cursor-pointer"
           />
-          Maintain admin mode on this device
+          Maintain parent mode on this device
         </label>
         <button
           @click="emit('cancel')"

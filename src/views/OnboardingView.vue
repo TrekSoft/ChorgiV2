@@ -107,7 +107,7 @@ async function submit() {
             />
           </label>
           <p class="text-amber-600 text-sm">
-            This PIN gates all admin actions (schedule, settings, sign-out) — keep it away from the kids.
+            This PIN gates all parent actions (schedule, settings, sign-out) — keep it away from the kids.
           </p>
         </template>
 

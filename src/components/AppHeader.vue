@@ -40,9 +40,9 @@ function onPinCancel() {
         class="flex items-center gap-2 cursor-pointer select-none"
         role="switch"
         :aria-checked="isAdminMode"
-        aria-label="Toggle admin mode"
+        aria-label="Toggle parent mode"
       >
-        <span class="text-sm font-bold" :class="isAdminMode ? 'text-amber-700' : 'text-amber-400'">Admin</span>
+        <span class="text-sm font-bold" :class="isAdminMode ? 'text-amber-700' : 'text-amber-400'">Parent</span>
         <span
           class="relative w-12 h-7 rounded-full transition-colors duration-200"
           :class="isAdminMode ? 'bg-amber-500' : 'bg-amber-200'"
