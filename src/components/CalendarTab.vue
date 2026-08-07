@@ -79,14 +79,18 @@ function entriesFor(day: Date): ScheduleEntry[] {
         if (completedDate && format(completedDate, DATE_FORMAT) !== format(day, DATE_FORMAT)) continue
       }
       // Also check completions for assigned no-deadline one-offs
-      const assigneeIds = chore.assigneeIds || []
-      for (const assigneeId of assigneeIds) {
+      let hideChore = false
+      for (const assigneeId of (chore.assigneeIds || [])) {
         const completion = completions.value[completionIdFor(chore, assigneeId, 'anytime')]
         if (completion) {
           const completedDate = completion.completedAt?.toDate()
-          if (completedDate && format(completedDate, DATE_FORMAT) !== format(day, DATE_FORMAT)) continue
+          if (completedDate && format(completedDate, DATE_FORMAT) !== format(day, DATE_FORMAT)) {
+            hideChore = true
+            break
+          }
         }
       }
+      if (hideChore) continue
     }
     entries.push({
       key: `chore-${chore.id}`,
