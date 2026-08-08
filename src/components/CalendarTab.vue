@@ -146,16 +146,23 @@ function scrollToToday() {
     return
   }
   nextTick(() => {
-    const el = todayCardRef.value
-    if (!el) return
-    const top = el.getBoundingClientRect().top + window.scrollY - 120
-    window.scrollTo({ top, behavior: 'smooth' })
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        const el = todayCardRef.value
+        if (!el) return
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      })
+    })
   })
 }
 
+onMounted(() => {
+  if (!choresLoading.value) scrollToToday()
+})
+
 watch(choresLoading, (loading) => {
   if (!loading) scrollToToday()
-}, { immediate: true })
+})
 </script>
 
 <template>
