@@ -255,7 +255,7 @@ watch(choresLoading, (loading) => {
               : 'text-amber-400 bg-amber-50 hover:bg-amber-100 border border-dashed border-amber-300 normal-case font-medium'"
             :title="cleaningDays[format(day, DATE_FORMAT)] ? 'Edit cleaning day' : 'Mark as cleaning day'"
           >
-            {{ cleaningDays[format(day, DATE_FORMAT)] ? '🧹 cleaning' : '+ 🧹' }}
+            {{ cleaningDays[format(day, DATE_FORMAT)] ? '🧹' : '+ 🧹' }}
           </button>
         </div>
 
