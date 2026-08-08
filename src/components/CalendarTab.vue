@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, nextTick, watch } from 'vue'
+import { ref, computed, nextTick, watch } from 'vue'
 import { format, addDays, addWeeks, startOfWeek, eachDayOfInterval, isToday } from 'date-fns'
 import { Icon } from '@iconify/vue'
 import { occursOn } from '../lib/recurrence'
@@ -135,34 +135,21 @@ function openEdit(entry: ScheduleEntry) {
 }
 
 function scrollToToday() {
-  if (window.innerWidth >= 1400) {
-    window.scrollTo({ top: 0 })
-    return
-  }
+  if (window.innerWidth >= 1400) return
   const weekStart = startOfWeek(anchor.value, { weekStartsOn: weekStartsOn.value })
   const weekEnd = addDays(weekStart, 6)
-  if (today < weekStart || today > weekEnd) {
-    window.scrollTo({ top: 0 })
-    return
-  }
+  if (today < weekStart || today > weekEnd) return
   nextTick(() => {
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        const el = todayCardRef.value
-        if (!el) return
-        el.scrollIntoView({ behavior: 'smooth', block: 'start' })
-      })
-    })
+    const el = todayCardRef.value
+    if (!el) return
+    const top = el.getBoundingClientRect().top + window.scrollY - 120
+    window.scrollTo({ top, behavior: 'smooth' })
   })
 }
 
-onMounted(() => {
-  if (!choresLoading.value) scrollToToday()
-})
-
 watch(choresLoading, (loading) => {
   if (!loading) scrollToToday()
-})
+}, { immediate: true })
 </script>
 
 <template>
