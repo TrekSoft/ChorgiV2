@@ -387,7 +387,7 @@ async function onTaskUnclaim(task: ClaimableItem) {
             v-if="!choresLoading && assigned.length === 0"
             compact
             title="No chores right now"
-            subtitle="Check back later, or grab an extra chore!"
+            subtitle="Enable Parent mode and go to Schedule to add chores."
           />
           <ChoreCard
             v-for="entry in assigned"
@@ -421,7 +421,7 @@ async function onTaskUnclaim(task: ClaimableItem) {
               v-if="claimableChores.length === 0"
               compact
               title="Nothing to claim right now"
-              subtitle="Extra one-off chores and cleaning-day tasks will show up here."
+              subtitle="Enable Parent mode and go to Schedule to add extra chores."
             />
             <ChoreCard
               v-for="task in claimableChores"
