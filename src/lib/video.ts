@@ -54,6 +54,8 @@ export interface UploadedVideo {
   videoThumbURL: string | null
 }
 
+const MAX_VIDEO_SIZE = 100 * 1024 * 1024
+
 export async function uploadFamilyVideo(
   familyId: string,
   subPath: string,
@@ -61,6 +63,10 @@ export async function uploadFamilyVideo(
 ): Promise<UploadedVideo> {
   const type = file.type || 'video/mp4'
   const ext = extensionForType(type)
+  if (file.size > MAX_VIDEO_SIZE) {
+    throw new Error(`Video is ${Math.round(file.size / 1024 / 1024)}MB — max is 100MB. Try a shorter clip.`)
+  }
+  console.debug('[uploadFamilyVideo] size=%d bytes type=%s', file.size, type)
   const videoRef = storageRef(storage, `families/${familyId}/${subPath}/video.${ext}`) as StorageReference
   await uploadBytes(videoRef, file, { contentType: type })
   const videoURL = await getDownloadURL(videoRef)
