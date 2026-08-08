@@ -31,7 +31,8 @@ const routes: RouteRecordRaw[] = [
 const router = createRouter({
   history: createWebHistory(),
   routes,
-  scrollBehavior() {
+  scrollBehavior(to) {
+    if (to.name === 'schedule') return false
     return { top: 0 }
   },
 })

@@ -135,10 +135,16 @@ function openEdit(entry: ScheduleEntry) {
 }
 
 function scrollToToday() {
-  if (window.innerWidth >= 1400) return
+  if (window.innerWidth >= 1400) {
+    window.scrollTo({ top: 0 })
+    return
+  }
   const weekStart = startOfWeek(anchor.value, { weekStartsOn: weekStartsOn.value })
   const weekEnd = addDays(weekStart, 6)
-  if (today < weekStart || today > weekEnd) return
+  if (today < weekStart || today > weekEnd) {
+    window.scrollTo({ top: 0 })
+    return
+  }
   nextTick(() => {
     const el = todayCardRef.value
     if (!el) return
