@@ -58,6 +58,9 @@ async function submit() {
         <p class="text-amber-700 text-center text-sm">
           Open the email <strong>on this device</strong> and tap the link to finish signing in.
         </p>
+        <p class="text-amber-600 text-center text-sm">
+          Be sure to check your Spam folder.
+        </p>
         <button @click="sent = false" class="text-amber-600 text-sm underline">
           Use a different email
         </button>
