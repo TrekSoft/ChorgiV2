@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import { Icon } from '@iconify/vue'
 import { writeBatch, doc } from 'firebase/firestore'
 import { db } from '../lib/firebase'
 import { familyId, member } from '../composables/useFamily'
@@ -62,6 +63,19 @@ async function deleteRoom(room: Room) {
 
 function tasksFor(roomId: string) {
   return tasks.value.filter((t) => t.kind === CHORE_KIND.CLEANING && t.roomId === roomId)
+}
+
+// rooms start collapsed on mobile; always expanded from the sm breakpoint up
+const expandedRoomIds = ref<string[]>([])
+
+function isExpanded(roomId: string) {
+  return expandedRoomIds.value.includes(roomId)
+}
+
+function toggleRoom(roomId: string) {
+  expandedRoomIds.value = isExpanded(roomId)
+    ? expandedRoomIds.value.filter((id) => id !== roomId)
+    : [...expandedRoomIds.value, roomId]
 }
 
 const dragTaskId = ref<string | null>(null)
@@ -169,44 +183,59 @@ function openEditTask(task: Task) {
 
       <div v-if="rooms.length > 0" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <div v-for="room in rooms" :key="room.id" class="bg-white rounded-2xl border-2 border-amber-200 p-4 flex flex-col gap-3">
-          <div class="flex items-center justify-between">
-            <h3 class="font-bold text-amber-900 text-lg">{{ room.name }}</h3>
-            <div class="flex gap-3">
+          <div class="flex items-center justify-between gap-2">
+            <button
+              type="button"
+              class="flex items-center gap-2 min-w-0 text-left cursor-pointer sm:cursor-default"
+              :aria-expanded="isExpanded(room.id)"
+              @click="toggleRoom(room.id)"
+            >
+              <Icon
+                icon="mdi:chevron-down"
+                class="w-5 h-5 shrink-0 text-amber-500 transition-transform sm:hidden"
+                :class="isExpanded(room.id) ? '' : '-rotate-90'"
+              />
+              <h3 class="font-bold text-amber-900 text-lg truncate">{{ room.name }}</h3>
+              <span class="text-sm font-medium text-amber-500 sm:hidden">{{ tasksFor(room.id).length }}</span>
+            </button>
+            <div class="flex gap-3 shrink-0">
               <button @click="renameRoom(room)" class="text-sm text-amber-600 font-medium hover:underline cursor-pointer">Rename</button>
               <button @click="deleteRoom(room)" class="btn-danger-text">Delete</button>
             </div>
           </div>
 
-          <div
-            v-for="task in tasksFor(room.id)"
-            :key="task.id"
-            draggable="true"
-            @dragstart="onDragStart(task.id)"
-            @dragover.prevent="onDragOver(task.id)"
-            @dragleave="onDragLeave"
-            @drop.prevent="onDrop(room.id)"
-            :class="dragOverTaskId === task.id && dragTaskId !== task.id ? 'ring-2 ring-amber-400 rounded-xl' : ''"
-          >
-            <ScheduleItem
-              :name="task.name"
-              :icon-name="task.iconName"
-              :photo-url="task.photoURL"
-              :video-url="task.videoURL"
-              :video-thumb-url="task.videoThumbURL"
-              :assignees="assigneesFor(task)"
-              draggable
-              @click="openEditTask(task)"
-              @photo-click="lightboxSrc = task.photoURL || null"
-              @video-click="lightboxVideoSrc = task.videoURL || null"
-            />
-          </div>
+          <div :class="isExpanded(room.id) ? 'flex flex-col gap-3' : 'hidden sm:flex sm:flex-col sm:gap-3'">
+            <div
+              v-for="task in tasksFor(room.id)"
+              :key="task.id"
+              draggable="true"
+              @dragstart="onDragStart(task.id)"
+              @dragover.prevent="onDragOver(task.id)"
+              @dragleave="onDragLeave"
+              @drop.prevent="onDrop(room.id)"
+              :class="dragOverTaskId === task.id && dragTaskId !== task.id ? 'ring-2 ring-amber-400 rounded-xl' : ''"
+            >
+              <ScheduleItem
+                :name="task.name"
+                :icon-name="task.iconName"
+                :photo-url="task.photoURL"
+                :video-url="task.videoURL"
+                :video-thumb-url="task.videoThumbURL"
+                :assignees="assigneesFor(task)"
+                draggable
+                @click="openEditTask(task)"
+                @photo-click="lightboxSrc = task.photoURL || null"
+                @video-click="lightboxVideoSrc = task.videoURL || null"
+              />
+            </div>
 
-          <button
-            @click="openAddTask(room.id)"
-            class="text-sm font-bold text-amber-600 border-2 border-dashed border-amber-200 rounded-xl py-2 hover:bg-amber-50 cursor-pointer"
-          >
-            + Task
-          </button>
+            <button
+              @click="openAddTask(room.id)"
+              class="text-sm font-bold text-amber-600 border-2 border-dashed border-amber-200 rounded-xl py-2 hover:bg-amber-50 cursor-pointer"
+            >
+              + Task
+            </button>
+          </div>
         </div>
       </div>
       <div v-else class="hidden sm:block h-28"></div>
