@@ -105,9 +105,17 @@ function toggleAssignee(id: string) {
   }
 }
 
-const meAssigned = computed(() => assigneeIds.value.includes(meAssigneeId.value))
+const meAssigned = computed(() =>
+  props.kind === FORM_KIND.CLEANING_TASK
+    ? assigneeId.value === meAssigneeId.value
+    : assigneeIds.value.includes(meAssigneeId.value),
+)
 
 function toggleMe() {
+  if (props.kind === FORM_KIND.CLEANING_TASK) {
+    assigneeId.value = meAssigned.value ? null : meAssigneeId.value
+    return
+  }
   if (meAssigned.value) {
     assigneeIds.value = assigneeIds.value.filter((a: string) => a !== meAssigneeId.value)
   } else {
@@ -257,7 +265,6 @@ function submit() {
       </span>
       <div class="flex flex-wrap gap-2">
         <button
-          v-if="kind !== FORM_KIND.CLEANING_TASK"
           type="button"
           @click="toggleMe"
           class="pill font-bold"

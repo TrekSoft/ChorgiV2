@@ -1,13 +1,15 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { writeBatch, doc } from 'firebase/firestore'
 import { db } from '../lib/firebase'
-import { familyId } from '../composables/useFamily'
+import { familyId, member } from '../composables/useFamily'
 import { rooms, upsertRoom, removeRoom, roomsLoading } from '../composables/useCleaning'
 import { tasks, removeTask, reorderTasks } from '../composables/useTasks'
 import { children } from '../composables/useChildren'
+import { currentUser } from '../composables/useAuth'
 import { useDialog } from '../composables/useDialog'
-import { CHORE_KIND, FORM_KIND } from '../lib/constants'
+import { isParentAssignee, parentAssigneeDisplay } from '../lib/chore-utils'
+import { CHORE_KIND, FORM_KIND, PARENT_ASSIGNEE_PREFIX } from '../lib/constants'
 import type { Room, Task, ChoreFormInitial } from '../types/firebase'
 import ScheduleItem from './ScheduleItem.vue'
 import PhotoLightbox from './PhotoLightbox.vue'
@@ -96,8 +98,13 @@ async function onDrop(roomId: string) {
   dragOverTaskId.value = null
 }
 
+const meAssigneeId = computed(() => PARENT_ASSIGNEE_PREFIX + (currentUser.value?.uid || ''))
+
 function assigneesFor(task: Task) {
   if (!task.assigneeId) return []
+  if (isParentAssignee(task.assigneeId)) {
+    return [{ id: task.assigneeId, ...parentAssigneeDisplay(task.assigneeId, meAssigneeId.value, member.value) }]
+  }
   const c = children.value.find((c) => c.id === task.assigneeId)
   return c ? [c] : []
 }

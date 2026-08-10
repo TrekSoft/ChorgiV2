@@ -7,6 +7,7 @@ import { occursOn, deadlineFor, startsAt } from '../lib/recurrence'
 import { timePeriods } from '../composables/useTimePeriods'
 import { CHORE_KIND, CARD_VARIANT, CONFETTI_MODE, FORM_KIND, NOW_TICK_INTERVAL_MS, OFFLINE_MESSAGE, PARENT_ASSIGNEE_PREFIX, TOAST_DURATION_MS, WEEK_START_SUNDAY, type ConfettiMode, type FormKind } from '../lib/constants'
 import { DATE_FORMAT, formatCents } from '../lib/format'
+import { isParentAssignee, parentAssigneeDisplay } from '../lib/chore-utils'
 import { family } from '../composables/useFamily'
 import { member } from '../composables/useFamily'
 import { children } from '../composables/useChildren'
@@ -235,12 +236,14 @@ function assignedChild(task: ClaimableItem): Child | null {
 function taskCardProps(task: ClaimableItem) {
   if (task.assigneeId) {
     const claim = claimFor(task)
-    const child_ = assignedChild(task)
     const mine = isPreAssigned(task)
+    const assignee = isParentAssignee(task.assigneeId)
+      ? parentAssigneeDisplay(task.assigneeId, meAssigneeId.value, member.value)
+      : assignedChild(task)
     return {
       completed: !!claim?.completed,
-      claimedByName: child_?.name || null,
-      claimedByPhoto: child_?.photoURL || null,
+      claimedByName: assignee?.name || null,
+      claimedByPhoto: assignee?.photoURL || null,
       disabled: !mine && !isAdminMode.value,
     }
   }

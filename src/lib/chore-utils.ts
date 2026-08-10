@@ -1,6 +1,25 @@
-import { CHORE_KIND } from './constants'
+import { CHORE_KIND, PARENT_ASSIGNEE_PREFIX } from './constants'
 import { occursOn, startsAt } from './recurrence'
-import type { Chore, Task, Room, CleaningDay, Claim, Child, TimePeriod } from '../types/firebase'
+import type { Chore, Task, Room, CleaningDay, Claim, Child, Member, TimePeriod } from '../types/firebase'
+
+export function isParentAssignee(assigneeId: string | null | undefined): boolean {
+  return !!assigneeId && assigneeId.startsWith(PARENT_ASSIGNEE_PREFIX)
+}
+
+export interface ParentAssigneeDisplay {
+  name: string
+  photoURL: string | null
+}
+
+/** Name/photo to show for a task assigned to a parent — only the signed-in parent's profile is known. */
+export function parentAssigneeDisplay(
+  assigneeId: string,
+  meAssigneeId: string,
+  member: Member | null,
+): ParentAssigneeDisplay {
+  if (assigneeId !== meAssigneeId) return { name: 'Parent', photoURL: null }
+  return { name: member?.name || 'Parent', photoURL: member?.photoURL || null }
+}
 
 export function isActiveChore(chore: Chore): boolean {
   return chore.active !== false
