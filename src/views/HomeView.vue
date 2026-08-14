@@ -2,12 +2,15 @@
 import { ref } from 'vue'
 import { children, childrenLoading } from '../composables/useChildren'
 import { isAdminMode } from '../composables/useAdminMode'
+import { useAllowanceAccrual } from '../composables/useAllowance'
 import AppHeader from '../components/AppHeader.vue'
 import ChildTile from '../components/ChildTile.vue'
 import ParentTile from '../components/ParentTile.vue'
 import AddChildTile from '../components/AddChildTile.vue'
 import ChildFormDialog from '../components/ChildFormDialog.vue'
 import type { Child } from '../types/firebase'
+
+useAllowanceAccrual()
 
 const dialogOpen = ref(false)
 const editingChild = ref<Child | null>(null)
