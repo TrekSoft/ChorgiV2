@@ -1,8 +1,9 @@
+import { watch } from 'vue'
 import { format } from 'date-fns'
 import { doc, updateDoc, increment } from 'firebase/firestore'
 import { db } from '../lib/firebase'
 import { familyId, family } from './useFamily'
-import { children } from './useChildren'
+import { children, childrenLoading } from './useChildren'
 
 import { DEFAULT_MARK_PENALTY_CENTS } from '../lib/constants'
 import { DATE_FORMAT } from '../lib/format'
@@ -18,11 +19,11 @@ export async function updateMarkPenaltyCents(cents: number): Promise<void> {
 }
 
 /**
- * Accrue daily allowance for all children.
- * Called on app load. For each child, calculates days since last accrual
- * (capped at 7) and adds weeklyAllowanceCents / 7 per day.
+ * Accrue daily allowance for all children. For each child, calculates days
+ * since last accrual and adds weeklyAllowanceCents / 7 per day. Children
+ * already accrued today are skipped, so calling this repeatedly is a no-op.
  */
-export async function accrueDailyAllowance(): Promise<void> {
+async function runAccrual(): Promise<void> {
   if (!familyId.value || children.value.length === 0) return
 
   const todayStr = format(new Date(), DATE_FORMAT)
@@ -57,6 +58,32 @@ export async function accrueDailyAllowance(): Promise<void> {
       })
     }
   }
+}
+
+let accrualInFlight: Promise<void> | null = null
+
+export function accrueDailyAllowance(): Promise<void> {
+  if (!accrualInFlight) {
+    accrualInFlight = runAccrual().finally(() => {
+      accrualInFlight = null
+    })
+  }
+  return accrualInFlight
+}
+
+/**
+ * Accrue allowance as soon as family data is ready. Call from a component
+ * setup so it re-checks each time that component mounts (e.g. every
+ * navigation to the home screen) rather than only on a full page load.
+ */
+export function useAllowanceAccrual(): void {
+  watch(
+    [familyId, childrenLoading],
+    ([id, loading]) => {
+      if (id && !loading && children.value.length > 0) accrueDailyAllowance()
+    },
+    { immediate: true },
+  )
 }
 
 export async function addMark(childId: string): Promise<void> {

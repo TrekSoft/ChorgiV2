@@ -66,6 +66,60 @@ export function playPop(): void {
   playNoiseBurst(0.05, 0.06, 0)
 }
 
+export function playChime(): void {
+  playTone(784, 0.18, 'sine', 0.12, 0)
+  playTone(1175, 0.35, 'sine', 0.09, 0.09)
+}
+
+export function playBoing(): void {
+  playTone(180, 0.22, 'triangle', 0.14, 0, 520)
+  playTone(520, 0.12, 'triangle', 0.07, 0.2, 300)
+}
+
+export function playSparkle(): void {
+  const freqs = [1047, 1319, 1568, 2093]
+  freqs.forEach((freq, i) => {
+    playTone(freq, 0.09, 'sine', 0.07, i * 0.05)
+  })
+  playNoiseBurst(0.06, 0.04, 0.2)
+}
+
+export function playWhistle(): void {
+  playTone(440, 0.28, 'sine', 0.1, 0, 1320)
+  playNoiseBurst(0.05, 0.04, 0.26)
+}
+
+export function playDrumroll(): void {
+  for (let i = 0; i < 6; i++) {
+    playNoiseBurst(0.04, 0.05, i * 0.045)
+  }
+  playTone(660, 0.2, 'square', 0.09, 0.3)
+}
+
+const COMPLETION_SOUNDS: Array<() => void> = [
+  playPop,
+  playChime,
+  playBoing,
+  playSparkle,
+  playWhistle,
+  playDrumroll,
+]
+
+/** Stable per-day hash so every completion on a given day shares one sound. */
+function dayHash(date: Date): number {
+  const key = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`
+  let hash = 0
+  for (let i = 0; i < key.length; i++) {
+    hash = (hash * 31 + key.charCodeAt(i)) | 0
+  }
+  return Math.abs(hash)
+}
+
+/** Chore completion sound; the variant is picked at random once per day. */
+export function playCompletion(date: Date = new Date()): void {
+  COMPLETION_SOUNDS[dayHash(date) % COMPLETION_SOUNDS.length]()
+}
+
 export function playCoin(): void {
   playTone(988, 0.07, 'square', 0.08, 0)
   playTone(1319, 0.12, 'square', 0.08, 0.07)
