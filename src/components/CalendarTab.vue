@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref, computed, nextTick, watch } from 'vue'
-import { format, addDays, addWeeks, startOfWeek, eachDayOfInterval, isToday } from 'date-fns'
+import { ref, computed } from 'vue'
+import { format, addDays, addWeeks, startOfWeek, startOfDay, isBefore, eachDayOfInterval, isToday } from 'date-fns'
 import { Icon } from '@iconify/vue'
 import { occursOn } from '../lib/recurrence'
 import { CHORE_KIND, FORM_KIND, WEEK_START_SUNDAY, PARENT_ASSIGNEE_PREFIX, type FormKind } from '../lib/constants'
@@ -24,8 +24,25 @@ const meAssigneeId = computed(() => PARENT_ASSIGNEE_PREFIX + (currentUser.value?
 const filterChildId = ref<string | null>(null)
 const lightboxSrc = ref<string | null>(null)
 const lightboxVideoSrc = ref<string | null>(null)
-const todayCardRef = ref<HTMLElement | null>(null)
 const today = new Date()
+
+// days are accordions on mobile (always expanded from the desktop breakpoint up);
+// past days start collapsed
+const dayExpandedOverrides = ref<Record<string, boolean>>({})
+
+function isDayExpanded(day: Date) {
+  const key = format(day, DATE_FORMAT)
+  const override = dayExpandedOverrides.value[key]
+  if (override !== undefined) return override
+  return !isBefore(startOfDay(day), startOfDay(today))
+}
+
+function toggleDay(day: Date) {
+  dayExpandedOverrides.value = {
+    ...dayExpandedOverrides.value,
+    [format(day, DATE_FORMAT)]: !isDayExpanded(day),
+  }
+}
 
 // --- cleaning day dialog ---
 const cleaningDialogOpen = ref(false)
@@ -134,22 +151,6 @@ function openEdit(entry: ScheduleEntry) {
   dialogOpen.value = true
 }
 
-function scrollToToday() {
-  if (window.innerWidth >= 1400) return
-  const weekStart = startOfWeek(anchor.value, { weekStartsOn: weekStartsOn.value })
-  const weekEnd = addDays(weekStart, 6)
-  if (today < weekStart || today > weekEnd) return
-  nextTick(() => {
-    const el = todayCardRef.value
-    if (!el) return
-    const top = el.getBoundingClientRect().top + window.scrollY - 120
-    window.scrollTo({ top, behavior: 'smooth' })
-  })
-}
-
-watch(choresLoading, (loading) => {
-  if (!loading) scrollToToday()
-}, { immediate: true })
 </script>
 
 <template>
@@ -225,15 +226,27 @@ watch(choresLoading, (loading) => {
       <div
         v-for="day in days"
         :key="day.toISOString()"
-        :ref="(el) => { if (isToday(day)) todayCardRef = el as HTMLElement | null }"
-        class="flex flex-col gap-2 rounded-2xl border-2 p-2 min-[1400px]:p-3 min-[1400px]:min-h-32 scroll-mt-36"
+        class="flex flex-col gap-2 rounded-2xl border-2 p-2 min-[1400px]:p-3 min-[1400px]:min-h-32"
         :class="isToday(day) ? 'border-amber-400 bg-white' : 'border-amber-200 bg-white/60'"
       >
-        <div class="flex items-center justify-between">
-          <div class="font-bold text-amber-900">
-            {{ format(day, 'EEE') }}
-            <span class="font-medium text-amber-600">{{ format(day, 'MMM d') }}</span>
-          </div>
+        <div class="flex items-center justify-between gap-2">
+          <button
+            type="button"
+            class="flex items-center gap-2 min-w-0 text-left cursor-pointer min-[1400px]:cursor-default"
+            :aria-expanded="isDayExpanded(day)"
+            @click="toggleDay(day)"
+          >
+            <Icon
+              icon="mdi:chevron-down"
+              class="w-5 h-5 shrink-0 text-amber-500 transition-transform min-[1400px]:hidden"
+              :class="isDayExpanded(day) ? '' : '-rotate-90'"
+            />
+            <span class="font-bold text-amber-900">
+              {{ format(day, 'EEE') }}
+              <span class="font-medium text-amber-600">{{ format(day, 'MMM d') }}</span>
+            </span>
+            <span class="text-sm font-medium text-amber-500 min-[1400px]:hidden">{{ entriesFor(day).length }}</span>
+          </button>
           <button
             @click="openCleaningDialog(day)"
             class="text-xs font-bold uppercase tracking-wide px-2 py-0.5 rounded-full cursor-pointer transition-colors"
@@ -246,38 +259,40 @@ watch(choresLoading, (loading) => {
           </button>
         </div>
 
-        <ScheduleItem
-          v-for="entry in entriesFor(day)"
-          :key="entry.key"
-          :name="entry.item.name"
-          :icon-name="entry.item.iconName"
-          :photo-url="entry.item.photoURL"
-          :video-url="entry.item.videoURL"
-          :video-thumb-url="entry.item.videoThumbURL"
-          :time-window="resolveTimeWindow(entry.item).timeWindow"
-          :time-period-label="resolveTimeWindow(entry.item).label"
-          :weekly="!!entry.item.weekly"
-          :no-deadline="!!entry.item.noDeadline"
-          :oneoff="entry.kind === FORM_KIND.ONEOFF_CHORE"
-          :bonus-cents="entry.item.bonusCents || null"
-          :assignees="entry.assignees"
-          :assigned-to-all="entry.assignedToAll"
-          :claimable="entry.claimable"
-          @click="openEdit(entry)"
-          @photo-click="lightboxSrc = entry.item.photoURL || null"
-          @video-click="lightboxVideoSrc = entry.item.videoURL || null"
-        />
+        <div :class="isDayExpanded(day) ? 'flex flex-col gap-2 flex-1' : 'hidden min-[1400px]:flex min-[1400px]:flex-col min-[1400px]:gap-2 min-[1400px]:flex-1'">
+          <ScheduleItem
+            v-for="entry in entriesFor(day)"
+            :key="entry.key"
+            :name="entry.item.name"
+            :icon-name="entry.item.iconName"
+            :photo-url="entry.item.photoURL"
+            :video-url="entry.item.videoURL"
+            :video-thumb-url="entry.item.videoThumbURL"
+            :time-window="resolveTimeWindow(entry.item).timeWindow"
+            :time-period-label="resolveTimeWindow(entry.item).label"
+            :weekly="!!entry.item.weekly"
+            :no-deadline="!!entry.item.noDeadline"
+            :oneoff="entry.kind === FORM_KIND.ONEOFF_CHORE"
+            :bonus-cents="entry.item.bonusCents || null"
+            :assignees="entry.assignees"
+            :assigned-to-all="entry.assignedToAll"
+            :claimable="entry.claimable"
+            @click="openEdit(entry)"
+            @photo-click="lightboxSrc = entry.item.photoURL || null"
+            @video-click="lightboxVideoSrc = entry.item.videoURL || null"
+          />
 
-        <div class="flex gap-2 mt-auto pt-1">
-          <button
-            @click="openAdd(FORM_KIND.ONEOFF_CHORE, day)"
-            class="flex-1 text-xs font-bold border-2 border-dashed rounded-xl py-1.5 min-[1400px]:py-2 hover:bg-amber-50 cursor-pointer"
-            :class="isToday(day)
-              ? 'border-amber-400 text-amber-700 bg-amber-50'
-              : 'border-amber-200 text-amber-600'"
-          >
-            + One-off chore
-          </button>
+          <div class="flex gap-2 mt-auto pt-1">
+            <button
+              @click="openAdd(FORM_KIND.ONEOFF_CHORE, day)"
+              class="flex-1 text-xs font-bold border-2 border-dashed rounded-xl py-1.5 min-[1400px]:py-2 hover:bg-amber-50 cursor-pointer"
+              :class="isToday(day)
+                ? 'border-amber-400 text-amber-700 bg-amber-50'
+                : 'border-amber-200 text-amber-600'"
+            >
+              + One-off chore
+            </button>
+          </div>
         </div>
       </div>
     </div>
