@@ -1,13 +1,16 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import AvatarMenu from './AvatarMenu.vue'
 import PinDialog from './PinDialog.vue'
 import logo from '../assets/logo.png'
 import { isAdminMode, enterAdminMode, exitAdminMode, setKeepAdmin } from '../composables/useAdminMode'
+import { specialDay } from '../composables/useSpecialDay'
+import { specialDayLabel } from '../lib/special-day'
 
 const router = useRouter()
 const showPin = ref(false)
+const countdown = computed(() => specialDayLabel(specialDay.value))
 
 function toggleAdmin() {
   if (isAdminMode.value) {
@@ -34,6 +37,12 @@ function onPinCancel() {
       <img :src="logo" alt="Chorgi" class="w-16 h-16" />
       <span class="text-3xl font-bold text-amber-900 hidden sm:inline">Chorgi</span>
     </button>
+    <p
+      v-if="countdown"
+      class="flex-1 min-w-0 px-2 text-center text-sm sm:text-lg font-bold text-amber-700 truncate"
+    >
+      {{ countdown }}
+    </p>
     <div class="flex items-center gap-3">
       <button
         @click="toggleAdmin"
