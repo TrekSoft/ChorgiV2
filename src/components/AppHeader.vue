@@ -39,7 +39,7 @@ function onPinCancel() {
     </button>
     <p
       v-if="countdown"
-      class="flex-1 min-w-0 px-2 text-center text-sm sm:text-lg font-bold text-amber-700 truncate"
+      class="hidden sm:block flex-1 min-w-0 px-2 text-center text-lg font-bold text-amber-700 truncate"
     >
       {{ countdown }}
     </p>
