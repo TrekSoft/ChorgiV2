@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import confetti from 'canvas-confetti'
 import { CONFETTI_MODE, type ConfettiMode } from '../lib/constants'
-import { playCompletion, playCoin, playFireworks, playBalloons } from '../lib/sounds'
+import { playCompletion, playCoin, playCelebration, playBalloons } from '../lib/sounds'
 
 // Usage: const burstRef = ref(); burstRef.value.fire('confetti' | 'coins' | 'fireworks')
 
@@ -36,7 +36,7 @@ function fireCoins() {
 }
 
 function fireFireworks() {
-  playSafely(playFireworks)
+  playSafely(playCelebration)
   const duration = 2000
   const end = Date.now() + duration
   const colors = ['#f59e0b', '#ec4899', '#8b5cf6', '#22c55e']

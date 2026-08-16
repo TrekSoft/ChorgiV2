@@ -136,6 +136,61 @@ export function playFireworks(): void {
   }
 }
 
+export function playFanfare(): void {
+  const notes = [523, 659, 784, 1047]
+  notes.forEach((freq, i) => {
+    playTone(freq, 0.22, 'square', 0.07, i * 0.14)
+  })
+  playTone(1568, 0.5, 'square', 0.06, 0.56)
+  playNoiseBurst(0.12, 0.05, 0.56)
+}
+
+export function playApplause(): void {
+  for (let i = 0; i < 14; i++) {
+    playNoiseBurst(0.09 + Math.random() * 0.06, 0.03 + Math.random() * 0.03, i * 0.07)
+  }
+  playTone(880, 0.35, 'sine', 0.05, 0.9)
+}
+
+export function playVictoryRiff(): void {
+  const notes = [392, 523, 659, 523, 784]
+  notes.forEach((freq, i) => {
+    playTone(freq, 0.16, 'triangle', 0.1, i * 0.12)
+  })
+  playTone(1047, 0.6, 'triangle', 0.09, 0.6)
+}
+
+export function playStarburst(): void {
+  for (let i = 0; i < 8; i++) {
+    playTone(1047 + i * 180, 0.12, 'sine', 0.06, i * 0.07, 2600)
+  }
+  playNoiseBurst(0.25, 0.06, 0.5)
+  playTone(2093, 0.4, 'sine', 0.05, 0.55)
+}
+
+export function playChampionBells(): void {
+  const notes = [659, 988, 1319]
+  notes.forEach((freq, i) => {
+    playTone(freq, 0.5, 'sine', 0.09, i * 0.18)
+    playTone(freq * 2, 0.3, 'sine', 0.04, i * 0.18)
+  })
+  playTone(1976, 0.7, 'sine', 0.05, 0.7)
+}
+
+const CELEBRATION_SOUNDS: Array<() => void> = [
+  playFireworks,
+  playFanfare,
+  playApplause,
+  playVictoryRiff,
+  playStarburst,
+  playChampionBells,
+]
+
+/** All-chores-done celebration sound; the variant is picked at random once per day. */
+export function playCelebration(date: Date = new Date()): void {
+  CELEBRATION_SOUNDS[(dayHash(date) + 7) % CELEBRATION_SOUNDS.length]()
+}
+
 export function playBalloons(): void {
   const ac = getCtx()
   if (!ac) return
