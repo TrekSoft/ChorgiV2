@@ -29,6 +29,7 @@ export interface FamilyDoc {
   weekStartsOn: 0 | 1
   markPenaltyCents?: number
   timePeriods?: TimePeriod[]
+  specialDay?: SpecialDay | null
   createdAt: MaybeTimestamp
 }
 
@@ -142,6 +143,12 @@ export interface PendingInviteDoc {
 
 export interface UserIndexDoc {
   familyId: string
+}
+
+/** A family milestone counted down in the header, e.g. "Disney trip". */
+export interface SpecialDay {
+  title: string
+  date: DateString
 }
 
 export interface TimePeriod {

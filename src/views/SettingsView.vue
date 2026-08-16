@@ -19,6 +19,7 @@ import { uploadMemberPhoto } from '../lib/photo'
 import { DEFAULT_MARK_PENALTY_CENTS, DEFAULT_TIME_PERIODS } from '../lib/constants'
 import { dollarsToCents, formatCents } from '../lib/format'
 import { timePeriods, updateTimePeriods } from '../composables/useTimePeriods'
+import { specialDay, updateSpecialDay, clearSpecialDay } from '../composables/useSpecialDay'
 import type { TimePeriod } from '../types/firebase'
 import AppHeader from '../components/AppHeader.vue'
 import PhotoPicker from '../components/PhotoPicker.vue'
@@ -126,6 +127,44 @@ async function sendInvite() {
     inviteError.value = 'Could not authorize that email. Please try again.'
   } finally {
     inviting.value = false
+  }
+}
+
+const specialDayTitle = ref('')
+const specialDayDate = ref('')
+const specialDaySaving = ref(false)
+const specialDaySaved = ref(false)
+
+watch(
+  specialDay,
+  (day) => {
+    specialDayTitle.value = day?.title || ''
+    specialDayDate.value = day?.date || ''
+  },
+  { immediate: true },
+)
+
+async function saveSpecialDay() {
+  if (!specialDayTitle.value.trim() || !specialDayDate.value) return
+  specialDaySaving.value = true
+  specialDaySaved.value = false
+  try {
+    await updateSpecialDay({ title: specialDayTitle.value, date: specialDayDate.value })
+    specialDaySaved.value = true
+  } finally {
+    specialDaySaving.value = false
+  }
+}
+
+async function removeSpecialDay() {
+  specialDaySaving.value = true
+  specialDaySaved.value = false
+  try {
+    await clearSpecialDay()
+    specialDayTitle.value = ''
+    specialDayDate.value = ''
+  } finally {
+    specialDaySaving.value = false
   }
 }
 
@@ -238,6 +277,38 @@ async function saveTimePeriods() {
           {{ markPenaltySaving ? 'Saving…' : 'Save penalty' }}
         </button>
         <p v-if="markPenaltySaved" class="text-success">Saved!</p>
+      </section>
+
+      <section class="card-shadow p-6 flex flex-col gap-4">
+        <h2 class="heading-section">Special day</h2>
+        <p class="text-amber-600 text-sm">Counts down in the header, e.g. "12 days until Disney trip".</p>
+        <label class="flex flex-col gap-1">
+          <span class="form-label">Title</span>
+          <input v-model="specialDayTitle" type="text" class="input-field" placeholder="e.g. Disney trip" />
+        </label>
+        <label class="flex flex-col gap-1">
+          <span class="form-label">Date</span>
+          <input v-model="specialDayDate" type="date" class="input-field" />
+        </label>
+        <div class="flex gap-2">
+          <button
+            @click="saveSpecialDay"
+            :disabled="specialDaySaving || !specialDayTitle.trim() || !specialDayDate"
+            class="btn-primary"
+          >
+            {{ specialDaySaving ? 'Saving…' : 'Save special day' }}
+          </button>
+          <button
+            v-if="specialDay"
+            type="button"
+            @click="removeSpecialDay"
+            :disabled="specialDaySaving"
+            class="btn-secondary"
+          >
+            Clear
+          </button>
+        </div>
+        <p v-if="specialDaySaved" class="text-success">Saved!</p>
       </section>
 
       <section class="card-shadow p-6 flex flex-col gap-4">
