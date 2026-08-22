@@ -28,6 +28,7 @@ import {
 } from '../composables/useCompletions'
 import { isAdminMode } from '../composables/useAdminMode'
 import { currentUser } from '../composables/useAuth'
+import { playSafely, playClaim, playUnclaim } from '../lib/sounds'
 import { useDialog } from '../composables/useDialog'
 import { useIdleTimeout } from '../composables/useIdleTimeout'
 import AppHeader from '../components/AppHeader.vue'
@@ -303,7 +304,7 @@ async function onTaskTap(task: ClaimableItem) {
   }
   const claim = claimFor(task)
   if (!claim) {
-    await withPending(task.id, () => claimTask(task, meAssigneeId.value, claimDateStr(task)), () => {})
+    await withPending(task.id, () => claimTask(task, meAssigneeId.value, claimDateStr(task)), () => playSafely(playClaim))
     return
   }
   const mine = claim.childId === meAssigneeId.value
@@ -336,6 +337,7 @@ async function onTaskTap(task: ClaimableItem) {
     })
     if (ok) {
       await unclaimTask(task, claimDateStr(task))
+      playSafely(playUnclaim)
     }
   }
 }
@@ -346,6 +348,7 @@ async function onTaskUnclaim(task: ClaimableItem) {
   const mine = claim.childId === meAssigneeId.value
   if (mine) {
     await unclaimTask(task, claimDateStr(task))
+    playSafely(playUnclaim)
   } else if (isAdminMode.value) {
     const owner = claimChild(claim)
     const ok = await confirm({
@@ -356,6 +359,7 @@ async function onTaskUnclaim(task: ClaimableItem) {
     })
     if (ok) {
       await unclaimTask(task, claimDateStr(task))
+      playSafely(playUnclaim)
     }
   }
 }

@@ -90,7 +90,9 @@ function formatTimeLabel(time: string) {
 
 const oneoffNoDeadline = ref(props.initial?.noDeadline || false)
 const showDate = computed(() => props.kind === FORM_KIND.ONEOFF_CHORE && !oneoffNoDeadline.value)
-const showBonus = computed(() => props.kind === FORM_KIND.ONEOFF_CHORE)
+const showBonus = computed(() =>
+  props.kind === FORM_KIND.ONEOFF_CHORE || props.kind === FORM_KIND.RECURRING_CHORE,
+)
 const showRoom = computed(() => props.kind === FORM_KIND.CLEANING_TASK)
 const showRecurrence = computed(() => props.kind === FORM_KIND.RECURRING_CHORE)
 const showTimeWindow = computed(() => props.kind === FORM_KIND.RECURRING_CHORE && recurrenceMode.value === RECURRENCE_MODE.DAILY)
@@ -212,6 +214,7 @@ function submit() {
       recurrence,
       timeWindow,
       timePeriodId: recurrenceMode.value === RECURRENCE_MODE.DAILY ? selectedPeriodId.value || null : null,
+      bonusCents: dollarsToCents(bonusAmount.value),
     })
   } else if (props.kind === FORM_KIND.ONEOFF_CHORE) {
     emit('submit', {
