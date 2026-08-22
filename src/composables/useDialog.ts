@@ -3,9 +3,15 @@ import { ref } from 'vue'
 interface ConfirmOptions {
   title?: string
   message: string
+  breakdown?: DialogBreakdownItem[]
   confirmLabel?: string
   cancelLabel?: string
   danger?: boolean
+}
+
+interface DialogBreakdownItem {
+  label: string
+  value: string
 }
 
 interface PromptOptions {
@@ -24,6 +30,7 @@ interface DialogState {
   mode: DialogMode
   title: string
   message: string
+  breakdown: DialogBreakdownItem[]
   confirmLabel: string
   cancelLabel: string
   danger: boolean
@@ -37,6 +44,7 @@ const state = ref<DialogState>({
   mode: 'confirm',
   title: '',
   message: '',
+  breakdown: [],
   confirmLabel: 'Confirm',
   cancelLabel: 'Cancel',
   danger: false,
@@ -54,6 +62,7 @@ export function useDialog() {
         resolve: resolve as (value: boolean | string | null) => void,
         title: options.title || 'Confirm',
         message: options.message,
+        breakdown: options.breakdown || [],
         confirmLabel: options.confirmLabel || 'Confirm',
         cancelLabel: options.cancelLabel || 'Cancel',
         danger: options.danger ?? false,
@@ -71,6 +80,7 @@ export function useDialog() {
         resolve: (() => { resolve() }) as (value: boolean | string | null) => void,
         title: options.title || 'Notice',
         message: options.message,
+        breakdown: options.breakdown || [],
         confirmLabel: options.confirmLabel || 'OK',
         cancelLabel: options.cancelLabel || '',
         danger: options.danger ?? false,
@@ -88,6 +98,7 @@ export function useDialog() {
         resolve: resolve as (value: boolean | string | null) => void,
         title: options.title || 'Input',
         message: options.message,
+        breakdown: [],
         confirmLabel: options.confirmLabel || 'OK',
         cancelLabel: options.cancelLabel || 'Cancel',
         danger: false,
