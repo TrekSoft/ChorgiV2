@@ -42,13 +42,21 @@ watch(
     const maybeDone = () => {
       if (completionsLoaded && claimsLoaded) completionsLoading.value = false
     }
+    // metadata changes are needed so an acked write raises an event even when it leaves the
+    // document data untouched (e.g. clearing `completed`), otherwise the pending-write filter
+    // below would hide the doc until some unrelated change arrives
     unsubscribeCompletions = onSnapshot(
       collection(db, 'families', id, 'completions').withConverter(completionConverter),
+      { includeMetadataChanges: true },
       (snap) => {
         const map: Record<string, Completion> = {}
         snap.docs.forEach((d) => {
           // a completion only counts once the server acks it, so the UI can stay in a loading state
-          if (d.metadata.hasPendingWrites) return
+          if (d.metadata.hasPendingWrites) {
+            const acked = completions.value[d.id]
+            if (acked) map[d.id] = acked
+            return
+          }
           map[d.id] = d.data()
         })
         completions.value = map
@@ -58,10 +66,17 @@ watch(
     )
     unsubscribeClaims = onSnapshot(
       collection(db, 'families', id, 'claims').withConverter(claimConverter),
+      { includeMetadataChanges: true },
       (snap) => {
         const map: Record<string, Claim> = {}
         snap.docs.forEach((d) => {
-          if (d.metadata.hasPendingWrites) return
+          // keep the last acked state of an existing claim so a pending update doesn't make the
+          // card look unclaimed
+          if (d.metadata.hasPendingWrites) {
+            const acked = claims.value[d.id]
+            if (acked) map[d.id] = acked
+            return
+          }
           map[d.id] = d.data()
         })
         claims.value = map
