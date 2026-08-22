@@ -43,6 +43,19 @@ function onCancel() {
       <div class="dialog-container p-6 w-full max-w-sm flex flex-col gap-4">
         <h2 class="text-xl font-bold text-amber-900">{{ state.title }}</h2>
         <p class="text-amber-800">{{ state.message }}</p>
+        <div
+          v-if="state.breakdown.length"
+          class="rounded-2xl border-2 border-amber-200 bg-amber-50 divide-y divide-amber-200"
+        >
+          <div
+            v-for="item in state.breakdown"
+            :key="item.label"
+            class="flex items-center justify-between gap-4 px-4 py-3"
+          >
+            <span class="font-medium text-amber-800">{{ item.label }}</span>
+            <span class="font-bold text-amber-900">{{ item.value }}</span>
+          </div>
+        </div>
         <input
           v-if="state.mode === 'prompt'"
           ref="inputRef"

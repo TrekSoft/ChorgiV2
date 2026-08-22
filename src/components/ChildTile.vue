@@ -67,10 +67,21 @@ const { confirm } = useDialog()
 
 function onPayoutClick(event: Event) {
   event.stopPropagation()
+  const totalCents = props.child.allowanceBalanceCents
+  const titheCents = Math.round(totalCents * 0.1)
+  const remainingCents = totalCents - titheCents
+  const savingsCents = Math.trunc(remainingCents / 2)
+  const spendingCents = remainingCents - savingsCents
+
   confirm({
-    title: 'Mark as paid',
-    message: `Mark ${props.child.name} as paid? This resets their balance to $0.00.`,
-    confirmLabel: 'Mark paid',
+    title: 'Pay allowance',
+    message: `Pay ${props.child.name}'s $${formatCents(totalCents)} allowance?`,
+    breakdown: [
+      { label: 'Tithe (10%)', value: `$${formatCents(titheCents)}` },
+      { label: 'Savings (50% of remainder)', value: `$${formatCents(savingsCents)}` },
+      { label: 'Spending (50% of remainder)', value: `$${formatCents(spendingCents)}` },
+    ],
+    confirmLabel: 'Pay allowance',
     danger: true,
   }).then((ok) => { if (ok) payoutChild(props.child.id) })
 }
@@ -109,7 +120,7 @@ function onPayoutClick(event: Event) {
       <!-- Admin: payout button -->
       <Tooltip
         v-if="isAdminMode && !editingBalance"
-        label="Mark as paid"
+        label="Pay allowance"
       >
         <button
           @click.stop="onPayoutClick"
