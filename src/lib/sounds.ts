@@ -11,6 +11,15 @@ function getCtx(): AudioContext | null {
   return ctx
 }
 
+/** Play an optional sound without allowing audio failures to affect the caller. */
+export function playSafely(play: () => void): void {
+  try {
+    play()
+  } catch {
+    /* sound is optional */
+  }
+}
+
 function playTone(
   freq: number,
   duration: number,
@@ -96,28 +105,41 @@ export function playDrumroll(): void {
   playTone(660, 0.2, 'square', 0.09, 0.3)
 }
 
-const COMPLETION_SOUNDS: Array<() => void> = [
+/** Bright ascending cue for claiming a task. */
+export function playClaim(): void {
+  playTone(660, 0.08, 'sine', 0.1, 0, 880)
+  playTone(880, 0.14, 'sine', 0.09, 0.08, 1175)
+}
+
+/** Soft descending release cue for unclaiming a task. */
+export function playUnclaim(): void {
+  playTone(740, 0.11, 'triangle', 0.07, 0, 500)
+  playTone(500, 0.18, 'triangle', 0.05, 0.1, 330)
+}
+
+function playMarimba(): void {
+  playTone(262, 0.14, 'triangle', 0.1, 0)
+  playTone(330, 0.14, 'triangle', 0.09, 0.14)
+  playTone(523, 0.28, 'triangle', 0.1, 0.28)
+}
+
+export const COMPLETION_SOUNDS: Array<() => void> = [
   playPop,
   playChime,
   playBoing,
   playSparkle,
   playWhistle,
   playDrumroll,
+  playMarimba,
 ]
 
-/** Stable per-day hash so every completion on a given day shares one sound. */
-function dayHash(date: Date): number {
-  const key = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`
-  let hash = 0
-  for (let i = 0; i < key.length; i++) {
-    hash = (hash * 31 + key.charCodeAt(i)) | 0
-  }
-  return Math.abs(hash)
+export function completionSoundForWeekday(weekday: number): () => void {
+  return COMPLETION_SOUNDS[weekday]
 }
 
-/** Chore completion sound; the variant is picked at random once per day. */
+/** Chore completion sound; each weekday has a fixed variant. */
 export function playCompletion(date: Date = new Date()): void {
-  COMPLETION_SOUNDS[dayHash(date) % COMPLETION_SOUNDS.length]()
+  completionSoundForWeekday(date.getDay())()
 }
 
 export function playCoin(): void {
@@ -177,18 +199,29 @@ export function playChampionBells(): void {
   playTone(1976, 0.7, 'sine', 0.05, 0.7)
 }
 
-const CELEBRATION_SOUNDS: Array<() => void> = [
+function playBassDrop(): void {
+  playTone(146, 0.5, 'sawtooth', 0.08, 0, 73)
+  playNoiseBurst(0.22, 0.07, 0.08)
+  playTone(292, 0.6, 'triangle', 0.08, 0.2, 584)
+}
+
+export const CELEBRATION_SOUNDS: Array<() => void> = [
   playFireworks,
   playFanfare,
   playApplause,
   playVictoryRiff,
   playStarburst,
   playChampionBells,
+  playBassDrop,
 ]
 
-/** All-chores-done celebration sound; the variant is picked at random once per day. */
+export function celebrationSoundForWeekday(weekday: number): () => void {
+  return CELEBRATION_SOUNDS[weekday]
+}
+
+/** All-chores-done celebration sound; each weekday has a fixed variant. */
 export function playCelebration(date: Date = new Date()): void {
-  CELEBRATION_SOUNDS[(dayHash(date) + 7) % CELEBRATION_SOUNDS.length]()
+  celebrationSoundForWeekday(date.getDay())()
 }
 
 export function playBalloons(): void {

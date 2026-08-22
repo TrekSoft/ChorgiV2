@@ -1,18 +1,9 @@
 <script setup lang="ts">
 import confetti from 'canvas-confetti'
 import { CONFETTI_MODE, type ConfettiMode } from '../lib/constants'
-import { playCompletion, playCoin, playCelebration, playBalloons } from '../lib/sounds'
+import { playSafely, playCompletion, playCoin, playCelebration, playBalloons } from '../lib/sounds'
 
 // Usage: const burstRef = ref(); burstRef.value.fire('confetti' | 'coins' | 'fireworks')
-
-// Audio can fail (blocked autoplay, no AudioContext); never let it swallow the visuals
-function playSafely(play: () => void) {
-  try {
-    play()
-  } catch {
-    /* sound is optional */
-  }
-}
 
 function fireConfetti() {
   playSafely(playCompletion)
