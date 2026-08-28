@@ -33,9 +33,9 @@ This file is the resume anchor. At the start of each session, read this file, fi
 | — **Recurring Chore** | Repeats. Either **Daily-pattern** (every day / specific weekdays / odd days / even days / a chosen day of the month), optionally with a **time window** — or **Weekly** (do it any time before end of week, no pattern options). |
 | **Time Window** | Optional on daily-pattern chores. **Start** (optional): chore is hidden from kids until start time. **End** (optional, can be set without a start): after end time the chore stays completable but moves to the TOP of the list labeled 'X min/hrs overdue', and its completion is recorded as **late**. |
 | — **One-off Chore** | Tied to a specific date, no recurrence. Assignees are **optional** — an unassigned one-off is claimable by any kid (shows in the right column of the child view). Optional monetary **bonus** added to allowance on completion. Visually distinguished from recurring chores. |
-| **Cleaning Task** | Anything *unassigned* that children can claim, belonging to a **Room** in the Cleaning Day Config; no date, no bonus. Becomes claimable on days marked as a Cleaning Day that include its room. |
+| **Cleaning Task** | Anything *unassigned* that children can claim, belonging to a **Room** in the Cleaning Day Config; no date, no bonus. Each task has a **Category**: `tidy` (yellow dot), `clean` (green dot), or `deep` (red dot); pre-category docs default to `tidy`. Becomes claimable on days marked as a Cleaning Day that include its room. |
 | **Room** | A named section in the Cleaning Day Config holding Cleaning Tasks. |
-| **Cleaning Day** | A date marked by the parent + a selected subset of Rooms. All Cleaning Tasks in those rooms become claimable that day. |
+| **Cleaning Day** | A date marked by the parent + a selected subset of Rooms, each with a per-day **Category** (default `tidy`). Claimable tasks are cumulative: a `tidy` day includes only tidy tasks, `clean` adds clean, `deep` includes all three. |
 | **Completion** | A record that a specific child completed a specific chore/task for a specific period (day or week). |
 | **Allowance** | Weekly amount per child that auto-accrues each week regardless of chore performance; bonus amounts add to it; "Mark Paid" resets balance to zero. |
 | **Mark** | A standalone demerit counter on a child (no monetary value). Count is displayed on the child's tile; parents add or subtract marks from the tile in admin mode. |
@@ -115,6 +115,8 @@ families/{uid}/tasks/{taskId}     # claimable cleaning tasks
   kind: 'cleaning'
   name, iconName?, photoURL?
   roomId: string
+  category: 'tidy'|'clean'|'deep'  # pre-feature docs lack it; treated as 'tidy'
+                                   # (backfill: scripts/migrate-cleaning-categories.mjs)
   order: number
   # per-day claim state lives on instance docs, not here (see below)
 
@@ -123,6 +125,7 @@ families/{uid}/rooms/{roomId}
 
 families/{uid}/cleaningDays/{yyyy-MM-dd}
   roomIds: string[]
+  roomCategories?: { [roomId]: 'tidy'|'clean'|'deep' }  # missing entry = 'tidy'
 
 families/{uid}/completions/{periodKey}_{choreId}_{childId}
   # periodKey = 'yyyy-MM-dd' for daily/oneoff/cleaning, 'yyyy-Www' for weekly chores

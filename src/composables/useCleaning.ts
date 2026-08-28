@@ -13,6 +13,7 @@ import {
 import { db } from '../lib/firebase'
 import { familyId } from './useFamily'
 import type { Room, CleaningDay, RoomDoc } from '../types/firebase'
+import type { CleaningCategory } from '../lib/constants'
 import { roomConverter, cleaningDayConverter } from '../types/firebase'
 
 export const rooms = ref<Room[]>([])
@@ -72,18 +73,31 @@ export async function removeRoom(roomId: string): Promise<void> {
     if ((day.roomIds || []).includes(roomId)) {
       const remaining = day.roomIds.filter((r) => r !== roomId)
       const dayRef = doc(db, 'families', familyId.value!, 'cleaningDays', date)
-      if (remaining.length === 0) batch.delete(dayRef)
-      else batch.set(dayRef, { roomIds: remaining })
+      if (remaining.length === 0) {
+        batch.delete(dayRef)
+      } else {
+        const remainingCategories = { ...(day.roomCategories || {}) }
+        delete remainingCategories[roomId]
+        batch.set(dayRef, { roomIds: remaining, roomCategories: remainingCategories })
+      }
     }
   }
   await batch.commit()
 }
 
-export async function setCleaningDayRooms(date: string, roomIds: string[]): Promise<void> {
+export async function setCleaningDayRooms(
+  date: string,
+  roomIds: string[],
+  roomCategories: Record<string, CleaningCategory> = {},
+): Promise<void> {
   const dayRef = doc(db, 'families', familyId.value!, 'cleaningDays', date)
   if (roomIds.length === 0) {
     await deleteDoc(dayRef)
   } else {
-    await setDoc(dayRef, { roomIds })
+    const categories: Record<string, CleaningCategory> = {}
+    for (const roomId of roomIds) {
+      categories[roomId] = roomCategories[roomId] || 'tidy'
+    }
+    await setDoc(dayRef, { roomIds, roomCategories: categories })
   }
 }

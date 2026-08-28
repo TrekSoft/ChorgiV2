@@ -9,8 +9,8 @@ import { tasks, removeTask, reorderTasks } from '../composables/useTasks'
 import { children } from '../composables/useChildren'
 import { currentUser } from '../composables/useAuth'
 import { useDialog } from '../composables/useDialog'
-import { isParentAssignee, parentAssigneeDisplay } from '../lib/chore-utils'
-import { CHORE_KIND, FORM_KIND, PARENT_ASSIGNEE_PREFIX } from '../lib/constants'
+import { isParentAssignee, parentAssigneeDisplay, taskCategory } from '../lib/chore-utils'
+import { CHORE_KIND, FORM_KIND, PARENT_ASSIGNEE_PREFIX, CLEANING_CATEGORIES, CLEANING_CATEGORY_LABELS, CLEANING_CATEGORY_DOT_CLASS, type CleaningCategory } from '../lib/constants'
 import type { Room, Task, ChoreFormInitial } from '../types/firebase'
 import ScheduleItem from './ScheduleItem.vue'
 import PhotoLightbox from './PhotoLightbox.vue'
@@ -61,8 +61,13 @@ async function deleteRoom(room: Room) {
   await batch.commit()
 }
 
-function tasksFor(roomId: string) {
-  return tasks.value.filter((t) => t.kind === CHORE_KIND.CLEANING && t.roomId === roomId)
+function tasksFor(roomId: string, category?: CleaningCategory) {
+  return tasks.value.filter(
+    (t) =>
+      t.kind === CHORE_KIND.CLEANING &&
+      t.roomId === roomId &&
+      (category === undefined || taskCategory(t) === category),
+  )
 }
 
 // rooms start collapsed on mobile; always expanded from the sm breakpoint up
@@ -76,6 +81,24 @@ function toggleRoom(roomId: string) {
   expandedRoomIds.value = isExpanded(roomId)
     ? expandedRoomIds.value.filter((id) => id !== roomId)
     : [...expandedRoomIds.value, roomId]
+}
+
+// category sections start collapsed on mobile; always expanded from the sm breakpoint up
+const expandedSectionKeys = ref<string[]>([])
+
+function sectionKey(roomId: string, category: CleaningCategory) {
+  return `${roomId}:${category}`
+}
+
+function isSectionExpanded(roomId: string, category: CleaningCategory) {
+  return expandedSectionKeys.value.includes(sectionKey(roomId, category))
+}
+
+function toggleSection(roomId: string, category: CleaningCategory) {
+  const key = sectionKey(roomId, category)
+  expandedSectionKeys.value = isSectionExpanded(roomId, category)
+    ? expandedSectionKeys.value.filter((k) => k !== key)
+    : [...expandedSectionKeys.value, key]
 }
 
 const dragTaskId = ref<string | null>(null)
@@ -94,20 +117,24 @@ function onDragLeave() {
   dragOverTaskId.value = null
 }
 
-async function onDrop(roomId: string) {
+// reorder stays within a category section; other sections keep their relative order
+async function onDrop(roomId: string, category: CleaningCategory) {
   if (dragTaskId.value === null) return
-  const roomTasks = tasksFor(roomId)
-  const fromIdx = roomTasks.findIndex((t) => t.id === dragTaskId.value)
-  const toIdx = roomTasks.findIndex((t) => t.id === dragOverTaskId.value)
+  const sectionTasks = tasksFor(roomId, category)
+  const fromIdx = sectionTasks.findIndex((t) => t.id === dragTaskId.value)
+  const toIdx = sectionTasks.findIndex((t) => t.id === dragOverTaskId.value)
   if (fromIdx === -1 || toIdx === -1 || fromIdx === toIdx) {
     dragTaskId.value = null
     dragOverTaskId.value = null
     return
   }
-  const reordered = [...roomTasks]
-  const [moved] = reordered.splice(fromIdx, 1)
-  reordered.splice(toIdx, 0, moved)
-  await reorderTasks(reordered.map((t) => t.id))
+  const reorderedSection = [...sectionTasks]
+  const [moved] = reorderedSection.splice(fromIdx, 1)
+  reorderedSection.splice(toIdx, 0, moved)
+  const sectionIds = new Set(reorderedSection.map((t) => t.id))
+  let i = 0
+  const newRoomOrder = tasksFor(roomId).map((t) => (sectionIds.has(t.id) ? reorderedSection[i++] : t))
+  await reorderTasks(newRoomOrder.map((t) => t.id))
   dragTaskId.value = null
   dragOverTaskId.value = null
 }
@@ -131,9 +158,9 @@ const taskDialogOpen = ref(false)
 const editingTask = ref<Task | null>(null)
 const taskPrefill = ref<ChoreFormInitial | null>(null)
 
-function openAddTask(roomId: string) {
+function openAddTask(roomId: string, category: CleaningCategory) {
   editingTask.value = null
-  taskPrefill.value = { roomId }
+  taskPrefill.value = { roomId, category }
   taskDialogOpen.value = true
 }
 
@@ -204,37 +231,63 @@ function openEditTask(task: Task) {
             </div>
           </div>
 
-          <div :class="isExpanded(room.id) ? 'flex flex-col gap-3' : 'hidden sm:flex sm:flex-col sm:gap-3'">
+          <div :class="isExpanded(room.id) ? 'flex flex-col' : 'hidden sm:flex sm:flex-col'">
             <div
-              v-for="task in tasksFor(room.id)"
-              :key="task.id"
-              draggable="true"
-              @dragstart="onDragStart(task.id)"
-              @dragover.prevent="onDragOver(task.id)"
-              @dragleave="onDragLeave"
-              @drop.prevent="onDrop(room.id)"
-              :class="dragOverTaskId === task.id && dragTaskId !== task.id ? 'ring-2 ring-amber-400 rounded-xl' : ''"
+              v-for="(cat, catIdx) in CLEANING_CATEGORIES"
+              :key="cat"
+              class="flex flex-col gap-2 py-2 first:pt-0 last:pb-0"
+              :class="catIdx > 0 ? 'border-t border-amber-100' : ''"
             >
-              <ScheduleItem
-                :name="task.name"
-                :icon-name="task.iconName"
-                :photo-url="task.photoURL"
-                :video-url="task.videoURL"
-                :video-thumb-url="task.videoThumbURL"
-                :assignees="assigneesFor(task)"
-                draggable
-                @click="openEditTask(task)"
-                @photo-click="lightboxSrc = task.photoURL || null"
-                @video-click="lightboxVideoSrc = task.videoURL || null"
-              />
-            </div>
+              <button
+                type="button"
+                class="flex items-center gap-2 text-left cursor-pointer sm:cursor-default"
+                :aria-expanded="isSectionExpanded(room.id, cat)"
+                @click="toggleSection(room.id, cat)"
+              >
+                <Icon
+                  icon="mdi:chevron-down"
+                  class="w-4 h-4 shrink-0 text-amber-400 transition-transform sm:hidden"
+                  :class="isSectionExpanded(room.id, cat) ? '' : '-rotate-90'"
+                />
+                <span class="w-2.5 h-2.5 rounded-full shrink-0" :class="CLEANING_CATEGORY_DOT_CLASS[cat]"></span>
+                <span class="text-sm font-bold text-amber-800">{{ CLEANING_CATEGORY_LABELS[cat] }}</span>
+                <span class="text-xs font-medium text-amber-500">{{ tasksFor(room.id, cat).length }}</span>
+              </button>
 
-            <button
-              @click="openAddTask(room.id)"
-              class="text-sm font-bold text-amber-600 border-2 border-dashed border-amber-200 rounded-xl py-2 hover:bg-amber-50 cursor-pointer"
-            >
-              + Task
-            </button>
+              <div :class="isSectionExpanded(room.id, cat) ? 'flex flex-col gap-2' : 'hidden sm:flex sm:flex-col sm:gap-2'">
+                <div
+                  v-for="task in tasksFor(room.id, cat)"
+                  :key="task.id"
+                  draggable="true"
+                  @dragstart="onDragStart(task.id)"
+                  @dragover.prevent="onDragOver(task.id)"
+                  @dragleave="onDragLeave"
+                  @drop.prevent="onDrop(room.id, cat)"
+                  :class="dragOverTaskId === task.id && dragTaskId !== task.id ? 'ring-2 ring-amber-400 rounded-xl' : ''"
+                >
+                  <ScheduleItem
+                    :name="task.name"
+                    :icon-name="task.iconName"
+                    :photo-url="task.photoURL"
+                    :video-url="task.videoURL"
+                    :video-thumb-url="task.videoThumbURL"
+                    :assignees="assigneesFor(task)"
+                    :category-dot="cat"
+                    draggable
+                    @click="openEditTask(task)"
+                    @photo-click="lightboxSrc = task.photoURL || null"
+                    @video-click="lightboxVideoSrc = task.videoURL || null"
+                  />
+                </div>
+
+                <button
+                  @click="openAddTask(room.id, cat)"
+                  class="text-sm font-bold text-amber-600 border-2 border-dashed border-amber-200 rounded-xl py-2 hover:bg-amber-50 cursor-pointer"
+                >
+                  + Task
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>

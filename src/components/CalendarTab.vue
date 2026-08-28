@@ -316,6 +316,7 @@ function openEdit(entry: ScheduleEntry) {
       :open="cleaningDialogOpen"
       :date="cleaningDialogDate"
       :initial-room-ids="cleaningDialogDate ? (cleaningDays[format(cleaningDialogDate, DATE_FORMAT)]?.roomIds || []) : []"
+      :initial-room-categories="cleaningDialogDate ? (cleaningDays[format(cleaningDialogDate, DATE_FORMAT)]?.roomCategories || {}) : {}"
       @close="cleaningDialogOpen = false"
     />
 

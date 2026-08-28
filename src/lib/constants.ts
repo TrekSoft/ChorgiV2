@@ -58,6 +58,31 @@ export type RecurrenceMode = typeof RECURRENCE_MODE[keyof typeof RECURRENCE_MODE
 
 export const PARENT_ASSIGNEE_PREFIX = '__parent_'
 
+export const CLEANING_CATEGORY = Object.freeze({
+  TIDY: 'tidy',
+  CLEAN: 'clean',
+  DEEP: 'deep',
+} as const)
+export type CleaningCategory = typeof CLEANING_CATEGORY[keyof typeof CLEANING_CATEGORY]
+
+export const CLEANING_CATEGORIES: CleaningCategory[] = [
+  CLEANING_CATEGORY.TIDY,
+  CLEANING_CATEGORY.CLEAN,
+  CLEANING_CATEGORY.DEEP,
+]
+
+export const CLEANING_CATEGORY_LABELS: Record<CleaningCategory, string> = {
+  [CLEANING_CATEGORY.TIDY]: 'Tidy',
+  [CLEANING_CATEGORY.CLEAN]: 'Clean',
+  [CLEANING_CATEGORY.DEEP]: 'Deep',
+}
+
+export const CLEANING_CATEGORY_DOT_CLASS: Record<CleaningCategory, string> = {
+  [CLEANING_CATEGORY.TIDY]: 'bg-yellow-400',
+  [CLEANING_CATEGORY.CLEAN]: 'bg-green-500',
+  [CLEANING_CATEGORY.DEEP]: 'bg-red-500',
+}
+
 export const WEEK_START_SUNDAY = 0
 export const WEEK_START_MONDAY = 1
 

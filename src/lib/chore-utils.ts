@@ -1,4 +1,4 @@
-import { CHORE_KIND, PARENT_ASSIGNEE_PREFIX } from './constants'
+import { CHORE_KIND, PARENT_ASSIGNEE_PREFIX, CLEANING_CATEGORY, CLEANING_CATEGORIES, type CleaningCategory } from './constants'
 import { occursOn, startsAt } from './recurrence'
 import type { Chore, Task, Room, CleaningDay, Claim, Child, Member, TimePeriod } from '../types/firebase'
 
@@ -47,6 +47,22 @@ export function assignedChoresForChild(chore: Chore, childId: string, date: Date
   return true
 }
 
+/** Category of a cleaning task; pre-feature docs have no category and default to tidy. */
+export function taskCategory(task: Task): CleaningCategory {
+  return task.category || CLEANING_CATEGORY.TIDY
+}
+
+/** Category selected for a room on a given cleaning day; defaults to tidy. */
+export function roomCategoryFor(day: CleaningDay | undefined, roomId: string): CleaningCategory {
+  return day?.roomCategories?.[roomId] || CLEANING_CATEGORY.TIDY
+}
+
+/** Cumulative set: tidy → [tidy], clean → [tidy, clean], deep → all three. */
+export function includedCategories(category: CleaningCategory): CleaningCategory[] {
+  const idx = CLEANING_CATEGORIES.indexOf(category)
+  return CLEANING_CATEGORIES.slice(0, idx === -1 ? 1 : idx + 1)
+}
+
 export interface CleaningSection {
   room: Room
   tasks: Task[]
@@ -61,10 +77,15 @@ export function cleaningSectionsForDate(
   const day = cleaningDays[dateStr]
   if (!day) return []
   return (day.roomIds || [])
-    .map((roomId) => ({
-      room: rooms.find((r) => r.id === roomId)!,
-      tasks: tasks.filter((t) => t.kind === CHORE_KIND.CLEANING && t.roomId === roomId),
-    }))
+    .map((roomId) => {
+      const included = includedCategories(roomCategoryFor(day, roomId))
+      return {
+        room: rooms.find((r) => r.id === roomId)!,
+        tasks: tasks.filter(
+          (t) => t.kind === CHORE_KIND.CLEANING && t.roomId === roomId && included.includes(taskCategory(t)),
+        ),
+      }
+    })
     .filter((s) => s.room && s.tasks.length > 0)
 }
 

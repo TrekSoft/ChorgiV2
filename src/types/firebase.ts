@@ -6,6 +6,7 @@ import type {
 } from 'firebase/firestore'
 import type { ChoreKind } from '../lib/constants'
 import type { FormKind } from '../lib/constants'
+import type { CleaningCategory } from '../lib/constants'
 
 // ── Primitive type aliases ──────────────────────────────────────────────────
 
@@ -102,6 +103,8 @@ export interface TaskDoc {
   videoURL?: string | null
   videoThumbURL?: string | null
   roomId: string
+  /** tidy | clean | deep — missing on pre-feature docs, treated as 'tidy' until migrated */
+  category?: CleaningCategory
   order: number
   assigneeId?: string | null
   bonusCents?: number
@@ -116,6 +119,8 @@ export interface RoomDoc {
 
 export interface CleaningDayDoc {
   roomIds: string[]
+  /** Per-room cleaning category for this day; missing entries default to 'tidy' */
+  roomCategories?: Record<string, CleaningCategory>
 }
 
 export interface CompletionDoc {
@@ -219,6 +224,7 @@ export interface ChoreFormInitial {
   date?: string | null
   bonusCents?: number
   roomId?: string
+  category?: CleaningCategory
   weekly?: boolean
   noDeadline?: boolean
   recurrence?: RecurrencePattern | null
@@ -245,6 +251,7 @@ export interface ChoreFormPayload {
   date?: string | null
   bonusCents?: number
   roomId?: string
+  category?: CleaningCategory
 }
 
 /** Structural type for items that can be claimed (both Chore and Task satisfy this). */

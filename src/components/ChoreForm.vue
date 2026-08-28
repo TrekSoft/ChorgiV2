@@ -3,7 +3,7 @@ import { ref, computed, watch } from 'vue'
 import { Icon } from '@iconify/vue'
 import IconPicker from './IconPicker.vue'
 import MediaUpload from './MediaUpload.vue'
-import { FORM_KIND, CHORE_KIND, RECURRENCE_TYPE, RECURRENCE_MODE, PARENT_ASSIGNEE_PREFIX, type FormKind } from '../lib/constants'
+import { FORM_KIND, CHORE_KIND, RECURRENCE_TYPE, RECURRENCE_MODE, PARENT_ASSIGNEE_PREFIX, CLEANING_CATEGORY, CLEANING_CATEGORIES, CLEANING_CATEGORY_LABELS, CLEANING_CATEGORY_DOT_CLASS, type FormKind, type CleaningCategory } from '../lib/constants'
 import { dollarsToCents } from '../lib/format'
 import { timePeriods } from '../composables/useTimePeriods'
 import { currentUser } from '../composables/useAuth'
@@ -52,6 +52,7 @@ const assigneeId = ref(props.initial?.assigneeId || null)
 const date = ref(props.initial?.date || '')
 const bonusAmount = ref(props.initial ? String((props.initial.bonusCents || 0) / 100) : '0')
 const roomId = ref(props.initial?.roomId || (props.rooms[0]?.id ?? ''))
+const category = ref<CleaningCategory>(props.initial?.category || CLEANING_CATEGORY.TIDY)
 
 const recurrenceMode = ref(props.initial?.weekly ? RECURRENCE_MODE.WEEKLY : RECURRENCE_MODE.DAILY)
 const dailyPatternType = ref(props.initial?.recurrence?.type || RECURRENCE_TYPE.DAILY)
@@ -231,6 +232,7 @@ function submit() {
       kind: CHORE_KIND.CLEANING,
       assigneeId: assigneeId.value,
       roomId: roomId.value,
+      category: category.value,
     })
   }
 }
@@ -293,6 +295,23 @@ function submit() {
           :class="(kind === FORM_KIND.CLEANING_TASK ? assigneeId === child.id : assigneeIds.includes(child.id)) ? 'pill-selected' : 'pill-unselected'"
         >
           {{ child.name }}
+        </button>
+      </div>
+    </div>
+
+    <div v-if="showRoom" class="flex flex-col gap-2">
+      <span class="form-label">Category</span>
+      <div class="flex flex-wrap gap-2">
+        <button
+          v-for="cat in CLEANING_CATEGORIES"
+          :key="cat"
+          type="button"
+          @click="category = cat"
+          class="pill flex items-center gap-2"
+          :class="category === cat ? 'pill-selected' : 'pill-unselected'"
+        >
+          <span class="w-2.5 h-2.5 rounded-full shrink-0" :class="CLEANING_CATEGORY_DOT_CLASS[cat]"></span>
+          {{ CLEANING_CATEGORY_LABELS[cat] }}
         </button>
       </div>
     </div>

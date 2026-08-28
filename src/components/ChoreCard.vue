@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue'
 import CountdownLabel from './CountdownLabel.vue'
-import { CARD_VARIANT, type CardVariant } from '../lib/constants'
+import { CARD_VARIANT, CLEANING_CATEGORY_DOT_CLASS, type CardVariant, type CleaningCategory } from '../lib/constants'
 import { formatCents } from '../lib/format'
 
 const props = withDefaults(defineProps<{
@@ -25,6 +25,7 @@ const props = withDefaults(defineProps<{
   canUnassign?: boolean
   unassignLabel?: string
   editable?: boolean
+  categoryDot?: CleaningCategory | null
 }>(), {
   iconName: null,
   photoUrl: null,
@@ -45,6 +46,7 @@ const props = withDefaults(defineProps<{
   canUnassign: false,
   unassignLabel: 'Remove me',
   editable: false,
+  categoryDot: null,
 })
 const emit = defineEmits<{ toggle: []; 'photo-click': []; 'video-click': []; unassign: []; edit: [] }>()
 
@@ -149,6 +151,12 @@ function onUnassignClick() {
 
       <div class="flex-1 min-w-0">
         <div class="flex items-center gap-2 flex-wrap">
+          <span
+            v-if="categoryDot"
+            class="w-3 h-3 rounded-full shrink-0"
+            :class="CLEANING_CATEGORY_DOT_CLASS[categoryDot]"
+            :title="categoryDot"
+          ></span>
           <span class="text-lg font-bold truncate" :class="disabled ? 'text-stone-500' : 'text-amber-900'">{{ name }}</span>
           <span v-if="oneoff" class="badge text-purple-500 bg-purple-100">
             one-off

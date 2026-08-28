@@ -3,6 +3,7 @@ import { computed } from 'vue'
 import { Icon } from '@iconify/vue'
 import { format, parse } from 'date-fns'
 import { formatCents } from '../lib/format'
+import { CLEANING_CATEGORY_DOT_CLASS, type CleaningCategory } from '../lib/constants'
 import type { TimeWindow } from '../types/firebase'
 
 const props = withDefaults(defineProps<{
@@ -21,6 +22,7 @@ const props = withDefaults(defineProps<{
   assignedToAll?: boolean
   claimable?: boolean
   draggable?: boolean
+  categoryDot?: CleaningCategory | null
 }>(), {
   iconName: null,
   photoUrl: null,
@@ -36,6 +38,7 @@ const props = withDefaults(defineProps<{
   assignedToAll: false,
   claimable: false,
   draggable: false,
+  categoryDot: null,
 })
 const emit = defineEmits<{ click: []; 'photo-click': []; 'video-click': [] }>()
 
@@ -97,6 +100,12 @@ const timeLabel = computed(() => {
 
     <div class="flex-1 min-w-0">
       <div class="flex items-center gap-1.5 flex-wrap">
+        <span
+          v-if="categoryDot"
+          class="w-2.5 h-2.5 rounded-full shrink-0"
+          :class="CLEANING_CATEGORY_DOT_CLASS[categoryDot]"
+          :title="categoryDot"
+        ></span>
         <span class="font-bold text-amber-900 text-sm truncate">{{ name }}</span>
         <span v-if="oneoff" class="badge-sm text-purple-500 bg-purple-100">
           one-off

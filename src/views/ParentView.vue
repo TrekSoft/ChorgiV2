@@ -7,7 +7,7 @@ import { occursOn, deadlineFor, startsAt } from '../lib/recurrence'
 import { timePeriods } from '../composables/useTimePeriods'
 import { CHORE_KIND, CARD_VARIANT, CONFETTI_MODE, FORM_KIND, NOW_TICK_INTERVAL_MS, OFFLINE_MESSAGE, PARENT_ASSIGNEE_PREFIX, TOAST_DURATION_MS, WEEK_START_SUNDAY, type ConfettiMode, type FormKind } from '../lib/constants'
 import { DATE_FORMAT, formatCents } from '../lib/format'
-import { isParentAssignee, parentAssigneeDisplay } from '../lib/chore-utils'
+import { isParentAssignee, parentAssigneeDisplay, cleaningSectionsForDate, taskCategory } from '../lib/chore-utils'
 import { family } from '../composables/useFamily'
 import { member } from '../composables/useFamily'
 import { children } from '../composables/useChildren'
@@ -211,16 +211,9 @@ const claimableChores = computed(() =>
   }),
 )
 
-const cleaningSections = computed(() => {
-  const day = cleaningDays.value[todayStr.value]
-  if (!day) return []
-  return (day.roomIds || [])
-    .map((roomId) => ({
-      room: rooms.value.find((r) => r.id === roomId),
-      tasks: tasks.value.filter((t) => t.kind === CHORE_KIND.CLEANING && t.roomId === roomId),
-    }))
-    .filter((s) => s.room && s.tasks.length > 0)
-})
+const cleaningSections = computed(() =>
+  cleaningSectionsForDate(todayStr.value, cleaningDays.value, rooms.value, tasks.value),
+)
 
 function isPreAssigned(task: ClaimableItem) {
   return !!task.assigneeId && task.assigneeId === meAssigneeId.value
@@ -454,8 +447,8 @@ async function onTaskUnclaim(task: ClaimableItem) {
             />
           </div>
 
-          <div v-for="section in cleaningSections" :key="section.room!.id" class="flex flex-col gap-3">
-            <h2 class="text-lg font-bold text-sky-800">🧹 {{ section.room!.name }}</h2>
+          <div v-for="section in cleaningSections" :key="section.room.id" class="flex flex-col gap-3">
+            <h2 class="text-lg font-bold text-sky-800">🧹 {{ section.room.name }}</h2>
             <ChoreCard
               v-for="task in section.tasks"
               :key="task.id"
@@ -464,6 +457,7 @@ async function onTaskUnclaim(task: ClaimableItem) {
               :photo-url="task.photoURL"
               :video-url="task.videoURL"
               :video-thumb-url="task.videoThumbURL"
+              :category-dot="taskCategory(task)"
               :variant="CARD_VARIANT.TASK"
               v-bind="taskCardProps(task)"
               :pending="isPending(task.id)"
