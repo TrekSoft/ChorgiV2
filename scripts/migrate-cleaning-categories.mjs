@@ -5,7 +5,7 @@
 //   1. Firebase Console → Project settings → Service accounts → Generate new private key
 //   2. Save the downloaded JSON as scripts/serviceAccountKey.json (gitignored)
 //      — or point GOOGLE_APPLICATION_CREDENTIALS at it
-//   3. npm install --no-save firebase-admin
+//   3. (firebase-admin is already available via the firebase-tools dev dependency)
 //
 // Run:     node scripts/migrate-cleaning-categories.mjs
 // Dry run: node scripts/migrate-cleaning-categories.mjs --dry-run
@@ -13,7 +13,8 @@
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
-import admin from 'firebase-admin'
+import { initializeApp, cert } from 'firebase-admin'
+import { getFirestore } from 'firebase-admin/firestore'
 
 const here = dirname(fileURLToPath(import.meta.url))
 const keyPath = process.env.GOOGLE_APPLICATION_CREDENTIALS || join(here, 'serviceAccountKey.json')
@@ -21,15 +22,15 @@ const dryRun = process.argv.includes('--dry-run')
 
 let credential
 try {
-  credential = admin.credential.cert(JSON.parse(readFileSync(keyPath, 'utf8')))
+  credential = cert(JSON.parse(readFileSync(keyPath, 'utf8')))
 } catch {
   console.error(`Could not load a service account key at: ${keyPath}`)
   console.error('See the setup steps in the header of this script.')
   process.exit(1)
 }
 
-admin.initializeApp({ credential })
-const db = admin.firestore()
+initializeApp({ credential })
+const db = getFirestore()
 
 const familyRefs = await db.collection('families').listDocuments()
 let scanned = 0
