@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch, nextTick } from 'vue'
+import { ref, watch, nextTick, onMounted, onUnmounted } from 'vue'
 import { verifyPin } from '../composables/usePinGate'
 
 const props = withDefaults(defineProps<{
@@ -14,6 +14,25 @@ const digits = ref(['', '', '', ''])
 const inputs = ref<HTMLInputElement[]>([])
 const error = ref(false)
 const keepAdmin = ref(false)
+
+// Keyboard avoidance: track the visual viewport so the dialog re-centers above the keyboard
+const keyboardOffset = ref(0)
+
+function updateKeyboardOffset() {
+  const vv = window.visualViewport
+  if (!vv) return
+  keyboardOffset.value = Math.max(0, window.innerHeight - vv.height - vv.offsetTop)
+}
+
+onMounted(() => {
+  window.visualViewport?.addEventListener('resize', updateKeyboardOffset)
+  window.visualViewport?.addEventListener('scroll', updateKeyboardOffset)
+})
+
+onUnmounted(() => {
+  window.visualViewport?.removeEventListener('resize', updateKeyboardOffset)
+  window.visualViewport?.removeEventListener('scroll', updateKeyboardOffset)
+})
 
 watch(
   () => props.open,
@@ -56,7 +75,7 @@ async function submit() {
 
 <template>
   <Teleport to="body">
-    <div v-if="open" class="dialog-overlay">
+    <div v-if="open" class="dialog-overlay" :style="{ paddingBottom: `calc(1rem + ${keyboardOffset}px)` }">
       <div class="dialog-container p-8 w-full max-w-xs flex flex-col items-center gap-6">
         <h2 class="text-xl font-bold text-amber-900">{{ title }}</h2>
         <div class="flex gap-3">
