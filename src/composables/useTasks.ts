@@ -14,6 +14,7 @@ import { uploadFamilyPhoto } from '../lib/photo'
 import { uploadFamilyVideo } from '../lib/video'
 import type { Task, TaskDoc } from '../types/firebase'
 import { taskConverter } from '../types/firebase'
+import type { CleaningCategory } from '../lib/constants'
 
 export const tasks = ref<Task[]>([])
 export const tasksLoading = ref(true)
@@ -77,6 +78,20 @@ export async function upsertTask(taskId: string | null, data: TaskUpsertData): P
 export async function reorderTasks(taskIds: string[]): Promise<void> {
   const batch = writeBatch(db)
   taskIds.forEach((id, index) => {
+    batch.update(doc(db, 'families', familyId.value!, 'tasks', id), { order: index })
+  })
+  await batch.commit()
+}
+
+/** Move a task to a different category and rewrite the room's order in one batch. */
+export async function moveTaskToCategory(
+  taskId: string,
+  category: CleaningCategory,
+  orderedRoomTaskIds: string[],
+): Promise<void> {
+  const batch = writeBatch(db)
+  batch.update(doc(db, 'families', familyId.value!, 'tasks', taskId), { category })
+  orderedRoomTaskIds.forEach((id, index) => {
     batch.update(doc(db, 'families', familyId.value!, 'tasks', id), { order: index })
   })
   await batch.commit()

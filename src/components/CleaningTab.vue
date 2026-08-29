@@ -5,7 +5,7 @@ import { writeBatch, doc } from 'firebase/firestore'
 import { db } from '../lib/firebase'
 import { familyId, member } from '../composables/useFamily'
 import { rooms, upsertRoom, removeRoom, roomsLoading } from '../composables/useCleaning'
-import { tasks, removeTask, reorderTasks } from '../composables/useTasks'
+import { tasks, removeTask, reorderTasks, moveTaskToCategory } from '../composables/useTasks'
 import { children } from '../composables/useChildren'
 import { currentUser } from '../composables/useAuth'
 import { useDialog } from '../composables/useDialog'
@@ -103,6 +103,7 @@ function toggleSection(roomId: string, category: CleaningCategory) {
 
 const dragTaskId = ref<string | null>(null)
 const dragOverTaskId = ref<string | null>(null)
+const dragOverSectionKey = ref<string | null>(null)
 
 function onDragStart(taskId: string) {
   dragTaskId.value = taskId
@@ -117,26 +118,68 @@ function onDragLeave() {
   dragOverTaskId.value = null
 }
 
-// reorder stays within a category section; other sections keep their relative order
+function onSectionDragOver(roomId: string, category: CleaningCategory) {
+  if (dragTaskId.value === null) return
+  dragOverSectionKey.value = sectionKey(roomId, category)
+}
+
+function onSectionDragLeave(roomId: string, category: CleaningCategory) {
+  if (dragOverSectionKey.value === sectionKey(roomId, category)) dragOverSectionKey.value = null
+}
+
+// highlight a section as a move target when dragging a task from a different category
+function isDropTargetSection(roomId: string, category: CleaningCategory) {
+  if (dragTaskId.value === null || dragOverSectionKey.value !== sectionKey(roomId, category)) return false
+  const dragged = tasks.value.find((t) => t.id === dragTaskId.value)
+  return !!dragged && taskCategory(dragged) !== category
+}
+
+// same-category drop reorders within the section; cross-category drop moves the task
+// into that section at the drop position (or the end when dropped on empty space)
 async function onDrop(roomId: string, category: CleaningCategory) {
   if (dragTaskId.value === null) return
-  const sectionTasks = tasksFor(roomId, category)
-  const fromIdx = sectionTasks.findIndex((t) => t.id === dragTaskId.value)
-  const toIdx = sectionTasks.findIndex((t) => t.id === dragOverTaskId.value)
-  if (fromIdx === -1 || toIdx === -1 || fromIdx === toIdx) {
-    dragTaskId.value = null
-    dragOverTaskId.value = null
-    return
-  }
-  const reorderedSection = [...sectionTasks]
-  const [moved] = reorderedSection.splice(fromIdx, 1)
-  reorderedSection.splice(toIdx, 0, moved)
-  const sectionIds = new Set(reorderedSection.map((t) => t.id))
-  let i = 0
-  const newRoomOrder = tasksFor(roomId).map((t) => (sectionIds.has(t.id) ? reorderedSection[i++] : t))
-  await reorderTasks(newRoomOrder.map((t) => t.id))
+  const draggedId = dragTaskId.value
+  const dragged = tasks.value.find((t) => t.id === draggedId)
+  const toTaskId = dragOverTaskId.value
   dragTaskId.value = null
   dragOverTaskId.value = null
+  dragOverSectionKey.value = null
+  if (!dragged) return
+
+  const fromCategory = taskCategory(dragged)
+  const roomTasks = tasksFor(roomId)
+  const sectionTasks = tasksFor(roomId, category)
+  const toIdx = sectionTasks.findIndex((t) => t.id === toTaskId)
+
+  if (fromCategory === category) {
+    const fromIdx = sectionTasks.findIndex((t) => t.id === draggedId)
+    if (fromIdx === -1 || fromIdx === toIdx) return
+    if (toIdx === -1 && sectionTasks.length <= 1) return
+    const reorderedSection = [...sectionTasks]
+    reorderedSection.splice(fromIdx, 1)
+    if (toIdx === -1) reorderedSection.push(dragged)
+    else reorderedSection.splice(toIdx, 0, dragged)
+    const sectionIds = new Set(reorderedSection.map((t) => t.id))
+    let i = 0
+    const newRoomOrder = roomTasks.map((t) => (sectionIds.has(t.id) ? reorderedSection[i++] : t))
+    await reorderTasks(newRoomOrder.map((t) => t.id))
+    return
+  }
+
+  const rest = roomTasks.filter((t) => t.id !== draggedId)
+  let insertAt: number
+  if (toIdx !== -1) {
+    insertAt = rest.findIndex((t) => t.id === sectionTasks[toIdx].id)
+  } else {
+    let lastIdx = -1
+    rest.forEach((t, i) => {
+      if (taskCategory(t) === category) lastIdx = i
+    })
+    insertAt = lastIdx + 1
+  }
+  const newRoomOrder = [...rest]
+  newRoomOrder.splice(insertAt, 0, dragged)
+  await moveTaskToCategory(draggedId, category, newRoomOrder.map((t) => t.id))
 }
 
 const meAssigneeId = computed(() => PARENT_ASSIGNEE_PREFIX + (currentUser.value?.uid || ''))
@@ -236,7 +279,13 @@ function openEditTask(task: Task) {
               v-for="(cat, catIdx) in CLEANING_CATEGORIES"
               :key="cat"
               class="flex flex-col gap-2 py-2 first:pt-0 last:pb-0"
-              :class="catIdx > 0 ? 'border-t border-amber-100' : ''"
+              :class="[
+                catIdx > 0 ? 'border-t border-amber-100' : '',
+                isDropTargetSection(room.id, cat) ? 'ring-2 ring-sky-300 rounded-xl' : '',
+              ]"
+              @dragover.prevent="onSectionDragOver(room.id, cat)"
+              @dragleave="onSectionDragLeave(room.id, cat)"
+              @drop.prevent="onDrop(room.id, cat)"
             >
               <button
                 type="button"
@@ -262,7 +311,7 @@ function openEditTask(task: Task) {
                   @dragstart="onDragStart(task.id)"
                   @dragover.prevent="onDragOver(task.id)"
                   @dragleave="onDragLeave"
-                  @drop.prevent="onDrop(room.id, cat)"
+                  @drop.stop.prevent="onDrop(room.id, cat)"
                   :class="dragOverTaskId === task.id && dragTaskId !== task.id ? 'ring-2 ring-amber-400 rounded-xl' : ''"
                 >
                   <ScheduleItem
