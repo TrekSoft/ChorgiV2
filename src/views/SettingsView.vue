@@ -23,6 +23,9 @@ import { specialDay, updateSpecialDay, clearSpecialDay } from '../composables/us
 import type { TimePeriod } from '../types/firebase'
 import AppHeader from '../components/AppHeader.vue'
 import PhotoPicker from '../components/PhotoPicker.vue'
+import { useDarkMode } from '../composables/useDarkMode'
+
+const { sunSchedule } = useDarkMode()
 
 const name = ref('')
 const birthdate = ref('')
@@ -417,6 +420,10 @@ async function saveTimePeriods() {
           No email is sent. They just need to sign in with this exact email at Chorgi and they'll automatically join your family.
         </p>
       </section>
+
+      <p v-if="sunSchedule" class="text-center text-amber-500 text-sm">
+        Dark mode automatically applied between {{ sunSchedule.sunset }} – {{ sunSchedule.sunrise }}
+      </p>
     </main>
   </div>
 </template>

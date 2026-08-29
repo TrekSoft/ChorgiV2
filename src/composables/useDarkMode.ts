@@ -65,11 +65,24 @@ function isDarkWithSunTimes(now: Date, times: SunTimes | null): boolean {
 }
 
 const isDark = ref(false)
+const sunSchedule = ref<{ sunset: string; sunrise: string } | null>(null)
 let sunTimes: SunTimes | null = null
 let fetchedToday = false
 
+function updateScheduleDisplay() {
+  if (sunTimes) {
+    sunSchedule.value = {
+      sunset: new Date(sunTimes.sunset).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }),
+      sunrise: new Date(sunTimes.sunrise).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }),
+    }
+  } else {
+    sunSchedule.value = null
+  }
+}
+
 function update() {
   isDark.value = isDarkWithSunTimes(new Date(), sunTimes)
+  updateScheduleDisplay()
 }
 
 async function ensureSunTimes() {
@@ -107,5 +120,5 @@ export function useDarkMode() {
     }
   })
 
-  return { isDark }
+  return { isDark, sunSchedule }
 }
