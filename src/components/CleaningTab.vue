@@ -3,11 +3,11 @@ import { computed, ref } from 'vue'
 import { Icon } from '@iconify/vue'
 import { writeBatch, doc } from 'firebase/firestore'
 import { db } from '../lib/firebase'
-import { familyId, member } from '../composables/useFamily'
+import { familyId } from '../composables/useFamily'
+import { familyMembers } from '../composables/useFamilyMembers'
 import { rooms, upsertRoom, removeRoom, roomsLoading } from '../composables/useCleaning'
 import { tasks, removeTask, reorderTasks, moveTaskToCategory } from '../composables/useTasks'
 import { children } from '../composables/useChildren'
-import { currentUser } from '../composables/useAuth'
 import { useDialog } from '../composables/useDialog'
 import { isParentAssignee, parentAssigneeDisplay, taskCategory } from '../lib/chore-utils'
 import { CHORE_KIND, FORM_KIND, PARENT_ASSIGNEE_PREFIX, CLEANING_CATEGORIES, CLEANING_CATEGORY_LABELS, CLEANING_CATEGORY_DOT_CLASS, type CleaningCategory } from '../lib/constants'
@@ -182,12 +182,10 @@ async function onDrop(roomId: string, category: CleaningCategory) {
   await moveTaskToCategory(draggedId, category, newRoomOrder.map((t) => t.id))
 }
 
-const meAssigneeId = computed(() => PARENT_ASSIGNEE_PREFIX + (currentUser.value?.uid || ''))
-
 function assigneesFor(task: Task) {
   if (!task.assigneeId) return []
   if (isParentAssignee(task.assigneeId)) {
-    return [{ id: task.assigneeId, ...parentAssigneeDisplay(task.assigneeId, meAssigneeId.value, member.value) }]
+    return [{ id: task.assigneeId, ...parentAssigneeDisplay(task.assigneeId, familyMembers.value) }]
   }
   const c = children.value.find((c) => c.id === task.assigneeId)
   return c ? [c] : []

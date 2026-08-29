@@ -9,7 +9,8 @@ import { CHORE_KIND, CARD_VARIANT, CONFETTI_MODE, FORM_KIND, NOW_TICK_INTERVAL_M
 import { DATE_FORMAT, formatCents } from '../lib/format'
 import { isParentAssignee, parentAssigneeDisplay, cleaningSectionsForDate, taskCategory } from '../lib/chore-utils'
 import { currentUser } from '../composables/useAuth'
-import { family, member } from '../composables/useFamily'
+import { family } from '../composables/useFamily'
+import { familyMembers } from '../composables/useFamilyMembers'
 import { children } from '../composables/useChildren'
 import { chores, choresLoading } from '../composables/useChores'
 import { tasks, tasksLoading } from '../composables/useTasks'
@@ -213,8 +214,12 @@ function claimFor(task: ClaimableItem) {
   return claims.value[claimIdFor(task, claimDateStr(task))] || null
 }
 
-function claimChild(claim: Claim | null) {
-  return children.value.find((c) => c.id === claim?.childId) || null
+// resolves a claim's owner — a child, or a parent when childId is a parent assignee id
+function claimOwner(claim: Claim | null): { name: string; photoURL: string | null } | null {
+  if (!claim) return null
+  if (isParentAssignee(claim.childId)) return parentAssigneeDisplay(claim.childId, familyMembers.value)
+  const c = children.value.find((c) => c.id === claim.childId)
+  return c ? { name: c.name, photoURL: c.photoURL || null } : null
 }
 
 // unassigned one-off chores for today are claimable by any kid
@@ -258,7 +263,7 @@ function taskCardProps(task: ClaimableItem) {
     const claim = claimFor(task)
     const mine = isPreAssigned(task)
     const assignee = isParentAssignee(task.assigneeId)
-      ? parentAssigneeDisplay(task.assigneeId, meAssigneeId.value, member.value)
+      ? parentAssigneeDisplay(task.assigneeId, familyMembers.value)
       : assignedChild(task)
     return {
       completed: !!claim?.completed,
@@ -269,7 +274,7 @@ function taskCardProps(task: ClaimableItem) {
   }
   const claim = claimFor(task)
   const mine = !!(claim && child.value && claim.childId === child.value.id)
-  const owner = claim ? claimChild(claim) : null
+  const owner = claimOwner(claim)
   return {
     completed: !!claim?.completed,
     claimedByName: claim ? owner?.name || 'someone else' : null,
@@ -351,7 +356,7 @@ async function onTaskTap(task: ClaimableItem) {
   }
   // claimed by another child — locked for kids; admin mode can release the claim
   if (isAdminMode.value) {
-    const owner = claimChild(claim)
+    const owner = claimOwner(claim)
     const ok = await confirm({
       title: 'Release claim',
       message: `Release ${owner?.name || 'the other child'}'s claim on "${task.name}"?`,
@@ -373,7 +378,7 @@ async function onTaskUnclaim(task: ClaimableItem) {
     await unclaimTask(task, claimDateStr(task))
     playSafely(playUnclaim)
   } else if (isAdminMode.value) {
-    const owner = claimChild(claim)
+    const owner = claimOwner(claim)
     const ok = await confirm({
       title: 'Release claim',
       message: `Release ${owner?.name || 'the other child'}'s claim on "${task.name}"?`,

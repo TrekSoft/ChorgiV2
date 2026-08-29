@@ -11,14 +11,14 @@ export interface ParentAssigneeDisplay {
   photoURL: string | null
 }
 
-/** Name/photo to show for a task assigned to a parent — only the signed-in parent's profile is known. */
+/** Name/photo to show for a task assigned to a parent, resolved from the family's member list. */
 export function parentAssigneeDisplay(
   assigneeId: string,
-  meAssigneeId: string,
-  member: Member | null,
+  members: Member[],
 ): ParentAssigneeDisplay {
-  if (assigneeId !== meAssigneeId) return { name: 'Parent', photoURL: null }
-  return { name: member?.name || 'Parent', photoURL: member?.photoURL || null }
+  const uid = assigneeId.slice(PARENT_ASSIGNEE_PREFIX.length)
+  const found = members.find((m) => m.id === uid)
+  return { name: found?.name || 'Parent', photoURL: found?.photoURL || null }
 }
 
 export function isActiveChore(chore: Chore): boolean {
