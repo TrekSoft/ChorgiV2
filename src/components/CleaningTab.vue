@@ -10,7 +10,7 @@ import { tasks, removeTask, reorderTasks, moveTaskToCategory } from '../composab
 import { children } from '../composables/useChildren'
 import { useDialog } from '../composables/useDialog'
 import { isParentAssignee, parentAssigneeDisplay, taskCategory } from '../lib/chore-utils'
-import { CHORE_KIND, FORM_KIND, PARENT_ASSIGNEE_PREFIX, CLEANING_CATEGORIES, CLEANING_CATEGORY_LABELS, CLEANING_CATEGORY_DOT_CLASS, type CleaningCategory } from '../lib/constants'
+import { CHORE_KIND, FORM_KIND, PARENT_ASSIGNEE_PREFIX, CLEANING_CATEGORY, CLEANING_CATEGORIES, CLEANING_CATEGORY_LABELS, CLEANING_CATEGORY_DOT_CLASS, type CleaningCategory } from '../lib/constants'
 import type { Room, Task, ChoreFormInitial } from '../types/firebase'
 import ScheduleItem from './ScheduleItem.vue'
 import PhotoLightbox from './PhotoLightbox.vue'
@@ -335,6 +335,13 @@ function openEditTask(task: Task) {
                 </button>
               </div>
             </div>
+
+            <button
+              @click="openAddTask(room.id, CLEANING_CATEGORY.TIDY)"
+              class="text-sm font-bold text-amber-600 border-2 border-dashed border-amber-200 rounded-xl py-2 hover:bg-amber-50 cursor-pointer sm:hidden"
+            >
+              + Task
+            </button>
           </div>
         </div>
       </div>

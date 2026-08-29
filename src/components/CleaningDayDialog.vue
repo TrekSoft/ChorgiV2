@@ -110,7 +110,7 @@ async function save() {
                 :aria-expanded="dropdownRoomId === room.id"
               >
                 <span class="w-2.5 h-2.5 rounded-full shrink-0" :class="CLEANING_CATEGORY_DOT_CLASS[categoryFor(room.id)]"></span>
-                <span class="text-sm">{{ CLEANING_CATEGORY_LABELS[categoryFor(room.id)] }}</span>
+                <span class="text-sm w-11 text-left">{{ CLEANING_CATEGORY_LABELS[categoryFor(room.id)] }}</span>
                 <Icon icon="mdi:chevron-down" class="w-4 h-4 shrink-0 transition-transform" :class="dropdownRoomId === room.id ? 'rotate-180' : ''" />
               </button>
               <div
