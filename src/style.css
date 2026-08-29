@@ -209,3 +209,16 @@ input[type="date"]::-webkit-calendar-picker-indicator,
 input[type="time"]::-webkit-calendar-picker-indicator {
   display: none !important;
 }
+
+@keyframes coinFall {
+  0% {
+    top: -40px;
+    opacity: 1;
+    transform: translateX(-50%) rotate(0deg);
+  }
+  100% {
+    top: 105vh;
+    opacity: 0;
+    transform: translateX(calc(-50% + var(--drift))) rotate(var(--rotation));
+  }
+}

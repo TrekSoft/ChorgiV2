@@ -7,6 +7,7 @@ import { isAdminMode } from '../composables/useAdminMode'
 import { addMark, removeMark, setAllowanceBalance, payoutChild } from '../composables/useAllowance'
 import { useDialog } from '../composables/useDialog'
 import { formatCents, dollarsToCents } from '../lib/format'
+import { celebrateCoins } from '../lib/coin-celebration'
 import Tooltip from './Tooltip.vue'
 import type { Child } from '../types/firebase'
 
@@ -83,7 +84,7 @@ function onPayoutClick(event: Event) {
     ],
     confirmLabel: 'Pay allowance',
     danger: true,
-  }).then((ok) => { if (ok) payoutChild(props.child.id) })
+  }).then((ok) => { if (ok) { payoutChild(props.child.id); celebrateCoins() } })
 }
 </script>
 
