@@ -13,7 +13,7 @@ This file is the resume anchor. At the start of each session, read this file, fi
 - **State:** No store framework (no Pinia). State = Vue composables wrapping Firestore `onSnapshot` live queries — data is always server-fresh, pushed in real time (claims/schedule edits sync instantly across devices). Offline persistence stays disabled.
 - **Routing:** Vue Router (`/` home grid, `/child/:id`, `/schedule` with `?tab=calendar|cleaning`, `/settings`)
 - **Styling:** Tailwind CSS (mobile-first, chunky touch targets)
-- **Backend:** Firebase — Auth (passwordless email link), Firestore (data + real-time sync), Storage (photos), Hosting (deploy)
+- **Backend:** Firebase — Auth (email/password), Firestore (data + real-time sync), Storage (photos), Hosting (deploy)
 - **Icons:** `@iconify/vue` (Iconify — huge searchable icon library, on-demand)
 - **Confetti/fireworks:** `canvas-confetti`
 - **Dates:** `date-fns`
@@ -47,7 +47,7 @@ This file is the resume anchor. At the start of each session, read this file, fi
 ## 3. Firebase Setup Guide (human steps — do once, Phase 0)
 
 1. Go to <https://console.firebase.google.com> → **Add project** → name it `chorgi` (disable Analytics; not needed).
-2. **Auth:** Build → Authentication → Sign-in method → enable **Email/Password (Email link / passwordless)**. localhost is pre-allowed; `chorgi.com` gets added as an authorized domain in Phase 9 once DNS is live.
+2. **Auth:** Build → Authentication → Sign-in method → enable **Email/Password**. localhost is pre-allowed; `chorgi.com` gets added as an authorized domain in Phase 9 once DNS is live.
 3. **Firestore:** Build → Firestore Database → Create database → **Production mode** → pick region closest to you.
 4. **Storage:** Build → Storage → Get started → Production mode.
 5. **Hosting:** Build → Hosting → Get started (skip CLI step; agents will run `firebase init hosting` later).
@@ -172,12 +172,12 @@ families/{uid}/claims/{yyyy-MM-dd}_{taskId}
 - **DoD:** app boots, Tailwind works, Firebase SDK initializes. **Human needs:** Firebase console steps (§3).
 
 ### Phase 1 — Auth + Profiles + PIN `[x]`
-- Email-link passwordless sign-up/sign-in flow; UX copy guides user to open the link on the SAME device/browser (Firebase constraint)
+- Email/password sign-up/sign-in flow (originally email-link passwordless; switched to email/password with a “Forgot password?” reset flow — legacy email-link users reset their password once)
 - First signup: create family + member profile (name, birthdate, optional photo → Storage) + set shared 4-digit PIN
 - Subsequent logins: `userIndex` lookup → load family; invite claim flow if email matches a pending invite (new member creates their own profile, family PIN already set)
 - `PinDialog`, `usePinGate`
 - Route guard: unauthenticated → auth screen (logo placeholder; drop provided logo into `src/assets/`)
-- **DoD:** primary parent signs up; invited parent joins via own email link; both see the same family; PIN gates actions.
+- **DoD:** primary parent signs up; invited parent joins by registering with their authorized email; both see the same family; PIN gates actions.
 
 ### Phase 2 — App Shell + Home Grid `[x]`
 - `AppHeader` + `AvatarMenu` with 5 actions: Schedule [PIN], Admin toggle [PIN], Settings [PIN], Reports [PIN], Sign out [PIN] (Schedule link is PIN-checked navigation only — direct URL entry is not gated, per spec)
@@ -277,7 +277,7 @@ families/{uid}/claims/{yyyy-MM-dd}_{taskId}
 2c. ~~**End-time behavior**~~ — RESOLVED: past end time, chore stays completable, pinned to top labeled overdue, completion flagged `late`; start time optional and hides chore until reached; end time settable without start time.
 2d. ~~**Reports page**~~ — RESOLVED: new PIN-gated `/reports` page (Phase 8b) with date picker and per-child late/overdue/missed/claimed breakdown.
 3. ~~**Single parent account**~~ — SUPERSEDED by 3b.
-3b. ~~**Multi-parent**~~ — RESOLVED: multiple parents per family. Primary uid = family doc id; additional parents invited by email in Settings, sign in with their own email link, get own member profile (avatar shows logged-in parent); ONE shared family PIN; `authorizedUids` + `userIndex` + `invites` model; all client-side, no Cloud Functions.
+3b. ~~**Multi-parent**~~ — RESOLVED: multiple parents per family. Primary uid = family doc id; additional parents invited by email in Settings, register/sign in with their own email + password, get own member profile (avatar shows logged-in parent); ONE shared family PIN; `authorizedUids` + `userIndex` + `invites` model; all client-side, no Cloud Functions.
 4. ~~**Multi-assignee completion**~~ — RESOLVED: each assignee completes independently; completion docs keyed chore+child+period; fireworks per child when THEIR left pane is done.
 5. ~~**Week start**~~ — RESOLVED: **Sunday** start (Sun–Sat week view; weekly chores due end of Saturday); stored as `weekStartsOn` family setting.
 6. ~~**Expired chore visibility**~~ — RESOLVED (superseded by 2c): overdue chores stay completable at top; at period end, incomplete chores vanish from child view and appear as Missed in Reports.

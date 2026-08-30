@@ -1,15 +1,13 @@
 import { ref } from 'vue'
 import {
+  createUserWithEmailAndPassword,
   onAuthStateChanged,
-  sendSignInLinkToEmail,
-  isSignInWithEmailLink,
-  signInWithEmailLink,
+  sendPasswordResetEmail,
+  signInWithEmailAndPassword,
   signOut as firebaseSignOut,
   type User,
 } from 'firebase/auth'
 import { auth } from '../lib/firebase'
-
-const EMAIL_KEY = 'chorgi_emailForSignIn'
 
 // undefined = auth state not yet known; null = known signed-out; object = signed-in user
 export const currentUser = ref<User | null | undefined>(undefined)
@@ -28,26 +26,16 @@ onAuthStateChanged(auth, (user) => {
   }
 })
 
-export async function sendSignInLink(email: string): Promise<void> {
-  const actionCodeSettings = {
-    url: `${window.location.origin}/auth/finish`,
-    handleCodeInApp: true,
-  }
-  await sendSignInLinkToEmail(auth, email, actionCodeSettings)
-  window.localStorage.setItem(EMAIL_KEY, email)
+export async function registerWithEmail(email: string, password: string): Promise<void> {
+  await createUserWithEmailAndPassword(auth, email, password)
 }
 
-export function isFinishLink(): boolean {
-  return isSignInWithEmailLink(auth, window.location.href)
+export async function signInWithEmail(email: string, password: string): Promise<void> {
+  await signInWithEmailAndPassword(auth, email, password)
 }
 
-export function rememberedEmail(): string | null {
-  return window.localStorage.getItem(EMAIL_KEY)
-}
-
-export async function completeSignIn(email: string): Promise<void> {
-  await signInWithEmailLink(auth, email, window.location.href)
-  window.localStorage.removeItem(EMAIL_KEY)
+export async function sendPasswordReset(email: string): Promise<void> {
+  await sendPasswordResetEmail(auth, email)
 }
 
 export function signOut(): Promise<void> {

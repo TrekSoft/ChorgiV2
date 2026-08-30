@@ -124,7 +124,7 @@ async function sendInvite() {
     const email = inviteEmail.value.trim()
     await inviteParent(email)
     inviteEmail.value = ''
-    inviteSent.value = `${email} is now authorized — they can sign in at Chorgi to join your family.`
+    inviteSent.value = `${email} is now authorized — they can create an account (or sign in) at Chorgi with that email to join your family.`
   } catch (e) {
     console.error('inviteParent failed', e)
     inviteError.value = 'Could not authorize that email. Please try again.'
@@ -417,7 +417,7 @@ async function saveTimePeriods() {
         <p v-if="inviteSent" class="text-success">{{ inviteSent }}</p>
         <p v-if="inviteError" class="text-error">{{ inviteError }}</p>
         <p class="text-amber-600 text-sm">
-          No email is sent. They just need to sign in with this exact email at Chorgi and they'll automatically join your family.
+          No email is sent. They just need to create an account (or sign in) with this exact email and a password at Chorgi and they'll automatically join your family.
         </p>
       </section>
 
