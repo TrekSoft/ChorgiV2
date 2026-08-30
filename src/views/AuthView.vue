@@ -68,9 +68,17 @@ async function submit() {
 
 <template>
   <main class="page-bg flex items-center justify-center p-6">
-    <div class="card-shadow p-8 w-full max-w-sm flex flex-col items-center gap-5">
+    <div class="card-shadow p-8 w-full max-w-sm flex flex-col items-center gap-5 relative">
+      <button
+        v-if="mode === 'reset' && !resetSent"
+        @click="switchMode('signin')"
+        class="absolute top-6 left-6 flex items-center gap-1 text-amber-600 hover:text-amber-700 text-sm font-medium cursor-pointer"
+      >
+        <Icon icon="mdi:arrow-left" class="w-4 h-4" />
+        Back to sign in
+      </button>
       <img :src="logo" alt="Chorgi logo" class="w-28 h-28" />
-      <h1 class="text-4xl font-bold text-amber-900">Chorgi</h1>
+      <h1 class="text-4xl font-bold text-amber-900 -mt-2">Chorgi</h1>
 
       <!-- Reset password sub-view -->
       <template v-if="mode === 'reset'">
@@ -89,14 +97,7 @@ async function submit() {
         </template>
 
         <template v-else>
-          <button
-            @click="switchMode('signin')"
-            class="self-start flex items-center gap-1 text-amber-600 hover:text-amber-700 text-sm font-medium cursor-pointer -ml-1"
-          >
-            <Icon icon="mdi:arrow-left" class="w-4 h-4" />
-            Back to sign in
-          </button>
-          <h2 class="text-lg font-bold text-amber-900 -mt-2">Reset your password</h2>
+          <h2 class="text-lg font-bold text-amber-900">Reset your password</h2>
           <p class="text-amber-700 text-sm text-center -mt-3">
             Enter your email and we'll send you a link to set a new password.
           </p>
