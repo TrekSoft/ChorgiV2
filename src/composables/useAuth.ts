@@ -3,14 +3,15 @@ import {
   confirmPasswordReset,
   createUserWithEmailAndPassword,
   onAuthStateChanged,
-  sendPasswordResetEmail,
   signInWithEmailAndPassword,
   signOut as firebaseSignOut,
   verifyPasswordResetCode,
   type User,
-  type ActionCodeSettings,
 } from 'firebase/auth'
+import { getFunctions, httpsCallable } from 'firebase/functions'
 import { auth } from '../lib/firebase'
+
+const functions = getFunctions()
 
 // undefined = auth state not yet known; null = known signed-out; object = signed-in user
 export const currentUser = ref<User | null | undefined>(undefined)
@@ -38,11 +39,8 @@ export async function signInWithEmail(email: string, password: string): Promise<
 }
 
 export async function sendPasswordReset(email: string): Promise<void> {
-  const actionCodeSettings: ActionCodeSettings = {
-    url: `${window.location.origin}/auth/reset-action`,
-    handleCodeInApp: true,
-  }
-  await sendPasswordResetEmail(auth, email, actionCodeSettings)
+  const sendReset = httpsCallable<{ email: string }, void>(functions, 'sendPasswordReset')
+  await sendReset({ email })
 }
 
 export async function verifyResetCode(code: string): Promise<string> {
