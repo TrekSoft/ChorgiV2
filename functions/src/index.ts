@@ -40,7 +40,7 @@ export const sendPasswordReset = onCall(
       const resetUrl = `${APP_URL}/auth/reset-action?oobCode=${oobCode}`
 
       await transporter.sendMail({
-        from: 'onboarding@resend.dev',
+        from: 'noreply@chorgi.com',
         to: email,
         subject: 'Reset your Chorgi password',
       html: `
