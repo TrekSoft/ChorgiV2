@@ -150,18 +150,6 @@ async function submit() {
           </button>
         </div>
 
-        <Transition
-          enter-active-class="transition-all duration-200 ease-out"
-          leave-active-class="transition-all duration-150 ease-in absolute"
-          enter-from-class="opacity-0 -translate-y-1"
-          leave-to-class="opacity-0 -translate-y-1"
-        >
-          <p v-if="mode === 'register'" class="w-full flex items-center gap-1.5 text-amber-500 text-xs pl-1">
-            <Icon icon="mdi:account-plus-outline" class="w-3.5 h-3.5 shrink-0" />
-            <span>Invited by a parent? Use the exact email they authorized to join their family.</span>
-          </p>
-        </Transition>
-
         <form @submit.prevent="submit" class="w-full flex flex-col gap-4">
           <label class="flex flex-col gap-1.5">
             <span class="form-label text-sm">Email</span>
