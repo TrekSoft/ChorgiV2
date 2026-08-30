@@ -7,40 +7,42 @@ initializeApp()
 
 const APP_URL = process.env.APP_URL || 'https://chorgi-aa4b9.web.app'
 
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST || 'smtp.gmail.com',
-  port: Number(process.env.SMTP_PORT) || 587,
-  secure: Number(process.env.SMTP_PORT) === 465,
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
-  },
-})
-
-export const sendPasswordReset = onCall(async (request) => {
-  const { email } = request.data as { email: string }
-  if (!email || typeof email !== 'string') {
-    throw new HttpsError('invalid-argument', 'Email is required')
-  }
-
-  try {
-    const link = await getAuth().generatePasswordResetLink(email, {
-      url: `${APP_URL}/auth/reset-action`,
-      handleCodeInApp: true,
-    })
-
-    const url = new URL(link)
-    const oobCode = url.searchParams.get('oobCode')
-    if (!oobCode) {
-      throw new HttpsError('internal', 'Failed to generate reset code')
+export const sendPasswordReset = onCall(
+  { secrets: ['SMTP_PASS'] },
+  async (request) => {
+    const { email } = request.data as { email: string }
+    if (!email || typeof email !== 'string') {
+      throw new HttpsError('invalid-argument', 'Email is required')
     }
 
-    const resetUrl = `${APP_URL}/auth/reset-action?oobCode=${oobCode}`
+    const transporter = nodemailer.createTransport({
+      host: process.env.SMTP_HOST || 'smtp.gmail.com',
+      port: Number(process.env.SMTP_PORT) || 587,
+      secure: Number(process.env.SMTP_PORT) === 465,
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
+      },
+    })
 
-    await transporter.sendMail({
-      from: `"Chorgi" <${process.env.SMTP_USER || 'noreply@chorgi.com'}>`,
-      to: email,
-      subject: 'Reset your Chorgi password',
+    try {
+      const link = await getAuth().generatePasswordResetLink(email, {
+        url: `${APP_URL}/auth/reset-action`,
+        handleCodeInApp: true,
+      })
+
+      const url = new URL(link)
+      const oobCode = url.searchParams.get('oobCode')
+      if (!oobCode) {
+        throw new HttpsError('internal', 'Failed to generate reset code')
+      }
+
+      const resetUrl = `${APP_URL}/auth/reset-action?oobCode=${oobCode}`
+
+      await transporter.sendMail({
+        from: 'onboarding@resend.dev',
+        to: email,
+        subject: 'Reset your Chorgi password',
       html: `
         <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 480px; margin: 0 auto; padding: 24px;">
           <h2 style="color: #92400e; margin-bottom: 16px;">Reset your password</h2>
