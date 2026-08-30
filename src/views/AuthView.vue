@@ -125,13 +125,13 @@ async function submit() {
 
       <!-- Sign in / Create account -->
       <template v-else>
-        <div class="w-full grid grid-cols-2 bg-amber-100 rounded-xl p-1" role="tablist">
+        <div class="w-full grid grid-cols-2 bg-amber-50 border-2 border-amber-200 rounded-xl p-1" role="tablist">
           <button
             role="tab"
             :aria-selected="mode === 'signin'"
             @click="switchMode('signin')"
             class="py-2 rounded-lg text-sm font-bold transition-colors cursor-pointer"
-            :class="mode === 'signin' ? 'bg-white text-amber-900 shadow-sm' : 'text-amber-600 hover:text-amber-800'"
+            :class="mode === 'signin' ? 'bg-amber-500 text-white shadow-sm' : 'text-amber-600 hover:text-amber-800'"
           >
             Sign in
           </button>
@@ -140,7 +140,7 @@ async function submit() {
             :aria-selected="mode === 'register'"
             @click="switchMode('register')"
             class="py-2 rounded-lg text-sm font-bold transition-colors cursor-pointer"
-            :class="mode === 'register' ? 'bg-white text-amber-900 shadow-sm' : 'text-amber-600 hover:text-amber-800'"
+            :class="mode === 'register' ? 'bg-amber-500 text-white shadow-sm' : 'text-amber-600 hover:text-amber-800'"
           >
             Create account
           </button>
