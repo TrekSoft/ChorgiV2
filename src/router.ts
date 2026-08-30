@@ -3,6 +3,7 @@ import type { RouteRecordRaw } from 'vue-router'
 import HomeView from './views/HomeView.vue'
 import AuthView from './views/AuthView.vue'
 import AuthFinishView from './views/AuthFinishView.vue'
+import AuthResetView from './views/AuthResetView.vue'
 import OnboardingView from './views/OnboardingView.vue'
 import SettingsView from './views/SettingsView.vue'
 import ScheduleView from './views/ScheduleView.vue'
@@ -18,6 +19,7 @@ const routes: RouteRecordRaw[] = [
   { path: '/', name: 'home', component: HomeView },
   { path: '/auth', name: 'auth', component: AuthView },
   { path: '/auth/finish', name: 'auth-finish', component: AuthFinishView },
+  { path: '/auth/reset-action', name: 'auth-reset-action', component: AuthResetView },
   { path: '/onboarding', name: 'onboarding', component: OnboardingView },
   { path: '/settings', name: 'settings', component: SettingsView },
   { path: '/schedule', name: 'schedule', component: ScheduleView },

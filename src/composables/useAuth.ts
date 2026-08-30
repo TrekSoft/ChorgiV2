@@ -1,11 +1,14 @@
 import { ref } from 'vue'
 import {
+  confirmPasswordReset,
   createUserWithEmailAndPassword,
   onAuthStateChanged,
   sendPasswordResetEmail,
   signInWithEmailAndPassword,
   signOut as firebaseSignOut,
+  verifyPasswordResetCode,
   type User,
+  type ActionCodeSettings,
 } from 'firebase/auth'
 import { auth } from '../lib/firebase'
 
@@ -35,7 +38,19 @@ export async function signInWithEmail(email: string, password: string): Promise<
 }
 
 export async function sendPasswordReset(email: string): Promise<void> {
-  await sendPasswordResetEmail(auth, email)
+  const actionCodeSettings: ActionCodeSettings = {
+    url: `${window.location.origin}/auth/reset-action`,
+    handleCodeInApp: true,
+  }
+  await sendPasswordResetEmail(auth, email, actionCodeSettings)
+}
+
+export async function verifyResetCode(code: string): Promise<string> {
+  return verifyPasswordResetCode(auth, code)
+}
+
+export async function confirmPasswordResetAction(code: string, newPassword: string): Promise<void> {
+  await confirmPasswordReset(auth, code, newPassword)
 }
 
 export function signOut(): Promise<void> {
