@@ -113,7 +113,7 @@ async function submit() {
               <button
                 type="button"
                 @click="showPassword = !showPassword"
-                class="absolute right-1 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center text-amber-400 hover:text-amber-600 cursor-pointer"
+                class="absolute right-1 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center text-amber-500 hover:text-amber-700 cursor-pointer"
                 :aria-label="showPassword ? 'Hide password' : 'Show password'"
               >
                 <Icon :icon="showPassword ? 'mdi:eye-off' : 'mdi:eye'" class="w-5 h-5" />
