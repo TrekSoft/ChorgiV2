@@ -23,9 +23,9 @@ import { specialDay, updateSpecialDay, clearSpecialDay } from '../composables/us
 import type { TimePeriod } from '../types/firebase'
 import AppHeader from '../components/AppHeader.vue'
 import PhotoPicker from '../components/PhotoPicker.vue'
-import { useDarkMode } from '../composables/useDarkMode'
+import { usePeriodicTick } from '../composables/usePeriodicTick'
 
-const { sunSchedule } = useDarkMode()
+const { sunSchedule } = usePeriodicTick()
 
 const name = ref('')
 const birthdate = ref('')

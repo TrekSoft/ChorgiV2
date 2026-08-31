@@ -1,5 +1,6 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import { getCoordsForTimezone } from '../lib/timezone-coords'
+import { accrueDailyAllowance } from './useAllowance'
 
 const FALLBACK_START_HOUR = 21 // 9 PM
 const FALLBACK_END_HOUR = 5 // 5 AM
@@ -80,17 +81,6 @@ function updateScheduleDisplay() {
   }
 }
 
-function update() {
-  if (sunTimes && sunTimes.date !== todayStr()) {
-    fetchedToday = false
-    sunTimes = null
-    ensureSunTimes()
-    return
-  }
-  isDark.value = isDarkWithSunTimes(new Date(), sunTimes)
-  updateScheduleDisplay()
-}
-
 async function ensureSunTimes() {
   if (fetchedToday) return
   sunTimes = getCachedSunTimes()
@@ -99,22 +89,32 @@ async function ensureSunTimes() {
     if (sunTimes) setCachedSunTimes(sunTimes)
   }
   fetchedToday = true
-  update()
+  tick()
+}
+
+function tick() {
+  if (sunTimes && sunTimes.date !== todayStr()) {
+    fetchedToday = false
+    sunTimes = null
+    ensureSunTimes()
+    return
+  }
+  isDark.value = isDarkWithSunTimes(new Date(), sunTimes)
+  updateScheduleDisplay()
+  accrueDailyAllowance()
 }
 
 let interval: ReturnType<typeof setInterval> | null = null
 let listeners = 0
 
-export function useDarkMode() {
+export function usePeriodicTick() {
   onMounted(() => {
     listeners++
     if (listeners === 1) {
-      // immediate update with cached or fallback
       sunTimes = getCachedSunTimes()
-      update()
-      // fetch fresh times if needed (once per day)
+      tick()
       ensureSunTimes()
-      interval = setInterval(update, 60_000)
+      interval = setInterval(tick, 60_000)
     }
   })
 

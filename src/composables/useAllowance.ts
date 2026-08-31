@@ -1,9 +1,8 @@
-import { watch } from 'vue'
 import { format } from 'date-fns'
 import { doc, updateDoc, increment } from 'firebase/firestore'
 import { db } from '../lib/firebase'
 import { familyId, family } from './useFamily'
-import { children, childrenLoading } from './useChildren'
+import { children } from './useChildren'
 
 import { DEFAULT_MARK_PENALTY_CENTS } from '../lib/constants'
 import { DATE_FORMAT } from '../lib/format'
@@ -69,21 +68,6 @@ export function accrueDailyAllowance(): Promise<void> {
     })
   }
   return accrualInFlight
-}
-
-/**
- * Accrue allowance as soon as family data is ready. Call from a component
- * setup so it re-checks each time that component mounts (e.g. every
- * navigation to the home screen) rather than only on a full page load.
- */
-export function useAllowanceAccrual(): void {
-  watch(
-    [familyId, childrenLoading],
-    ([id, loading]) => {
-      if (id && !loading && children.value.length > 0) accrueDailyAllowance()
-    },
-    { immediate: true },
-  )
 }
 
 export async function addMark(childId: string): Promise<void> {
