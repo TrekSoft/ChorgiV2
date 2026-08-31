@@ -81,6 +81,12 @@ function updateScheduleDisplay() {
 }
 
 function update() {
+  if (sunTimes && sunTimes.date !== todayStr()) {
+    fetchedToday = false
+    sunTimes = null
+    ensureSunTimes()
+    return
+  }
   isDark.value = isDarkWithSunTimes(new Date(), sunTimes)
   updateScheduleDisplay()
 }
