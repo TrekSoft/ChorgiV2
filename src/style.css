@@ -210,6 +210,74 @@ input[type="time"]::-webkit-calendar-picker-indicator {
   display: none !important;
 }
 
+/* Mystery bonus jackpot wheel */
+.jackpot-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at 50% 40%, rgba(120, 53, 15, 0.95), rgba(23, 12, 4, 0.98));
+  animation: jackpotFadeIn 0.3s ease-out;
+}
+
+.jackpot-title {
+  font-size: 2rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  color: #fde68a;
+  text-shadow:
+    0 0 8px #f59e0b,
+    0 0 24px #f59e0b,
+    0 2px 0 #92400e;
+  animation: jackpotGlow 1.2s ease-in-out infinite alternate;
+}
+
+.jackpot-light {
+  animation: jackpotBlink 0.6s ease-in-out infinite;
+  filter: drop-shadow(0 0 4px currentColor);
+}
+
+.jackpot-light-fast {
+  animation-duration: 0.18s;
+}
+
+.jackpot-win {
+  animation: jackpotPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.jackpot-amount {
+  display: block;
+  font-size: 3rem;
+  line-height: 1;
+  font-weight: 900;
+  color: #4ade80;
+  text-shadow:
+    0 0 12px #22c55e,
+    0 3px 0 #14532d;
+}
+
+@keyframes jackpotFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes jackpotGlow {
+  from { text-shadow: 0 0 6px #f59e0b, 0 0 16px #f59e0b, 0 2px 0 #92400e; }
+  to { text-shadow: 0 0 14px #fbbf24, 0 0 36px #f59e0b, 0 2px 0 #92400e; }
+}
+
+@keyframes jackpotBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.25; }
+}
+
+@keyframes jackpotPop {
+  0% { transform: scale(0.4); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
 @keyframes coinFall {
   0% {
     top: -40px;

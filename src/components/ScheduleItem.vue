@@ -18,6 +18,7 @@ const props = withDefaults(defineProps<{
   noDeadline?: boolean
   oneoff?: boolean
   bonusCents?: number | null
+  bonusMaxCents?: number | null
   assignees?: { id: string; name: string; photoURL?: string | null }[]
   assignedToAll?: boolean
   claimable?: boolean
@@ -34,6 +35,7 @@ const props = withDefaults(defineProps<{
   noDeadline: false,
   oneoff: false,
   bonusCents: null,
+  bonusMaxCents: null,
   assignees: () => [],
   assignedToAll: false,
   claimable: false,
@@ -116,7 +118,10 @@ const timeLabel = computed(() => {
         <span v-if="noDeadline" class="badge-sm text-indigo-600 bg-indigo-100">
           anytime
         </span>
-        <span v-if="bonusCents" class="badge-sm text-amber-700 bg-amber-100">
+        <span v-if="bonusMaxCents" class="badge-sm text-green-700 bg-green-100" title="Mystery bonus">
+          🎰 ${{ formatCents(bonusCents) }}–${{ formatCents(bonusMaxCents) }}
+        </span>
+        <span v-else-if="bonusCents" class="badge-sm text-amber-700 bg-amber-100">
           + ${{ formatCents(bonusCents) }}
         </span>
       </div>

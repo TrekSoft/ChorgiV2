@@ -12,6 +12,8 @@ import {
   claims,
   completionIdFor,
   claimIdFor,
+  choreBonusFor,
+  claimBonusFor,
 } from '../composables/useCompletions'
 import { occursOn, deadlineFor, startsAt } from '../lib/recurrence'
 import { timePeriods } from '../composables/useTimePeriods'
@@ -84,7 +86,7 @@ const reportData = computed(() => {
           late,
           overdue,
           missed,
-          bonusCents: chore.bonusCents || null,
+          bonusCents: (completed ? choreBonusFor(chore, child.id, date, ws) : chore.bonusCents) || null,
           deadline,
           isWeekly: chore.kind === CHORE_KIND.RECURRING && chore.weekly,
           isNoDeadline: !!chore.noDeadline,
@@ -118,7 +120,7 @@ const reportData = computed(() => {
           claimedByMe: isMine,
           claimedByName: claim ? childName(claim.childId) : null,
           completed: isMine ? !!claim?.completed : null,
-          bonusCents: chore.bonusCents || null,
+          bonusCents: (claim?.completed ? claimBonusFor(chore, claimKeyFor(chore, date, ws), claim.childId) : chore.bonusCents) || null,
         }
       })
       .filter((e) => e.claimedByMe)

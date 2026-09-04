@@ -147,6 +147,30 @@ export function playCoin(): void {
   playTone(1319, 0.12, 'square', 0.08, 0.07)
 }
 
+/** Single wheel-pointer click; pitch rises slightly as `progress` (0–1) approaches the stop. */
+export function playSpinTick(progress = 0): void {
+  playTone(900 + progress * 300, 0.03, 'square', 0.05, 0, 500)
+  playNoiseBurst(0.02, 0.04, 0)
+}
+
+/** A cascade of coin clinks; `intensity` (0–1) scales how many coins spill out. */
+export function playCoinClinks(intensity = 1): void {
+  const ac = getCtx()
+  if (!ac) return
+  const clinks = Math.round(4 + intensity * 20)
+  for (let i = 0; i < clinks; i++) {
+    const delay = i * 0.045 + Math.random() * 0.03
+    const freq = 1400 + Math.random() * 1600
+    const duration = 0.08 + Math.random() * 0.07
+    playTone(freq, duration, 'triangle', 0.12, delay, freq * 0.6)
+    playTone(freq * 1.5, duration * 0.6, 'sine', 0.04, delay, freq)
+  }
+  if (intensity >= 0.75) {
+    const start = clinks * 0.045 + 0.05
+    ;[784, 988, 1175, 1568].forEach((freq, i) => playTone(freq, 0.25, 'square', 0.06, start + i * 0.09))
+  }
+}
+
 export function playFireworks(): void {
   const ac = getCtx()
   if (!ac) return
