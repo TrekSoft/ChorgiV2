@@ -51,8 +51,12 @@ const assigneeIds = ref(props.initial?.assigneeIds || [])
 const assigneeId = ref(props.initial?.assigneeId || null)
 const date = ref(props.initial?.date || '')
 const bonusAmount = ref(props.initial ? String((props.initial.bonusCents || 0) / 100) : '0')
-const bonusMaxAmount = ref(props.initial?.bonusMaxCents ? String(props.initial.bonusMaxCents / 100) : '')
-const bonusMaxCents = computed(() => (bonusMaxAmount.value.trim() ? dollarsToCents(bonusMaxAmount.value) : null))
+// v-model on a type="number" input yields a number once typed, so this holds string | number
+const bonusMaxAmount = ref<string | number>(props.initial?.bonusMaxCents ? String(props.initial.bonusMaxCents / 100) : '')
+const bonusMaxCents = computed(() => {
+  const raw = String(bonusMaxAmount.value).trim()
+  return raw ? dollarsToCents(raw) : null
+})
 const bonusMaxInvalid = computed(() => bonusMaxCents.value !== null && bonusMaxCents.value <= dollarsToCents(bonusAmount.value))
 const roomId = ref(props.initial?.roomId || (props.rooms[0]?.id ?? ''))
 const category = ref<CleaningCategory>(props.initial?.category || CLEANING_CATEGORY.TIDY)
@@ -453,11 +457,11 @@ function submit() {
     <div v-if="showBonus" class="flex flex-col gap-1">
       <div class="flex gap-3">
         <label class="flex flex-col gap-1 flex-1 min-w-0">
-          <span class="form-label">Bonus amount ($) <span class="form-hint">(optional)</span></span>
+          <span class="form-label">Bonus ($) <span class="form-hint">(optional)</span></span>
           <input v-model="bonusAmount" type="number" min="0" step="any" class="input-field w-full min-w-0" />
         </label>
         <label class="flex flex-col gap-1 flex-1 min-w-0">
-          <span class="form-label">Max amount ($) <span class="form-hint">(optional)</span></span>
+          <span class="form-label">Max ($) <span class="form-hint">(optional)</span></span>
           <input v-model="bonusMaxAmount" type="number" min="0" step="any" placeholder="Mystery" class="input-field w-full min-w-0" :class="bonusMaxInvalid ? '!border-red-400' : ''" />
         </label>
       </div>
