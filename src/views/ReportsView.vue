@@ -17,6 +17,7 @@ import { occursOn, deadlineFor, startsAt } from '../lib/recurrence'
 import { timePeriods } from '../composables/useTimePeriods'
 import { CHORE_KIND, WEEK_START_SUNDAY } from '../lib/constants'
 import { DATE_FORMAT, formatCents } from '../lib/format'
+import { claimKeyFor, isClaimableOn } from '../lib/chore-utils'
 
 const weekStartsOn = computed(() => family.value?.weekStartsOn ?? WEEK_START_SUNDAY)
 const now = new Date()
@@ -101,32 +102,18 @@ const reportData = computed(() => {
     const overdueCount = choreEntries.filter((e) => e.overdue).length
     const missedCount = choreEntries.filter((e) => e.missed).length
 
-    // --- Claimable one-off chores ---
-    const claimableOneoffs = chores.value.filter((chore) => {
-      if (chore.kind !== CHORE_KIND.ONEOFF) return false
-      if (chore.active === false) return false
-      if ((chore.assigneeIds || []).length > 0) return false
-      if (chore.noDeadline) {
-        const claim = claims.value[claimIdFor(chore, 'anytime')]
-        if (claim?.completed) {
-          const completedDate = claim.completedAt?.toDate()
-          if (completedDate && format(completedDate, DATE_FORMAT) !== dateStr) return false
-        }
-        return true
-      }
-      return chore.date === dateStr
-    })
+    // --- Claimable (unassigned) chores ---
+    const claimableChores = chores.value.filter((chore) => isClaimableOn(chore, date, claims.value, claimIdFor, ws))
 
-    const oneoffEntries = claimableOneoffs
+    const oneoffEntries = claimableChores
       .map((chore) => {
-        const claimId = chore.noDeadline ? claimIdFor(chore, 'anytime') : claimIdFor(chore, dateStr)
-        const claim = claims.value[claimId]
+        const claim = claims.value[claimIdFor(chore, claimKeyFor(chore, date, ws))]
         const isMine = claim?.childId === child.id
         return {
           id: chore.id,
           name: chore.name,
           iconName: chore.iconName,
-          kind: CHORE_KIND.ONEOFF,
+          kind: chore.kind,
           claimed: !!claim,
           claimedByMe: isMine,
           claimedByName: claim ? childName(claim.childId) : null,

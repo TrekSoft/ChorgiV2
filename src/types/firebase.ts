@@ -266,6 +266,7 @@ export interface ClaimableItem {
   bonusCents?: number
   assigneeId?: string | null
   noDeadline?: boolean
+  weekly?: boolean
 }
 
 /** A calendar day entry in CalendarTab. */

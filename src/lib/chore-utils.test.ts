@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
-import { taskCategory, roomCategoryFor, includedCategories, cleaningSectionsForDate } from './chore-utils'
-import { CHORE_KIND, CLEANING_CATEGORY } from './constants'
-import type { Task, Room, CleaningDay } from '../types/firebase'
+import { taskCategory, roomCategoryFor, includedCategories, cleaningSectionsForDate, claimKeyFor, isClaimableOn } from './chore-utils'
+import { CHORE_KIND, CLEANING_CATEGORY, RECURRENCE_TYPE } from './constants'
+import type { Task, Room, CleaningDay, Chore } from '../types/firebase'
 
 function makeTask(overrides: Partial<Task>): Task {
   return {
@@ -94,5 +94,65 @@ describe('cleaningSectionsForDate', () => {
   it('omits rooms whose included categories have no tasks', () => {
     const days = { [dateStr]: { id: dateStr, roomIds: ['r2'] } as CleaningDay } // r2 only has a deep task
     expect(cleaningSectionsForDate(dateStr, days, rooms, tasks)).toEqual([])
+  })
+})
+
+function makeChore(overrides: Partial<Chore>): Chore {
+  return {
+    id: 'c1',
+    kind: CHORE_KIND.RECURRING,
+    name: 'Chore',
+    assigneeIds: [],
+    active: true,
+    ...overrides,
+  } as Chore
+}
+
+const claimIdFor = (item: { id: string }, dateStr: string) => `${dateStr}_${item.id}`
+
+describe('claimKeyFor', () => {
+  const friday = new Date(2026, 7, 28, 12) // Fri Aug 28 2026
+
+  it('uses the day for daily recurring chores and dated one-offs', () => {
+    expect(claimKeyFor(makeChore({ recurrence: { type: RECURRENCE_TYPE.DAILY } }), friday)).toBe('2026-08-28')
+    expect(claimKeyFor(makeChore({ kind: CHORE_KIND.ONEOFF, date: '2026-08-28' }), friday)).toBe('2026-08-28')
+  })
+
+  it('uses the week for weekly recurring chores', () => {
+    const weekly = makeChore({ weekly: true })
+    expect(claimKeyFor(weekly, friday, 0)).toBe(claimKeyFor(weekly, new Date(2026, 7, 23, 12), 0))
+    expect(claimKeyFor(weekly, friday, 0)).not.toBe(claimKeyFor(weekly, new Date(2026, 7, 30, 12), 0))
+  })
+
+  it("uses 'anytime' for no-deadline one-offs", () => {
+    expect(claimKeyFor(makeChore({ kind: CHORE_KIND.ONEOFF, noDeadline: true }), friday)).toBe('anytime')
+  })
+})
+
+describe('isClaimableOn', () => {
+  const friday = new Date(2026, 7, 28, 12)
+
+  it('includes unassigned recurring chores that occur on the day', () => {
+    const weekdays = makeChore({ recurrence: { type: RECURRENCE_TYPE.WEEKDAYS, days: [5] } })
+    expect(isClaimableOn(weekdays, friday, {}, claimIdFor)).toBe(true)
+    expect(isClaimableOn(weekdays, new Date(2026, 7, 27, 12), {}, claimIdFor)).toBe(false)
+    expect(isClaimableOn(makeChore({ weekly: true }), friday, {}, claimIdFor)).toBe(true)
+  })
+
+  it('excludes assigned and inactive chores', () => {
+    expect(isClaimableOn(makeChore({ weekly: true, assigneeIds: ['kid'] }), friday, {}, claimIdFor)).toBe(false)
+    expect(isClaimableOn(makeChore({ weekly: true, active: false }), friday, {}, claimIdFor)).toBe(false)
+  })
+
+  it('respects the start of a daily time window when now is given', () => {
+    const morning = makeChore({ recurrence: { type: RECURRENCE_TYPE.DAILY }, timeWindow: { start: '14:00' } })
+    expect(isClaimableOn(morning, friday, {}, claimIdFor, 0, [], friday)).toBe(false)
+    expect(isClaimableOn(morning, friday, {}, claimIdFor, 0, [], new Date(2026, 7, 28, 15))).toBe(true)
+  })
+
+  it('includes dated one-offs only on their date', () => {
+    const oneoff = makeChore({ kind: CHORE_KIND.ONEOFF, date: '2026-08-28' })
+    expect(isClaimableOn(oneoff, friday, {}, claimIdFor)).toBe(true)
+    expect(isClaimableOn(oneoff, new Date(2026, 7, 29, 12), {}, claimIdFor)).toBe(false)
   })
 })

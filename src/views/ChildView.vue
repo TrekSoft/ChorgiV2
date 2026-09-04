@@ -7,7 +7,7 @@ import { occursOn, deadlineFor, startsAt } from '../lib/recurrence'
 import { timePeriods } from '../composables/useTimePeriods'
 import { CHORE_KIND, CARD_VARIANT, CONFETTI_MODE, FORM_KIND, NOW_TICK_INTERVAL_MS, OFFLINE_MESSAGE, PARENT_ASSIGNEE_PREFIX, TOAST_DURATION_MS, WEEK_START_SUNDAY, type ConfettiMode, type FormKind } from '../lib/constants'
 import { DATE_FORMAT, formatCents } from '../lib/format'
-import { isParentAssignee, parentAssigneeDisplay, cleaningSectionsForDate, taskCategory } from '../lib/chore-utils'
+import { isParentAssignee, parentAssigneeDisplay, cleaningSectionsForDate, taskCategory, claimKeyFor, isClaimableOn } from '../lib/chore-utils'
 import { currentUser } from '../composables/useAuth'
 import { family } from '../composables/useFamily'
 import { familyMembers } from '../composables/useFamilyMembers'
@@ -207,7 +207,7 @@ watch(allAssignedDone, (done) => {
 
 // --- right pane: claimable tasks ---
 function claimDateStr(task: ClaimableItem): string {
-  return task.noDeadline ? 'anytime' : todayStr.value
+  return claimKeyFor(task, now.value, weekStartsOn.value)
 }
 
 function claimFor(task: ClaimableItem) {
@@ -222,23 +222,14 @@ function claimOwner(claim: Claim | null): { name: string; photoURL: string | nul
   return c ? { name: c.name, photoURL: c.photoURL || null } : null
 }
 
-// unassigned one-off chores for today are claimable by any kid
+// unassigned one-off and recurring chores occurring today are claimable by any kid
 const claimableChores = computed(() =>
-  chores.value.filter((c) => {
-    if (c.kind !== CHORE_KIND.ONEOFF) return false
-    if (c.active === false) return false
-    if ((c.assigneeIds || []).length > 0) return false
-    if (c.noDeadline) {
-      const claim = claims.value[claimIdFor(c, 'anytime')]
-      if (claim?.completed) {
-        const completedDate = claim.completedAt?.toDate()
-        if (completedDate && format(completedDate, DATE_FORMAT) !== todayStr.value) return false
-      }
-      return true
-    }
-    return c.date === todayStr.value
-  }),
+  chores.value.filter((c) => isClaimableOn(c, now.value, claims.value, claimIdFor, weekStartsOn.value, timePeriods.value, now.value)),
 )
+
+function claimDeadline(chore: Chore): Date | null {
+  return chore.noDeadline ? null : deadlineFor(chore, now.value, weekStartsOn.value, timePeriods.value)
+}
 
 const cleaningSections = computed(() => {
   if (!child.value) return []
@@ -467,7 +458,8 @@ async function onTaskUnclaim(task: ClaimableItem) {
               :video-url="task.videoURL"
               :video-thumb-url="task.videoThumbURL"
               :bonus-cents="task.bonusCents || null"
-              oneoff
+              :oneoff="task.kind === CHORE_KIND.ONEOFF"
+              :deadline="claimDeadline(task)"
               :variant="CARD_VARIANT.TASK"
               v-bind="taskCardProps(task)"
               :pending="isPending(task.id)"
