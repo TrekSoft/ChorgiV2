@@ -1,6 +1,8 @@
-import { CHORE_KIND, PARENT_ASSIGNEE_PREFIX, CLEANING_CATEGORY, CLEANING_CATEGORIES, type CleaningCategory } from './constants'
+import { format, startOfWeek } from 'date-fns'
+import { CHORE_KIND, PARENT_ASSIGNEE_PREFIX, CLEANING_CATEGORY, CLEANING_CATEGORIES, WEEK_START_SUNDAY, type CleaningCategory } from './constants'
+import { DATE_FORMAT, WEEK_KEY_FORMAT } from './format'
 import { occursOn, startsAt } from './recurrence'
-import type { Chore, Task, Room, CleaningDay, Claim, Child, Member, TimePeriod } from '../types/firebase'
+import type { Chore, Task, Room, CleaningDay, Claim, Child, ClaimableItem, Member, TimePeriod } from '../types/firebase'
 
 export function isParentAssignee(assigneeId: string | null | undefined): boolean {
   return !!assigneeId && assigneeId.startsWith(PARENT_ASSIGNEE_PREFIX)
@@ -36,6 +38,46 @@ export function isClaimableOneoff(chore: Chore, dateStr: string): boolean {
     getAssigneeIds(chore).length === 0 &&
     chore.date === dateStr
   )
+}
+
+/**
+ * Key scoping a claim to one occurrence of an item: 'anytime' for no-deadline
+ * one-offs, the week for weekly recurring chores, otherwise the calendar day.
+ */
+export function claimKeyFor(item: ClaimableItem, date: Date, weekStartsOn: 0 | 1 = WEEK_START_SUNDAY): string {
+  if (item.kind === CHORE_KIND.ONEOFF && item.noDeadline) return 'anytime'
+  if (item.kind === CHORE_KIND.RECURRING && item.weekly) {
+    return format(startOfWeek(date, { weekStartsOn }), WEEK_KEY_FORMAT, { weekStartsOn })
+  }
+  return format(date, DATE_FORMAT)
+}
+
+/** Unassigned one-off or recurring chore that any kid can claim on the given day. */
+export function isClaimableOn(
+  chore: Chore,
+  date: Date,
+  claims: Record<string, Claim>,
+  claimIdForFn: (item: ClaimableItem, dateStr: string) => string,
+  weekStartsOn: 0 | 1 = WEEK_START_SUNDAY,
+  periods: TimePeriod[] = [],
+  now: Date | null = null,
+): boolean {
+  if (!isActiveChore(chore)) return false
+  if (getAssigneeIds(chore).length > 0) return false
+  if (chore.kind === CHORE_KIND.ONEOFF && chore.noDeadline) {
+    const claim = claims[claimIdForFn(chore, claimKeyFor(chore, date, weekStartsOn))]
+    if (claim?.completed) {
+      const completedDate = claim.completedAt?.toDate()
+      if (completedDate && format(completedDate, DATE_FORMAT) !== format(date, DATE_FORMAT)) return false
+    }
+    return true
+  }
+  if (!occursOn(chore, date)) return false
+  if (now) {
+    const start = startsAt(chore, date, periods)
+    if (start && now < start) return false
+  }
+  return true
 }
 
 export function assignedChoresForChild(chore: Chore, childId: string, date: Date | string, now: Date, periods: TimePeriod[] = []): boolean {

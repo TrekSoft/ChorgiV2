@@ -170,8 +170,6 @@ watch(selectedPeriodId, (id) => {
 
 const valid = computed(() => {
   if (!name.value.trim()) return false
-  // recurring chores must be assigned; one-off chores may be left unassigned (claimable)
-  if (props.kind === FORM_KIND.RECURRING_CHORE && assigneeIds.value.length === 0) return false
   if (showDate.value && !date.value) return false
   if (showRoom.value && !roomId.value) return false
   if (showRecurrence.value && recurrenceMode.value === RECURRENCE_MODE.DAILY && dailyPatternType.value === RECURRENCE_TYPE.WEEKDAYS && weekdays.value.length === 0) {
@@ -265,8 +263,8 @@ function submit() {
     <div class="flex flex-col gap-2">
       <span class="form-label">
         Assign to
-        <span v-if="kind === FORM_KIND.ONEOFF_CHORE" class="form-hint">(optional — unassigned one-offs can be claimed by any kid)</span>
-        <span v-else-if="kind === FORM_KIND.CLEANING_TASK" class="form-hint">(optional)</span>
+        <span v-if="kind === FORM_KIND.CLEANING_TASK" class="form-hint">(optional)</span>
+        <span v-else class="form-hint">(optional — unassigned chores can be claimed by any kid)</span>
       </span>
       <div class="flex flex-wrap gap-2">
         <button

@@ -77,8 +77,8 @@ function matchesFilter(chore: Chore) {
   if (filterChildId.value === ME_FILTER) {
     return (chore.assigneeIds || []).includes(meAssigneeId.value)
   }
-  // unassigned one-off chores are claimable by any kid, so they show under every filter
-  if (chore.kind === CHORE_KIND.ONEOFF && (chore.assigneeIds || []).length === 0) return true
+  // unassigned chores are claimable by any kid, so they show under every filter
+  if ((chore.assigneeIds || []).length === 0) return true
   return (chore.assigneeIds || []).includes(filterChildId.value)
 }
 
@@ -122,7 +122,7 @@ function entriesFor(day: Date): ScheduleEntry[] {
       assignees: assigneesFor(chore),
       assignedToAll:
         children.value.length > 0 && (chore.assigneeIds || []).length >= children.value.length,
-      claimable: chore.kind === CHORE_KIND.ONEOFF && (chore.assigneeIds || []).length === 0,
+      claimable: (chore.assigneeIds || []).length === 0,
       // sort by start time (untimed chores last)
       sortKey: resolveTimeWindow(chore).timeWindow?.start || '99:99',
     })
