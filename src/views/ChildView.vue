@@ -20,6 +20,9 @@ import {
   claims,
   completionIdFor,
   claimIdFor,
+  claimJackpotSeed,
+  choreBonusFor,
+  claimBonusFor,
   completeChore,
   uncompleteChore,
   claimTask,
@@ -30,12 +33,14 @@ import {
 import { isAdminMode } from '../composables/useAdminMode'
 import { isBirthdayToday } from '../lib/birthday'
 import { playSafely, playClaim, playUnclaim } from '../lib/sounds'
+import { isJackpot, jackpotForItem, type Jackpot } from '../lib/jackpot'
 import { useDialog } from '../composables/useDialog'
 import { useIdleTimeout } from '../composables/useIdleTimeout'
 import AppHeader from '../components/AppHeader.vue'
 import ChoreCard from '../components/ChoreCard.vue'
 import EmptyState from '../components/EmptyState.vue'
 import ConfettiBurst from '../components/ConfettiBurst.vue'
+import JackpotWheel from '../components/JackpotWheel.vue'
 import PhotoLightbox from '../components/PhotoLightbox.vue'
 import ChoreFormDialog from '../components/ChoreFormDialog.vue'
 import type { Chore, Task, Claim, Child, ClaimableItem, AssignedEntry } from '../types/firebase'
@@ -99,6 +104,38 @@ async function withPending(id: string, write: () => Promise<void>, celebrate: ()
 
 const lightboxSrc = ref<string | null>(null)
 const lightboxVideoSrc = ref<string | null>(null)
+
+// --- mystery bonus wheel ---
+const wheel = ref<{ jackpot: Jackpot; minCents: number; maxCents: number; name: string } | null>(null)
+
+/** Celebrates a bonus: spins the wheel for a mystery bonus, otherwise the usual coin burst. */
+function celebrateBonus(item: ClaimableItem, bonusCents: number, seed: string) {
+  const jackpot = jackpotForItem(item, seed)
+  if (jackpot) {
+    wheel.value = { jackpot, minCents: item.bonusCents || 0, maxCents: item.bonusMaxCents!, name: item.name }
+    return
+  }
+  burst.value?.fire(CONFETTI_MODE.COINS)
+  showToast(`+ $${formatCents(bonusCents)} bonus!`)
+}
+
+function onWheelDone() {
+  if (wheel.value) showToast(`+ $${formatCents(wheel.value.jackpot.amountCents)} bonus!`)
+  wheel.value = null
+}
+
+/** Bonus shown on an assigned chore card: the won amount once done, otherwise the base bonus. */
+function choreCardBonus(entry: AssignedEntry): number | null {
+  if (!child.value) return null
+  if (entry.completed) return choreBonusFor(entry.chore, child.value.id, now.value, weekStartsOn.value) || null
+  return entry.chore.bonusCents || null
+}
+
+function claimCardBonus(task: ClaimableItem): number | null {
+  const claim = claimFor(task)
+  if (claim?.completed) return claimBonusFor(task, claimDateStr(task), claim.childId) || null
+  return task.bonusCents || null
+}
 
 // --- admin mode: edit a chore/task straight from its card ---
 const editDialogOpen = ref(false)
@@ -187,9 +224,12 @@ async function toggleChore(entry: AssignedEntry) {
       () => completeChore(entry.chore, childId, now.value, weekStartsOn.value),
       () => {
         completedThisSession = true
-        if (entry.chore.bonusCents) {
-          burst.value?.fire(CONFETTI_MODE.COINS)
-          showToast(`+ $${formatCents(entry.chore.bonusCents)} bonus!`)
+        if (entry.chore.bonusCents || isJackpot(entry.chore)) {
+          celebrateBonus(
+            entry.chore,
+            choreBonusFor(entry.chore, childId, now.value, weekStartsOn.value),
+            completionIdFor(entry.chore, childId, now.value, weekStartsOn.value),
+          )
         } else {
           burst.value?.fire(birthdayMode ? CONFETTI_MODE.BALLOONS : CONFETTI_MODE.CONFETTI)
         }
@@ -334,9 +374,8 @@ async function onTaskTap(task: ClaimableItem) {
         task.id,
         () => completeClaim(task, claimDateStr(task)),
         () => {
-          if (task.bonusCents) {
-            burst.value?.fire(CONFETTI_MODE.COINS)
-            showToast(`+ $${formatCents(task.bonusCents)} bonus!`)
+          if (task.bonusCents || isJackpot(task)) {
+            celebrateBonus(task, claimBonusFor(task, claimDateStr(task), claim.childId), claimJackpotSeed(task, claimDateStr(task), claim.childId))
           } else {
             burst.value?.fire(CONFETTI_MODE.CONFETTI)
           }
@@ -429,7 +468,8 @@ async function onTaskUnclaim(task: ClaimableItem) {
             :late="entry.late"
             :overdue="entry.overdue"
             :oneoff="entry.chore.kind === CHORE_KIND.ONEOFF"
-            :bonus-cents="entry.chore.bonusCents || null"
+            :bonus-cents="choreCardBonus(entry)"
+            :mystery-bonus="isJackpot(entry.chore) && !entry.completed"
             :variant="CARD_VARIANT.CHORE"
             :editable="isAdminMode"
             @toggle="toggleChore(entry)"
@@ -457,7 +497,8 @@ async function onTaskUnclaim(task: ClaimableItem) {
               :photo-url="task.photoURL"
               :video-url="task.videoURL"
               :video-thumb-url="task.videoThumbURL"
-              :bonus-cents="task.bonusCents || null"
+              :bonus-cents="claimCardBonus(task)"
+              :mystery-bonus="isJackpot(task) && !claimFor(task)?.completed"
               :oneoff="task.kind === CHORE_KIND.ONEOFF"
               :deadline="claimDeadline(task)"
               :variant="CARD_VARIANT.TASK"
@@ -522,6 +563,13 @@ async function onTaskUnclaim(task: ClaimableItem) {
     />
 
     <ConfettiBurst ref="burst" />
+    <JackpotWheel
+      :jackpot="wheel?.jackpot ?? null"
+      :min-cents="wheel?.minCents ?? 0"
+      :max-cents="wheel?.maxCents ?? 0"
+      :chore-name="wheel?.name"
+      @done="onWheelDone"
+    />
     <PhotoLightbox
       :open="!!lightboxSrc || !!lightboxVideoSrc"
       :src="lightboxSrc || undefined"

@@ -51,6 +51,9 @@ const assigneeIds = ref(props.initial?.assigneeIds || [])
 const assigneeId = ref(props.initial?.assigneeId || null)
 const date = ref(props.initial?.date || '')
 const bonusAmount = ref(props.initial ? String((props.initial.bonusCents || 0) / 100) : '0')
+const bonusMaxAmount = ref(props.initial?.bonusMaxCents ? String(props.initial.bonusMaxCents / 100) : '')
+const bonusMaxCents = computed(() => (bonusMaxAmount.value.trim() ? dollarsToCents(bonusMaxAmount.value) : null))
+const bonusMaxInvalid = computed(() => bonusMaxCents.value !== null && bonusMaxCents.value <= dollarsToCents(bonusAmount.value))
 const roomId = ref(props.initial?.roomId || (props.rooms[0]?.id ?? ''))
 const category = ref<CleaningCategory>(props.initial?.category || CLEANING_CATEGORY.TIDY)
 
@@ -178,6 +181,7 @@ const valid = computed(() => {
   if (showRecurrence.value && recurrenceMode.value === RECURRENCE_MODE.DAILY && dailyPatternType.value === RECURRENCE_TYPE.DAY_OF_MONTH && (!dayOfMonth.value || dayOfMonth.value < 1 || dayOfMonth.value > 31)) {
     return false
   }
+  if (showBonus.value && bonusMaxInvalid.value) return false
   return true
 })
 
@@ -214,6 +218,7 @@ function submit() {
       timeWindow,
       timePeriodId: recurrenceMode.value === RECURRENCE_MODE.DAILY ? selectedPeriodId.value || null : null,
       bonusCents: dollarsToCents(bonusAmount.value),
+      bonusMaxCents: bonusMaxCents.value,
     })
   } else if (props.kind === FORM_KIND.ONEOFF_CHORE) {
     emit('submit', {
@@ -223,6 +228,7 @@ function submit() {
       noDeadline: oneoffNoDeadline.value,
       date: oneoffNoDeadline.value ? null : date.value,
       bonusCents: dollarsToCents(bonusAmount.value),
+      bonusMaxCents: bonusMaxCents.value,
     })
   } else if (props.kind === FORM_KIND.CLEANING_TASK) {
     emit('submit', {
@@ -444,10 +450,20 @@ function submit() {
       </p>
     </div>
 
-    <label v-if="showBonus" class="flex flex-col gap-1">
-      <span class="form-label">Bonus amount ($) <span class="form-hint">(optional)</span></span>
-      <input v-model="bonusAmount" type="number" min="0" step="any" class="input-field" />
-    </label>
+    <div v-if="showBonus" class="flex flex-col gap-1">
+      <div class="flex gap-3">
+        <label class="flex flex-col gap-1 flex-1">
+          <span class="form-label">Bonus amount ($) <span class="form-hint">(optional)</span></span>
+          <input v-model="bonusAmount" type="number" min="0" step="any" class="input-field" />
+        </label>
+        <label class="flex flex-col gap-1 flex-1">
+          <span class="form-label">Max amount ($) <span class="form-hint">(optional)</span></span>
+          <input v-model="bonusMaxAmount" type="number" min="0" step="any" placeholder="Mystery" class="input-field" :class="bonusMaxInvalid ? '!border-red-400' : ''" />
+        </label>
+      </div>
+      <span v-if="bonusMaxInvalid" class="text-sm text-red-500">Max must be greater than the bonus amount.</span>
+      <span v-else-if="bonusMaxCents !== null" class="form-hint">🎰 Mystery bonus — a jackpot wheel picks an amount between the two when the chore is done.</span>
+    </div>
 
     </div>
     <div class="flex flex-col-reverse gap-2 pt-3 pb-3 min-[1400px]:pb-4 shrink-0 border-t border-amber-200 min-[1400px]:flex-row min-[1400px]:justify-end" style="padding-bottom: env(safe-area-inset-bottom)">

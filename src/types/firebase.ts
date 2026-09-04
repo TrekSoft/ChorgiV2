@@ -88,6 +88,8 @@ export interface ChoreDoc {
   timePeriodId?: string | null
   date?: DateString | null
   bonusCents?: number
+  /** When set above bonusCents, the bonus is a mystery amount decided by a jackpot wheel */
+  bonusMaxCents?: number | null
   roomId?: string
   order?: number
   active: boolean
@@ -223,6 +225,7 @@ export interface ChoreFormInitial {
   assigneeId?: string | null
   date?: string | null
   bonusCents?: number
+  bonusMaxCents?: number | null
   roomId?: string
   category?: CleaningCategory
   weekly?: boolean
@@ -250,6 +253,7 @@ export interface ChoreFormPayload {
   timePeriodId?: string | null
   date?: string | null
   bonusCents?: number
+  bonusMaxCents?: number | null
   roomId?: string
   category?: CleaningCategory
 }
@@ -264,6 +268,7 @@ export interface ClaimableItem {
   videoURL?: string | null
   videoThumbURL?: string | null
   bonusCents?: number
+  bonusMaxCents?: number | null
   assigneeId?: string | null
   noDeadline?: boolean
   weekly?: boolean

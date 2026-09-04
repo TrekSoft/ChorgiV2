@@ -274,6 +274,7 @@ function openEdit(entry: ScheduleEntry) {
             :no-deadline="!!entry.item.noDeadline"
             :oneoff="entry.kind === FORM_KIND.ONEOFF_CHORE"
             :bonus-cents="entry.item.bonusCents || null"
+            :bonus-max-cents="entry.item.bonusMaxCents || null"
             :assignees="entry.assignees"
             :assigned-to-all="entry.assignedToAll"
             :claimable="entry.claimable"

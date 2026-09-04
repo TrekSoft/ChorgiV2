@@ -19,6 +19,8 @@ const props = withDefaults(defineProps<{
   claimedByName?: string | null
   claimedByPhoto?: string | null
   bonusCents?: number | null
+  /** Mystery bonus: hide the amount behind a question mark until it's won */
+  mysteryBonus?: boolean
   disabled?: boolean
   pending?: boolean
   variant?: CardVariant
@@ -40,6 +42,7 @@ const props = withDefaults(defineProps<{
   claimedByName: null,
   claimedByPhoto: null,
   bonusCents: null,
+  mysteryBonus: false,
   disabled: false,
   pending: false,
   variant: CARD_VARIANT.CHORE,
@@ -161,7 +164,10 @@ function onUnassignClick() {
           <span v-if="oneoff" class="badge text-purple-500 bg-purple-100">
             one-off
           </span>
-          <span v-if="bonusCents" class="badge text-amber-700 bg-amber-100">
+          <span v-if="mysteryBonus" class="badge text-green-700 bg-green-100 inline-flex items-center gap-0.5" title="Mystery bonus">
+            + $<Icon icon="mdi:help-circle" class="w-4 h-4" />
+          </span>
+          <span v-else-if="bonusCents" class="badge text-amber-700 bg-amber-100">
             + ${{ formatCents(bonusCents) }}
           </span>
           <span v-if="late" class="badge text-red-500 bg-red-100">
