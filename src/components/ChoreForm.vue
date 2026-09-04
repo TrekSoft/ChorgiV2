@@ -452,13 +452,13 @@ function submit() {
 
     <div v-if="showBonus" class="flex flex-col gap-1">
       <div class="flex gap-3">
-        <label class="flex flex-col gap-1 flex-1">
+        <label class="flex flex-col gap-1 flex-1 min-w-0">
           <span class="form-label">Bonus amount ($) <span class="form-hint">(optional)</span></span>
-          <input v-model="bonusAmount" type="number" min="0" step="any" class="input-field" />
+          <input v-model="bonusAmount" type="number" min="0" step="any" class="input-field w-full min-w-0" />
         </label>
-        <label class="flex flex-col gap-1 flex-1">
+        <label class="flex flex-col gap-1 flex-1 min-w-0">
           <span class="form-label">Max amount ($) <span class="form-hint">(optional)</span></span>
-          <input v-model="bonusMaxAmount" type="number" min="0" step="any" placeholder="Mystery" class="input-field" :class="bonusMaxInvalid ? '!border-red-400' : ''" />
+          <input v-model="bonusMaxAmount" type="number" min="0" step="any" placeholder="Mystery" class="input-field w-full min-w-0" :class="bonusMaxInvalid ? '!border-red-400' : ''" />
         </label>
       </div>
       <span v-if="bonusMaxInvalid" class="text-sm text-red-500">Max must be greater than the bonus amount.</span>
