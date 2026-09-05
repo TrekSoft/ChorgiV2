@@ -201,7 +201,7 @@ async function toggleChore(entry: AssignedEntry) {
       danger: true,
     })
     if (!ok) return
-    await uncompleteChore(entry.chore, meAssigneeId.value, now.value, weekStartsOn.value)
+    await withPending(entry.chore.id, () => uncompleteChore(entry.chore, meAssigneeId.value, now.value, weekStartsOn.value), () => {})
   } else {
     await withPending(
       entry.chore.id,
@@ -320,7 +320,7 @@ async function onTaskTap(task: ClaimableItem) {
       return
     }
     if (claim.completed) {
-      await uncompleteClaim(task, claimDateStr(task))
+      await withPending(task.id, () => uncompleteClaim(task, claimDateStr(task)), () => {})
     } else {
       await withPending(
         task.id,
@@ -338,7 +338,7 @@ async function onTaskTap(task: ClaimableItem) {
   const mine = claim.childId === meAssigneeId.value
   if (mine) {
     if (claim.completed) {
-      await uncompleteClaim(task, claimDateStr(task))
+      await withPending(task.id, () => uncompleteClaim(task, claimDateStr(task)), () => {})
     } else {
       await withPending(
         task.id,
