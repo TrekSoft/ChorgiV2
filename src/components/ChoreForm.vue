@@ -465,8 +465,8 @@ function submit() {
           <input v-model="bonusMaxAmount" type="number" min="0" step="any" placeholder="Mystery" class="input-field w-full min-w-0" :class="bonusMaxInvalid ? '!border-red-400' : ''" />
         </label>
       </div>
-      <span v-if="bonusMaxInvalid" class="text-sm text-red-500">Max must be greater than the bonus amount.</span>
-      <span v-else-if="bonusMaxCents !== null" class="form-hint">🎰 Mystery bonus — a jackpot wheel picks an amount between the two when the chore is done.</span>
+      <span v-if="bonusMaxInvalid" class="text-sm text-red-500 mt-2">Max must be greater than the bonus amount.</span>
+      <span v-else-if="bonusMaxCents !== null" class="form-hint mt-2">🎰 Mystery bonus — a jackpot wheel picks an amount between the two when the chore is done.</span>
     </div>
 
     </div>
