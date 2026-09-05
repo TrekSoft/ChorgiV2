@@ -129,15 +129,17 @@ export function claimBonusFor(task: JackpotItem & { id: string }, dateStr: strin
 
 export async function completeChore(chore: Chore, childId: string, date: Date | string, weekStartsOn: 0 | 1 = WEEK_START_SUNDAY): Promise<void> {
   const id = completionIdFor(chore, childId, date, weekStartsOn)
+  if (completions.value[id]) return
   const late = !chore.noDeadline && new Date() > deadlineFor(chore, date, weekStartsOn, timePeriods.value)
+  const bonus = childId.startsWith(PARENT_ASSIGNEE_PREFIX) ? 0 : choreBonusFor(chore, childId, date, weekStartsOn)
   await withAckTimeout(
     setDoc(doc(db, 'families', familyId.value!, 'completions', id), {
       completedAt: serverTimestamp(),
       late,
+      bonusCents: bonus,
     }),
   )
-  const bonus = choreBonusFor(chore, childId, date, weekStartsOn)
-  if (bonus && !childId.startsWith(PARENT_ASSIGNEE_PREFIX)) {
+  if (bonus) {
     await updateDoc(doc(db, 'families', familyId.value!, 'children', childId), {
       allowanceBalanceCents: increment(bonus),
     })
@@ -146,10 +148,11 @@ export async function completeChore(chore: Chore, childId: string, date: Date | 
 
 export async function uncompleteChore(chore: Chore, childId: string, date: Date | string, weekStartsOn: 0 | 1 = WEEK_START_SUNDAY): Promise<void> {
   const id = completionIdFor(chore, childId, date, weekStartsOn)
-  const wasCompleted = !!completions.value[id]
-  await deleteDoc(doc(db, 'families', familyId.value!, 'completions', id))
-  const bonus = choreBonusFor(chore, childId, date, weekStartsOn)
-  if (wasCompleted && bonus && !childId.startsWith(PARENT_ASSIGNEE_PREFIX)) {
+  const completion = completions.value[id]
+  if (!completion) return
+  await withAckTimeout(deleteDoc(doc(db, 'families', familyId.value!, 'completions', id)))
+  const bonus = completion.bonusCents ?? choreBonusFor(chore, childId, date, weekStartsOn)
+  if (bonus && !childId.startsWith(PARENT_ASSIGNEE_PREFIX)) {
     await updateDoc(doc(db, 'families', familyId.value!, 'children', childId), {
       allowanceBalanceCents: increment(-bonus),
     })
@@ -167,14 +170,15 @@ export async function claimTask(task: { id: string }, childId: string, dateStr: 
 export async function completeClaim(task: JackpotItem & { id: string }, dateStr: string): Promise<void> {
   const claim = claims.value[claimIdFor(task, dateStr)]
   if (!claim || claim.completed) return
+  const bonus = claim.childId.startsWith(PARENT_ASSIGNEE_PREFIX) ? 0 : claimBonusFor(task, dateStr, claim.childId)
   await withAckTimeout(
     updateDoc(doc(db, 'families', familyId.value!, 'claims', claimIdFor(task, dateStr)), {
       completed: true,
       completedAt: serverTimestamp(),
+      bonusCents: bonus,
     }),
   )
-  const bonus = claimBonusFor(task, dateStr, claim.childId)
-  if (bonus && !claim.childId.startsWith(PARENT_ASSIGNEE_PREFIX)) {
+  if (bonus) {
     await updateDoc(doc(db, 'families', familyId.value!, 'children', claim.childId), {
       allowanceBalanceCents: increment(bonus),
     })
@@ -184,11 +188,14 @@ export async function completeClaim(task: JackpotItem & { id: string }, dateStr:
 export async function uncompleteClaim(task: JackpotItem & { id: string }, dateStr: string): Promise<void> {
   const claim = claims.value[claimIdFor(task, dateStr)]
   if (!claim || !claim.completed) return
-  await updateDoc(doc(db, 'families', familyId.value!, 'claims', claimIdFor(task, dateStr)), {
-    completed: false,
-    completedAt: null,
-  })
-  const bonus = claimBonusFor(task, dateStr, claim.childId)
+  await withAckTimeout(
+    updateDoc(doc(db, 'families', familyId.value!, 'claims', claimIdFor(task, dateStr)), {
+      completed: false,
+      completedAt: null,
+      bonusCents: null,
+    }),
+  )
+  const bonus = claim.bonusCents ?? claimBonusFor(task, dateStr, claim.childId)
   if (bonus && !claim.childId.startsWith(PARENT_ASSIGNEE_PREFIX)) {
     await updateDoc(doc(db, 'families', familyId.value!, 'children', claim.childId), {
       allowanceBalanceCents: increment(-bonus),
@@ -202,8 +209,8 @@ export async function unclaimTask(task: JackpotItem & { id: string }, dateStr: s
   const batch = writeBatch(db)
   const claimRef = doc(db, 'families', familyId.value!, 'claims', claimIdFor(task, dateStr))
   if (claim.completed) {
-    batch.update(claimRef, { completed: false, completedAt: null })
-    const bonus = claimBonusFor(task, dateStr, claim.childId)
+    batch.update(claimRef, { completed: false, completedAt: null, bonusCents: null })
+    const bonus = claim.bonusCents ?? claimBonusFor(task, dateStr, claim.childId)
     if (bonus && !claim.childId.startsWith(PARENT_ASSIGNEE_PREFIX)) {
       batch.update(doc(db, 'families', familyId.value!, 'children', claim.childId), {
         allowanceBalanceCents: increment(-bonus),

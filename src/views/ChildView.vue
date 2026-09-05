@@ -215,7 +215,8 @@ async function toggleChore(entry: AssignedEntry) {
       danger: true,
     })
     if (!ok) return
-    await uncompleteChore(entry.chore, child.value.id, now.value, weekStartsOn.value)
+    const childId = child.value.id
+    await withPending(entry.chore.id, () => uncompleteChore(entry.chore, childId, now.value, weekStartsOn.value), () => {})
   } else {
     const childId = child.value.id
     const birthdayMode = child.value.birthdate && isBirthdayToday(child.value.birthdate, now.value)
@@ -349,7 +350,7 @@ async function onTaskTap(task: ClaimableItem) {
       return
     }
     if (claim.completed) {
-      await uncompleteClaim(task, claimDateStr(task))
+      await withPending(task.id, () => uncompleteClaim(task, claimDateStr(task)), () => {})
     } else {
       await withPending(
         task.id,
@@ -368,7 +369,7 @@ async function onTaskTap(task: ClaimableItem) {
   const mine = claim.childId === child.value.id
   if (mine) {
     if (claim.completed) {
-      await uncompleteClaim(task, claimDateStr(task))
+      await withPending(task.id, () => uncompleteClaim(task, claimDateStr(task)), () => {})
     } else {
       await withPending(
         task.id,

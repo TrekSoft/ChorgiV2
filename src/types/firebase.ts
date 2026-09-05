@@ -128,6 +128,8 @@ export interface CleaningDayDoc {
 export interface CompletionDoc {
   completedAt: MaybeTimestamp
   late: boolean
+  /** Bonus credited to the child's balance for this completion; reversed verbatim on uncheck */
+  bonusCents?: number
 }
 
 export interface ClaimDoc {
@@ -135,6 +137,8 @@ export interface ClaimDoc {
   claimedAt: MaybeTimestamp
   completed: boolean
   completedAt?: MaybeTimestamp | null
+  /** Bonus credited to the child's balance for this completion; reversed verbatim on uncheck */
+  bonusCents?: number | null
 }
 
 export interface InviteDoc {

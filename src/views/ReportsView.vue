@@ -86,7 +86,7 @@ const reportData = computed(() => {
           late,
           overdue,
           missed,
-          bonusCents: (completed ? choreBonusFor(chore, child.id, date, ws) : chore.bonusCents) || null,
+          bonusCents: (completion ? completion.bonusCents ?? choreBonusFor(chore, child.id, date, ws) : chore.bonusCents) || null,
           deadline,
           isWeekly: chore.kind === CHORE_KIND.RECURRING && chore.weekly,
           isNoDeadline: !!chore.noDeadline,
@@ -120,7 +120,7 @@ const reportData = computed(() => {
           claimedByMe: isMine,
           claimedByName: claim ? childName(claim.childId) : null,
           completed: isMine ? !!claim?.completed : null,
-          bonusCents: (claim?.completed ? claimBonusFor(chore, claimKeyFor(chore, date, ws), claim.childId) : chore.bonusCents) || null,
+          bonusCents: (claim?.completed ? claim.bonusCents ?? claimBonusFor(chore, claimKeyFor(chore, date, ws), claim.childId) : chore.bonusCents) || null,
         }
       })
       .filter((e) => e.claimedByMe)
