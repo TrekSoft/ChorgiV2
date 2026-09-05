@@ -1,10 +1,11 @@
 import { ref, onMounted, onUnmounted } from 'vue'
+import { format } from 'date-fns'
 import { getCoordsForTimezone } from '../lib/timezone-coords'
 import { accrueDailyAllowance } from './useAllowance'
 
 const FALLBACK_START_HOUR = 21 // 9 PM
 const FALLBACK_END_HOUR = 5 // 5 AM
-const STORAGE_KEY = 'chorgi-sun-times'
+const STORAGE_KEY = 'chorgi-sun-times-v2'
 
 interface SunTimes {
   date: string // YYYY-MM-DD
@@ -13,7 +14,7 @@ interface SunTimes {
 }
 
 function todayStr(): string {
-  return new Date().toISOString().slice(0, 10)
+  return format(new Date(), 'yyyy-MM-dd')
 }
 
 function getCachedSunTimes(): SunTimes | null {
@@ -41,7 +42,8 @@ async function fetchSunTimes(): Promise<SunTimes | null> {
   const coords = getCoordsForTimezone(tz)
   if (!coords) return null
 
-  const url = `https://api.sunrise-sunset.org/json?lat=${coords.lat}&lng=${coords.lng}&date=today&formatted=0`
+  const date = todayStr()
+  const url = `https://api.sunrise-sunset.org/json?lat=${coords.lat}&lng=${coords.lng}&date=${date}&formatted=0`
   try {
     const res = await fetch(url)
     if (!res.ok) return null
@@ -49,8 +51,9 @@ async function fetchSunTimes(): Promise<SunTimes | null> {
     if (data.status !== 'OK') return null
     const sunrise = new Date(data.results.sunrise).getTime()
     const sunset = new Date(data.results.sunset).getTime()
-    if (isNaN(sunrise) || isNaN(sunset)) return null
-    return { date: todayStr(), sunrise, sunset }
+    if (isNaN(sunrise) || isNaN(sunset) || sunset <= sunrise) return null
+    if (format(new Date(sunrise), 'yyyy-MM-dd') !== date) return null
+    return { date, sunrise, sunset }
   } catch {
     return null
   }
@@ -68,7 +71,7 @@ function isDarkWithSunTimes(now: Date, times: SunTimes | null): boolean {
 const isDark = ref(false)
 const sunSchedule = ref<{ sunset: string; sunrise: string } | null>(null)
 let sunTimes: SunTimes | null = null
-let fetchedToday = false
+let fetchedFor: string | null = null
 
 function updateScheduleDisplay() {
   if (sunTimes) {
@@ -82,26 +85,35 @@ function updateScheduleDisplay() {
 }
 
 async function ensureSunTimes() {
-  if (fetchedToday) return
+  const today = todayStr()
+  if (fetchedFor === today) return
+  fetchedFor = today
   sunTimes = getCachedSunTimes()
   if (!sunTimes) {
-    sunTimes = await fetchSunTimes()
-    if (sunTimes) setCachedSunTimes(sunTimes)
+    const fetched = await fetchSunTimes()
+    if (fetched) {
+      sunTimes = fetched
+      setCachedSunTimes(fetched)
+    } else {
+      fetchedFor = null // retry on next tick
+    }
   }
-  fetchedToday = true
-  tick()
+  applyState()
+}
+
+function applyState() {
+  isDark.value = isDarkWithSunTimes(new Date(), sunTimes)
+  updateScheduleDisplay()
+  accrueDailyAllowance()
 }
 
 function tick() {
   if (sunTimes && sunTimes.date !== todayStr()) {
-    fetchedToday = false
     sunTimes = null
-    ensureSunTimes()
-    return
+    fetchedFor = null
   }
-  isDark.value = isDarkWithSunTimes(new Date(), sunTimes)
-  updateScheduleDisplay()
-  accrueDailyAllowance()
+  if (!sunTimes) ensureSunTimes()
+  applyState()
 }
 
 let interval: ReturnType<typeof setInterval> | null = null
@@ -111,9 +123,7 @@ export function usePeriodicTick() {
   onMounted(() => {
     listeners++
     if (listeners === 1) {
-      sunTimes = getCachedSunTimes()
       tick()
-      ensureSunTimes()
       interval = setInterval(tick, 60_000)
     }
   })
