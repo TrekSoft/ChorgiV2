@@ -204,10 +204,10 @@ onUnmounted(cancel)
           </svg>
         </div>
 
-        <div class="h-28 flex flex-col items-center justify-center gap-3 text-center">
+        <div class="min-h-28 mt-6 flex flex-col items-center justify-center gap-5 text-center">
           <template v-if="phase === 'won'">
             <div class="jackpot-win">
-              <span class="text-amber-100 text-lg font-bold block">{{ isMaxWin ? 'JACKPOT!!!' : 'You won' }}</span>
+              <span class="text-amber-100 text-lg font-bold block">{{ isMaxWin ? 'JACKPOT!!!' : 'You earned' }}</span>
               <span class="jackpot-amount">+{{ wonAmount }}</span>
             </div>
             <button type="button" @click="emit('done')" class="btn-primary px-8 py-3 text-lg flex items-center gap-2">
