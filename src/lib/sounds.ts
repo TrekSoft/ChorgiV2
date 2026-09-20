@@ -117,6 +117,60 @@ export function playUnclaim(): void {
   playTone(500, 0.18, 'triangle', 0.05, 0.1, 330)
 }
 
+function playMarimba(): void {
+  playTone(262, 0.14, 'triangle', 0.1, 0)
+  playTone(330, 0.14, 'triangle', 0.09, 0.14)
+  playTone(523, 0.28, 'triangle', 0.1, 0.28)
+}
+
+export const COMPLETION_SOUNDS: Array<() => void> = [
+  playPop,
+  playChime,
+  playBoing,
+  playSparkle,
+  playWhistle,
+  playDrumroll,
+  playMarimba,
+]
+
+export function completionSoundForWeekday(weekday: number): () => void {
+  return COMPLETION_SOUNDS[weekday]
+}
+
+/** Chore completion sound; each weekday has a fixed variant. */
+export function playCompletion(date: Date = new Date()): void {
+  completionSoundForWeekday(date.getDay())()
+}
+
+export function playCoin(): void {
+  playTone(988, 0.07, 'square', 0.08, 0)
+  playTone(1319, 0.12, 'square', 0.08, 0.07)
+}
+
+/** Single wheel-pointer click; pitch rises slightly as `progress` (0–1) approaches the stop. */
+export function playSpinTick(progress = 0): void {
+  playTone(900 + progress * 300, 0.03, 'square', 0.05, 0, 500)
+  playNoiseBurst(0.02, 0.04, 0)
+}
+
+/** A cascade of coin clinks; `intensity` (0–1) scales how many coins spill out. */
+export function playCoinClinks(intensity = 1): void {
+  const ac = getCtx()
+  if (!ac) return
+  const clinks = Math.round(4 + intensity * 20)
+  for (let i = 0; i < clinks; i++) {
+    const delay = i * 0.045 + Math.random() * 0.03
+    const freq = 1400 + Math.random() * 1600
+    const duration = 0.08 + Math.random() * 0.07
+    playTone(freq, duration, 'triangle', 0.12, delay, freq * 0.6)
+    playTone(freq * 1.5, duration * 0.6, 'sine', 0.04, delay, freq)
+  }
+  if (intensity >= 0.75) {
+    const start = clinks * 0.045 + 0.05
+    ;[784, 988, 1175, 1568].forEach((freq, i) => playTone(freq, 0.25, 'square', 0.06, start + i * 0.09))
+  }
+}
+
 /** Note frequencies (Hz); 0 is a rest. */
 const N = {
   R: 0,
@@ -250,7 +304,7 @@ export const SATURDAY_SONG: Song = {
   bass: [[C4, 2], [G3, 2], [G3, 2], [C4, 2], [A3, 2], [G3, 1], [C4, 1]],
 }
 
-export const COMPLETION_SONGS: readonly Song[] = [
+export const CELEBRATION_SONGS: readonly Song[] = [
   SUNDAY_SONG,
   MONDAY_SONG,
   TUESDAY_SONG,
@@ -264,119 +318,13 @@ export function songDuration(song: Song): number {
   return Math.max(stepsDuration(song.melody, song.bpm), song.bass ? stepsDuration(song.bass, song.bpm) : 0)
 }
 
-export const COMPLETION_SOUNDS: Array<() => void> = COMPLETION_SONGS.map((song) => () => playSong(song))
-
-export function completionSoundForWeekday(weekday: number): () => void {
-  return COMPLETION_SOUNDS[weekday]
-}
-
-/** Chore completion sound; each weekday has a fixed variant. */
-export function playCompletion(date: Date = new Date()): void {
-  completionSoundForWeekday(date.getDay())()
-}
-
-export function playCoin(): void {
-  playTone(988, 0.07, 'square', 0.08, 0)
-  playTone(1319, 0.12, 'square', 0.08, 0.07)
-}
-
-/** Single wheel-pointer click; pitch rises slightly as `progress` (0–1) approaches the stop. */
-export function playSpinTick(progress = 0): void {
-  playTone(900 + progress * 300, 0.03, 'square', 0.05, 0, 500)
-  playNoiseBurst(0.02, 0.04, 0)
-}
-
-/** A cascade of coin clinks; `intensity` (0–1) scales how many coins spill out. */
-export function playCoinClinks(intensity = 1): void {
-  const ac = getCtx()
-  if (!ac) return
-  const clinks = Math.round(4 + intensity * 20)
-  for (let i = 0; i < clinks; i++) {
-    const delay = i * 0.045 + Math.random() * 0.03
-    const freq = 1400 + Math.random() * 1600
-    const duration = 0.08 + Math.random() * 0.07
-    playTone(freq, duration, 'triangle', 0.12, delay, freq * 0.6)
-    playTone(freq * 1.5, duration * 0.6, 'sine', 0.04, delay, freq)
-  }
-  if (intensity >= 0.75) {
-    const start = clinks * 0.045 + 0.05
-    ;[784, 988, 1175, 1568].forEach((freq, i) => playTone(freq, 0.25, 'square', 0.06, start + i * 0.09))
-  }
-}
-
-export function playFireworks(): void {
-  const ac = getCtx()
-  if (!ac) return
-  for (let i = 0; i < 5; i++) {
-    const delay = i * 0.35 + Math.random() * 0.15
-    playTone(200 + Math.random() * 300, 0.15, 'sawtooth', 0.06, delay, 50)
-    playNoiseBurst(0.2, 0.08, delay + 0.05)
-    playTone(400 + Math.random() * 400, 0.3, 'sine', 0.04, delay + 0.1, 100)
-  }
-}
-
-export function playFanfare(): void {
-  const notes = [523, 659, 784, 1047]
-  notes.forEach((freq, i) => {
-    playTone(freq, 0.22, 'square', 0.07, i * 0.14)
-  })
-  playTone(1568, 0.5, 'square', 0.06, 0.56)
-  playNoiseBurst(0.12, 0.05, 0.56)
-}
-
-export function playApplause(): void {
-  for (let i = 0; i < 14; i++) {
-    playNoiseBurst(0.09 + Math.random() * 0.06, 0.03 + Math.random() * 0.03, i * 0.07)
-  }
-  playTone(880, 0.35, 'sine', 0.05, 0.9)
-}
-
-export function playVictoryRiff(): void {
-  const notes = [392, 523, 659, 523, 784]
-  notes.forEach((freq, i) => {
-    playTone(freq, 0.16, 'triangle', 0.1, i * 0.12)
-  })
-  playTone(1047, 0.6, 'triangle', 0.09, 0.6)
-}
-
-export function playStarburst(): void {
-  for (let i = 0; i < 8; i++) {
-    playTone(1047 + i * 180, 0.12, 'sine', 0.06, i * 0.07, 2600)
-  }
-  playNoiseBurst(0.25, 0.06, 0.5)
-  playTone(2093, 0.4, 'sine', 0.05, 0.55)
-}
-
-export function playChampionBells(): void {
-  const notes = [659, 988, 1319]
-  notes.forEach((freq, i) => {
-    playTone(freq, 0.5, 'sine', 0.09, i * 0.18)
-    playTone(freq * 2, 0.3, 'sine', 0.04, i * 0.18)
-  })
-  playTone(1976, 0.7, 'sine', 0.05, 0.7)
-}
-
-function playBassDrop(): void {
-  playTone(146, 0.5, 'sawtooth', 0.08, 0, 73)
-  playNoiseBurst(0.22, 0.07, 0.08)
-  playTone(292, 0.6, 'triangle', 0.08, 0.2, 584)
-}
-
-export const CELEBRATION_SOUNDS: Array<() => void> = [
-  playFireworks,
-  playFanfare,
-  playApplause,
-  playVictoryRiff,
-  playStarburst,
-  playChampionBells,
-  playBassDrop,
-]
+export const CELEBRATION_SOUNDS: Array<() => void> = CELEBRATION_SONGS.map((song) => () => playSong(song))
 
 export function celebrationSoundForWeekday(weekday: number): () => void {
   return CELEBRATION_SOUNDS[weekday]
 }
 
-/** All-chores-done celebration sound; each weekday has a fixed variant. */
+/** All-chores-done celebration song; each weekday has a fixed ~5s tune. */
 export function playCelebration(date: Date = new Date()): void {
   celebrationSoundForWeekday(date.getDay())()
 }
