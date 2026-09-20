@@ -71,8 +71,9 @@ function playNoiseBurst(duration: number, gain = 0.1, delay = 0): void {
 }
 
 export function playPop(): void {
-  playTone(600, 0.08, 'sine', 0.12, 0, 200)
-  playNoiseBurst(0.05, 0.06, 0)
+  playTone(900, 0.16, 'triangle', 0.18, 0, 350)
+  playTone(1400, 0.1, 'sine', 0.08, 0.02, 700)
+  playNoiseBurst(0.06, 0.08, 0)
 }
 
 export function playChime(): void {
