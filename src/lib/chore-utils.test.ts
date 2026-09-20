@@ -75,20 +75,20 @@ describe('cleaningSectionsForDate', () => {
     expect(sections[0].tasks.map((t) => t.id)).toEqual(['t-tidy', 't-legacy'])
   })
 
-  it('clean day includes tidy + clean tasks', () => {
+  it('clean day includes tidy + clean tasks, grouped by category', () => {
     const days = {
       [dateStr]: { id: dateStr, roomIds: ['r1'], roomCategories: { r1: CLEANING_CATEGORY.CLEAN } } as CleaningDay,
     }
     const sections = cleaningSectionsForDate(dateStr, days, rooms, tasks)
-    expect(sections[0].tasks.map((t) => t.id)).toEqual(['t-tidy', 't-clean', 't-legacy'])
+    expect(sections[0].tasks.map((t) => t.id)).toEqual(['t-tidy', 't-legacy', 't-clean'])
   })
 
-  it('deep day includes all categories', () => {
+  it('deep day includes all categories, grouped tidy → clean → deep', () => {
     const days = {
       [dateStr]: { id: dateStr, roomIds: ['r1'], roomCategories: { r1: CLEANING_CATEGORY.DEEP } } as CleaningDay,
     }
     const sections = cleaningSectionsForDate(dateStr, days, rooms, tasks)
-    expect(sections[0].tasks.map((t) => t.id)).toEqual(['t-tidy', 't-clean', 't-deep', 't-legacy'])
+    expect(sections[0].tasks.map((t) => t.id)).toEqual(['t-tidy', 't-legacy', 't-clean', 't-deep'])
   })
 
   it('omits rooms whose included categories have no tasks', () => {
