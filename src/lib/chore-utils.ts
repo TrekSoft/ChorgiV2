@@ -123,9 +123,9 @@ export function cleaningSectionsForDate(
       const included = includedCategories(roomCategoryFor(day, roomId))
       return {
         room: rooms.find((r) => r.id === roomId)!,
-        tasks: tasks.filter(
-          (t) => t.kind === CHORE_KIND.CLEANING && t.roomId === roomId && included.includes(taskCategory(t)),
-        ),
+        tasks: tasks
+          .filter((t) => t.kind === CHORE_KIND.CLEANING && t.roomId === roomId && included.includes(taskCategory(t)))
+          .sort((a, b) => CLEANING_CATEGORIES.indexOf(taskCategory(a)) - CLEANING_CATEGORIES.indexOf(taskCategory(b))),
       }
     })
     .filter((s) => s.room && s.tasks.length > 0)
