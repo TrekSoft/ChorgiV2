@@ -117,21 +117,154 @@ export function playUnclaim(): void {
   playTone(500, 0.18, 'triangle', 0.05, 0.1, 330)
 }
 
-function playMarimba(): void {
-  playTone(262, 0.14, 'triangle', 0.1, 0)
-  playTone(330, 0.14, 'triangle', 0.09, 0.14)
-  playTone(523, 0.28, 'triangle', 0.1, 0.28)
+/** Note frequencies (Hz); 0 is a rest. */
+const N = {
+  R: 0,
+  G3: 196, A3: 220,
+  C4: 262, F4: 349, G4: 392, A4: 440, B4: 494,
+  C5: 523, D5: 587, E5: 659, F5: 698, G5: 784, A5: 880, B5: 988,
+  C6: 1047, E6: 1319,
+} as const
+
+/** A melody step: [frequency, length in beats]. */
+type Step = readonly [freq: number, beats: number]
+
+interface Song {
+  bpm: number
+  type: OscillatorType
+  gain: number
+  melody: readonly Step[]
+  /** Optional accompaniment played in parallel with the melody. */
+  bass?: readonly Step[]
+  bassType?: OscillatorType
 }
 
-export const COMPLETION_SOUNDS: Array<() => void> = [
-  playPop,
-  playChime,
-  playBoing,
-  playSparkle,
-  playWhistle,
-  playDrumroll,
-  playMarimba,
+/** Total length of a step list in seconds at the given tempo. */
+export function stepsDuration(steps: readonly Step[], bpm: number): number {
+  const beat = 60 / bpm
+  return steps.reduce((sum, [, beats]) => sum + beats * beat, 0)
+}
+
+function playSteps(steps: readonly Step[], bpm: number, type: OscillatorType, gain: number): void {
+  const beat = 60 / bpm
+  let t = 0
+  for (const [freq, beats] of steps) {
+    const len = beats * beat
+    if (freq > 0) playTone(freq, len * 0.9, type, gain, t)
+    t += len
+  }
+}
+
+function playSong(song: Song): void {
+  playSteps(song.melody, song.bpm, song.type, song.gain)
+  if (song.bass) playSteps(song.bass, song.bpm, song.bassType ?? 'triangle', song.gain * 0.6)
+}
+
+const { R, G3, A3, C4, F4, G4, A4, B4, C5, D5, E5, F5, G5, A5, B5, C6, E6 } = N
+
+/** Sunday: gentle lullaby waltz. */
+export const SUNDAY_SONG: Song = {
+  bpm: 144,
+  type: 'sine',
+  gain: 0.12,
+  melody: [
+    [G4, 1], [C5, 1], [E5, 1], [G5, 2], [E5, 1],
+    [F5, 1], [E5, 1], [D5, 1], [C5, 3],
+  ],
+  bass: [[C4, 3], [G3, 3], [F4, 3], [C4, 3]],
+}
+
+/** Monday: peppy march to start the week. */
+export const MONDAY_SONG: Song = {
+  bpm: 180,
+  type: 'square',
+  gain: 0.07,
+  melody: [
+    [C5, 1], [C5, 1], [G5, 1], [G5, 1], [A5, 1], [A5, 1], [G5, 2],
+    [F5, 1], [F5, 1], [E5, 1], [E5, 1], [D5, 1], [D5, 1], [C5, 2],
+  ],
+  bass: [[C4, 2], [C4, 2], [F4, 2], [C4, 2], [F4, 2], [C4, 2], [G3, 2], [C4, 2]],
+}
+
+/** Tuesday: bouncy boogie. */
+export const TUESDAY_SONG: Song = {
+  bpm: 192,
+  type: 'triangle',
+  gain: 0.12,
+  melody: [
+    [C5, 1], [E5, 1], [G5, 1], [A5, 1], [G5, 1], [E5, 1], [C5, 2],
+    [D5, 1], [F5, 1], [A5, 1], [B5, 1], [A5, 1], [F5, 1], [D5, 2],
+  ],
+  bass: [[C4, 1], [R, 1], [C4, 1], [R, 1], [C4, 1], [R, 1], [C4, 2], [G3, 1], [R, 1], [G3, 1], [R, 1], [G3, 1], [R, 1], [G3, 2]],
+}
+
+/** Wednesday: sparkly music-box arpeggios. */
+export const WEDNESDAY_SONG: Song = {
+  bpm: 240,
+  type: 'sine',
+  gain: 0.1,
+  melody: [
+    [C5, 1], [E5, 1], [G5, 1], [C6, 1], [G5, 1], [E5, 1],
+    [A4, 1], [C5, 1], [E5, 1], [A5, 1], [E5, 1], [C5, 1],
+    [F4, 1], [A4, 1], [C5, 1], [F5, 1], [C5, 1], [A4, 1],
+    [G5, 1], [E6, 1],
+  ],
+  bass: [[C4, 6], [A3, 6], [F4, 6], [G3, 2]],
+}
+
+/** Thursday: cheerful whistle tune with a swoop. */
+export const THURSDAY_SONG: Song = {
+  bpm: 160,
+  type: 'sine',
+  gain: 0.11,
+  melody: [
+    [E5, 1], [G5, 1], [A5, 1.5], [G5, 0.5], [E5, 1], [D5, 1],
+    [C5, 1], [D5, 1], [E5, 1.5], [D5, 0.5], [C5, 1], [G5, 2],
+  ],
+  bass: [[C4, 2], [G3, 2], [A3, 2], [G3, 2], [F4, 2], [C4, 3]],
+}
+
+/** Friday: triumphant fanfare — the weekend is near. */
+export const FRIDAY_SONG: Song = {
+  bpm: 176,
+  type: 'square',
+  gain: 0.07,
+  melody: [
+    [G4, 0.5], [G4, 0.5], [G4, 0.5], [C5, 1.5], [E5, 1.5], [G5, 1.5],
+    [E5, 0.5], [G5, 0.5], [C6, 2], [B5, 1], [A5, 1], [G5, 1], [C6, 2],
+  ],
+  bass: [[C4, 1.5], [R, 1.5], [C4, 1.5], [G3, 1.5], [C4, 3], [F4, 1], [G3, 1], [C4, 3]],
+  bassType: 'sawtooth',
+}
+
+/** Saturday: relaxed, marimba-style groove. */
+export const SATURDAY_SONG: Song = {
+  bpm: 132,
+  type: 'triangle',
+  gain: 0.12,
+  melody: [
+    [C5, 0.5], [E5, 0.5], [G5, 1], [E5, 0.5], [C5, 0.5], [D5, 1],
+    [B4, 0.5], [D5, 0.5], [G5, 1], [F5, 0.5], [E5, 0.5], [C5, 1],
+    [A4, 0.5], [C5, 0.5], [E5, 1], [G5, 1], [C6, 1],
+  ],
+  bass: [[C4, 2], [G3, 2], [G3, 2], [C4, 2], [A3, 2], [G3, 1], [C4, 1]],
+}
+
+export const COMPLETION_SONGS: readonly Song[] = [
+  SUNDAY_SONG,
+  MONDAY_SONG,
+  TUESDAY_SONG,
+  WEDNESDAY_SONG,
+  THURSDAY_SONG,
+  FRIDAY_SONG,
+  SATURDAY_SONG,
 ]
+
+export function songDuration(song: Song): number {
+  return Math.max(stepsDuration(song.melody, song.bpm), song.bass ? stepsDuration(song.bass, song.bpm) : 0)
+}
+
+export const COMPLETION_SOUNDS: Array<() => void> = COMPLETION_SONGS.map((song) => () => playSong(song))
 
 export function completionSoundForWeekday(weekday: number): () => void {
   return COMPLETION_SOUNDS[weekday]

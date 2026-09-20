@@ -1,9 +1,12 @@
 import { describe, expect, it } from 'vitest'
 import {
   CELEBRATION_SOUNDS,
+  COMPLETION_SONGS,
   COMPLETION_SOUNDS,
   celebrationSoundForWeekday,
   completionSoundForWeekday,
+  songDuration,
+  stepsDuration,
 } from './sounds'
 
 describe('sound variants', () => {
@@ -12,6 +15,17 @@ describe('sound variants', () => {
     expect(CELEBRATION_SOUNDS).toHaveLength(7)
     expect(new Set(COMPLETION_SOUNDS).size).toBe(7)
     expect(new Set(CELEBRATION_SOUNDS).size).toBe(7)
+  })
+
+  it('plays a roughly five-second completion song for each weekday', () => {
+    for (const song of COMPLETION_SONGS) {
+      const seconds = songDuration(song)
+      expect(seconds).toBeGreaterThanOrEqual(4)
+      expect(seconds).toBeLessThanOrEqual(6)
+      if (song.bass) {
+        expect(stepsDuration(song.bass, song.bpm)).toBeCloseTo(stepsDuration(song.melody, song.bpm), 1)
+      }
+    }
   })
 
   it('maps every weekday to a distinct completion and celebration sound', () => {
