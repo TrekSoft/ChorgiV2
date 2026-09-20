@@ -2,13 +2,33 @@ let ctx: AudioContext | null = null
 
 function getCtx(): AudioContext | null {
   if (typeof window === 'undefined') return null
-  if (!ctx) {
+  if (!ctx || ctx.state === 'closed') {
     const AC = window.AudioContext || (window as any).webkitAudioContext
     if (!AC) return null
     ctx = new AC()
   }
-  if (ctx.state === 'suspended') ctx.resume()
+  if (ctx.state !== 'running') ctx.resume()
   return ctx
+}
+
+/**
+ * Resume the shared AudioContext from inside a user gesture. Browsers (notably iOS Safari) suspend
+ * an idle context and only honour `resume()` during a gesture, not after an awaited write.
+ */
+export function unlockAudio(): void {
+  const ac = getCtx()
+  if (!ac) return
+  const src = ac.createBufferSource()
+  src.buffer = ac.createBuffer(1, 1, ac.sampleRate)
+  src.connect(ac.destination)
+  src.start()
+}
+
+/** Keep the AudioContext unlocked by resuming it on every user interaction. */
+export function installAudioUnlock(target: EventTarget = window): void {
+  for (const event of ['pointerdown', 'touchend', 'keydown']) {
+    target.addEventListener(event, () => playSafely(unlockAudio), { capture: true, passive: true })
+  }
 }
 
 /** Play an optional sound without allowing audio failures to affect the caller. */
