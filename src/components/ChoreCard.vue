@@ -154,13 +154,15 @@ function onUnassignClick() {
 
       <div class="flex-1 min-w-0">
         <div class="flex items-center gap-2 flex-wrap">
-          <span
-            v-if="categoryDot"
-            class="w-3 h-3 rounded-full shrink-0"
-            :class="CLEANING_CATEGORY_DOT_CLASS[categoryDot]"
-            :title="categoryDot"
-          ></span>
-          <span class="text-lg font-bold truncate" :class="disabled ? 'text-stone-500' : 'text-amber-900'">{{ name }}</span>
+          <span class="flex items-center gap-2 min-w-0">
+            <span
+              v-if="categoryDot"
+              class="w-3 h-3 rounded-full shrink-0"
+              :class="CLEANING_CATEGORY_DOT_CLASS[categoryDot]"
+              :title="categoryDot"
+            ></span>
+            <span class="text-lg font-bold min-w-0 break-words" :class="disabled ? 'text-stone-500' : 'text-amber-900'">{{ name }}</span>
+          </span>
           <span v-if="oneoff" class="badge text-purple-500 bg-purple-100">
             one-off
           </span>
