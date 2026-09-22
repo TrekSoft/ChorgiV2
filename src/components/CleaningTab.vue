@@ -249,8 +249,8 @@ function openEditTask(task: Task) {
         </span>
       </div>
 
-      <div v-if="rooms.length > 0" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <div v-for="room in rooms" :key="room.id" class="bg-white rounded-2xl border-2 border-amber-200 p-4 flex flex-col gap-3">
+      <div v-if="rooms.length > 0" class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div v-for="room in rooms" :key="room.id" class="min-w-0 bg-white rounded-2xl border-2 border-amber-200 p-4 flex flex-col gap-3">
           <div class="flex items-center justify-between gap-2">
             <button
               type="button"
