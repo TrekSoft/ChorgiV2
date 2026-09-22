@@ -102,13 +102,15 @@ const timeLabel = computed(() => {
 
     <div class="flex-1 min-w-0">
       <div class="flex items-center gap-1.5 flex-wrap">
-        <span
-          v-if="categoryDot"
-          class="w-2.5 h-2.5 rounded-full shrink-0"
-          :class="CLEANING_CATEGORY_DOT_CLASS[categoryDot]"
-          :title="categoryDot"
-        ></span>
-        <span class="font-bold text-amber-900 text-sm truncate">{{ name }}</span>
+        <span class="flex items-center gap-1.5 min-w-0">
+          <span
+            v-if="categoryDot"
+            class="w-2.5 h-2.5 rounded-full shrink-0"
+            :class="CLEANING_CATEGORY_DOT_CLASS[categoryDot]"
+            :title="categoryDot"
+          ></span>
+          <span class="font-bold text-amber-900 text-sm min-w-0 break-words">{{ name }}</span>
+        </span>
         <span v-if="oneoff" class="badge-sm text-purple-500 bg-purple-100">
           one-off
         </span>
