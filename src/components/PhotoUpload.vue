@@ -45,8 +45,14 @@ function pick() {
   inputEl.value?.click()
 }
 
+const IMAGE_EXT = /\.(jpe?g|png|gif|webp|heic|heif|bmp|avif)$/i
+
+function isImage(file: File) {
+  return file.type ? file.type.startsWith('image/') : IMAGE_EXT.test(file.name)
+}
+
 function handleFile(file: File | undefined) {
-  if (!file || !file.type.startsWith('image/')) return
+  if (!file || !isImage(file)) return
   editSrc.value = URL.createObjectURL(file)
   editing.value = true
 }
@@ -67,7 +73,9 @@ function onEditorClose() {
 }
 
 function onChange(event: Event) {
-  handleFile((event.target as HTMLInputElement).files?.[0])
+  const input = event.target as HTMLInputElement
+  handleFile(input.files?.[0])
+  input.value = ''
 }
 
 function onDrop(event: DragEvent) {
@@ -85,7 +93,7 @@ function clear(event: Event) {
 
 <template>
   <!-- Inline variant: round thumbnail + text row -->
-  <label v-if="variant === 'inline'" class="flex flex-col gap-1">
+  <div v-if="variant === 'inline'" class="flex flex-col gap-1">
     <span class="form-label">
       {{ label }} <span v-if="optional" class="form-hint">(optional)</span>
     </span>
@@ -124,7 +132,7 @@ function clear(event: Event) {
       </div>
     </div>
     <input ref="inputEl" type="file" accept="image/*" class="hidden" @change="onChange" />
-  </label>
+  </div>
 
   <!-- Box variant: aspect-video drop zone with lightbox -->
   <div v-else class="flex flex-col gap-1">
