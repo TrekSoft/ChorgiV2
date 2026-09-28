@@ -350,6 +350,30 @@ export function playCelebration(date: Date = new Date()): void {
   celebrationSoundForWeekday(date.getDay())()
 }
 
+/** Happy Birthday in 3/4 time, starting on a one-beat pickup. */
+export const HAPPY_BIRTHDAY_SONG: Song = {
+  bpm: 180,
+  type: 'triangle',
+  gain: 0.12,
+  melody: [
+    [G4, 0.75], [G4, 0.25], [A4, 1], [G4, 1], [C5, 1], [B4, 2],
+    [G4, 0.75], [G4, 0.25], [A4, 1], [G4, 1], [D5, 1], [C5, 2],
+    [G4, 0.75], [G4, 0.25], [G5, 1], [E5, 1], [C5, 1], [B4, 1], [A4, 1],
+    [F5, 0.75], [F5, 0.25], [E5, 1], [C5, 1], [D5, 1], [C5, 3],
+  ],
+  bass: [[R, 1], [C4, 3], [G3, 3], [G3, 3], [C4, 3], [C4, 3], [F4, 3], [G3, 3], [C4, 3]],
+}
+
+let birthdaySongEndsAt = 0
+
+/** Plays Happy Birthday unless it is already playing, so rapid completions don't stack. */
+export function playBirthdaySong(): void {
+  const ac = getCtx()
+  if (!ac || ac.currentTime < birthdaySongEndsAt) return
+  birthdaySongEndsAt = ac.currentTime + songDuration(HAPPY_BIRTHDAY_SONG)
+  playSong(HAPPY_BIRTHDAY_SONG)
+}
+
 export function playBalloons(): void {
   const ac = getCtx()
   if (!ac) return

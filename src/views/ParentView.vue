@@ -10,6 +10,7 @@ import { DATE_FORMAT, formatCents } from '../lib/format'
 import { isParentAssignee, parentAssigneeDisplay, cleaningSectionsForDate, taskCategory, claimKeyFor, isClaimableOn } from '../lib/chore-utils'
 import { family } from '../composables/useFamily'
 import { member } from '../composables/useFamily'
+import { isBirthdayToday } from '../lib/birthday'
 import { familyMembers } from '../composables/useFamilyMembers'
 import { children } from '../composables/useChildren'
 import { chores, choresLoading } from '../composables/useChores'
@@ -57,6 +58,7 @@ const parentPhoto = computed(() => member.value?.photoURL || null)
 const weekStartsOn = computed(() => family.value?.weekStartsOn ?? WEEK_START_SUNDAY)
 
 const now = ref(new Date())
+const birthdayToday = computed(() => !!member.value?.birthdate && isBirthdayToday(member.value.birthdate, now.value))
 let nowTimer: ReturnType<typeof setInterval> | null = null
 onMounted(() => {
   nowTimer = setInterval(() => {
@@ -531,7 +533,7 @@ async function onTaskUnclaim(task: ClaimableItem) {
       @close="editDialogOpen = false"
     />
 
-    <ConfettiBurst ref="burst" />
+    <ConfettiBurst ref="burst" :birthday="birthdayToday" />
     <JackpotWheel
       :jackpot="wheel?.jackpot ?? null"
       :min-cents="wheel?.minCents ?? 0"
