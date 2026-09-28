@@ -1,12 +1,15 @@
 <script setup lang="ts">
 import confetti from 'canvas-confetti'
 import { CONFETTI_MODE, type ConfettiMode } from '../lib/constants'
-import { playSafely, playCompletion, playCoin, playCelebration, playBalloons } from '../lib/sounds'
+import { playSafely, playCompletion, playCoin, playCelebration, playBalloons, playBirthdaySong } from '../lib/sounds'
+
+/** When set, completion and celebration sounds play Happy Birthday instead. */
+const props = defineProps<{ birthday?: boolean }>()
 
 // Usage: const burstRef = ref(); burstRef.value.fire('confetti' | 'coins' | 'fireworks')
 
 function fireConfetti() {
-  playSafely(playCompletion)
+  playSafely(props.birthday ? playBirthdaySong : playCompletion)
   confetti({
     particleCount: 120,
     spread: 80,
@@ -27,7 +30,7 @@ function fireCoins() {
 }
 
 function fireFireworks() {
-  playSafely(playCelebration)
+  playSafely(props.birthday ? playBirthdaySong : playCelebration)
   const duration = 2000
   const end = Date.now() + duration
   const colors = ['#f59e0b', '#ec4899', '#8b5cf6', '#22c55e']
@@ -52,7 +55,7 @@ function fireFireworks() {
 }
 
 function fireBalloons() {
-  playSafely(playBalloons)
+  playSafely(props.birthday ? playBirthdaySong : playBalloons)
   const colors = ['#ef4444', '#f59e0b', '#22c55e', '#3b82f6', '#a855f7', '#ec4899']
   const count = 30
   for (let i = 0; i < count; i++) {

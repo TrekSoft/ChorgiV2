@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   CELEBRATION_SOUNDS,
+  HAPPY_BIRTHDAY_SONG,
   CELEBRATION_SONGS,
   COMPLETION_SOUNDS,
   celebrationSoundForWeekday,
@@ -34,5 +35,10 @@ describe('sound variants', () => {
 
     expect(new Set(completionByDay).size).toBe(7)
     expect(new Set(celebrationByDay).size).toBe(7)
+  })
+
+  it('keeps the Happy Birthday accompaniment in step with the melody', () => {
+    const { melody, bass, bpm } = HAPPY_BIRTHDAY_SONG
+    expect(stepsDuration(bass!, bpm)).toBeCloseTo(stepsDuration(melody, bpm), 5)
   })
 })

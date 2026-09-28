@@ -57,6 +57,7 @@ const weekStartsOn = computed(() => family.value?.weekStartsOn ?? WEEK_START_SUN
 const meAssigneeId = computed(() => PARENT_ASSIGNEE_PREFIX + (currentUser.value?.uid || ''))
 
 const now = ref(new Date())
+const birthdayToday = computed(() => !!child.value?.birthdate && isBirthdayToday(child.value.birthdate, now.value))
 let nowTimer: ReturnType<typeof setInterval> | null = null
 onMounted(() => {
   nowTimer = setInterval(() => {
@@ -219,7 +220,6 @@ async function toggleChore(entry: AssignedEntry) {
     await withPending(entry.chore.id, () => uncompleteChore(entry.chore, childId, now.value, weekStartsOn.value), () => {})
   } else {
     const childId = child.value.id
-    const birthdayMode = child.value.birthdate && isBirthdayToday(child.value.birthdate, now.value)
     await withPending(
       entry.chore.id,
       () => completeChore(entry.chore, childId, now.value, weekStartsOn.value),
@@ -232,7 +232,7 @@ async function toggleChore(entry: AssignedEntry) {
             completionIdFor(entry.chore, childId, now.value, weekStartsOn.value),
           )
         } else {
-          burst.value?.fire(birthdayMode ? CONFETTI_MODE.BALLOONS : CONFETTI_MODE.CONFETTI)
+          burst.value?.fire(birthdayToday.value ? CONFETTI_MODE.BALLOONS : CONFETTI_MODE.CONFETTI)
         }
       },
     )
@@ -563,7 +563,7 @@ async function onTaskUnclaim(task: ClaimableItem) {
       @close="editDialogOpen = false"
     />
 
-    <ConfettiBurst ref="burst" />
+    <ConfettiBurst ref="burst" :birthday="birthdayToday" />
     <JackpotWheel
       :jackpot="wheel?.jackpot ?? null"
       :min-cents="wheel?.minCents ?? 0"
