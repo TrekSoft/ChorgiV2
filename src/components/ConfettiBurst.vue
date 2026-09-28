@@ -3,13 +3,13 @@ import confetti from 'canvas-confetti'
 import { CONFETTI_MODE, type ConfettiMode } from '../lib/constants'
 import { playSafely, playCompletion, playCoin, playCelebration, playBalloons, playBirthdaySong } from '../lib/sounds'
 
-/** When set, completion and celebration sounds play Happy Birthday instead. */
+/** When set, the all-chores-done celebration plays Happy Birthday instead. */
 const props = defineProps<{ birthday?: boolean }>()
 
 // Usage: const burstRef = ref(); burstRef.value.fire('confetti' | 'coins' | 'fireworks')
 
 function fireConfetti() {
-  playSafely(props.birthday ? playBirthdaySong : playCompletion)
+  playSafely(playCompletion)
   confetti({
     particleCount: 120,
     spread: 80,
@@ -55,7 +55,7 @@ function fireFireworks() {
 }
 
 function fireBalloons() {
-  playSafely(props.birthday ? playBirthdaySong : playBalloons)
+  playSafely(playBalloons)
   const colors = ['#ef4444', '#f59e0b', '#22c55e', '#3b82f6', '#a855f7', '#ec4899']
   const count = 30
   for (let i = 0; i < count; i++) {
