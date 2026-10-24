@@ -4,7 +4,7 @@ import { useRouter } from 'vue-router'
 import { Icon } from '@iconify/vue'
 import { daysUntilBirthday, isBirthdayToday } from '../lib/birthday'
 import { isAdminMode } from '../composables/useAdminMode'
-import { addMark, removeMark, setAllowanceBalance, payoutChild } from '../composables/useAllowance'
+import { addMark, removeMark, setAllowanceBalance, payoutChild, allowanceSplit } from '../composables/useAllowance'
 import { useDialog } from '../composables/useDialog'
 import { formatCents, dollarsToCents } from '../lib/format'
 import { celebrateCoins } from '../lib/coin-celebration'
@@ -69,22 +69,19 @@ const { confirm } = useDialog()
 function onPayoutClick(event: Event) {
   event.stopPropagation()
   const totalCents = props.child.allowanceBalanceCents
-  const titheCents = Math.round(totalCents * 0.1)
-  const remainingCents = totalCents - titheCents
-  const savingsCents = Math.trunc(remainingCents / 2)
-  const spendingCents = remainingCents - savingsCents
+  const split = allowanceSplit(totalCents)
 
   confirm({
     title: 'Pay allowance',
-    message: `Pay ${props.child.name}'s $${formatCents(totalCents)} allowance?`,
+    message: `Pay ${props.child.name}'s $${formatCents(totalCents)} allowance into their bank accounts?`,
     breakdown: [
-      { label: 'Tithe (10%)', value: `$${formatCents(titheCents)}` },
-      { label: 'Savings (50% of remainder)', value: `$${formatCents(savingsCents)}` },
-      { label: 'Spending (50% of remainder)', value: `$${formatCents(spendingCents)}` },
+      { label: '💵 Spending (50% of remainder)', value: `$${formatCents(split.spendingCents)}` },
+      { label: '🏦 Savings (50% of remainder)', value: `$${formatCents(split.savingsCents)}` },
+      { label: '⛪ Tithe (10%)', value: `$${formatCents(split.titheCents)}` },
     ],
     confirmLabel: 'Pay allowance',
     danger: true,
-  }).then((ok) => { if (ok) { payoutChild(props.child.id); celebrateCoins() } })
+  }).then((ok) => { if (ok) { payoutChild(props.child.id, split); celebrateCoins() } })
 }
 </script>
 

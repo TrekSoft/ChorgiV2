@@ -48,6 +48,10 @@ export interface ChildDoc {
   weeklyAllowanceCents: number
   allowanceBalanceCents: number
   allowanceLastAccruedDate: DateString | null
+  /** Bank balances funded by allowance payouts — missing on pre-feature docs, treated as 0 */
+  bankSpendingCents?: number
+  bankSavingsCents?: number
+  bankTitheCents?: number
   marksCount: number
   order: number
   updatedAt?: MaybeTimestamp

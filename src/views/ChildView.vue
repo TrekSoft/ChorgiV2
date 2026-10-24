@@ -37,6 +37,7 @@ import { isJackpot, jackpotForItem, type Jackpot } from '../lib/jackpot'
 import { useDialog } from '../composables/useDialog'
 import { useIdleTimeout } from '../composables/useIdleTimeout'
 import AppHeader from '../components/AppHeader.vue'
+import BankAccounts from '../components/BankAccounts.vue'
 import ChoreCard from '../components/ChoreCard.vue'
 import EmptyState from '../components/EmptyState.vue'
 import ConfettiBurst from '../components/ConfettiBurst.vue'
@@ -428,7 +429,7 @@ async function onTaskUnclaim(task: ClaimableItem) {
   <div class="page-bg">
     <AppHeader />
     <main class="max-w-6xl mx-auto p-4 sm:p-6 flex flex-col gap-4">
-      <div class="flex items-center gap-3">
+      <div class="flex items-center gap-3 flex-wrap">
         <button
           @click="router.push('/')"
           class="w-14 h-14 rounded-full bg-white border-2 border-amber-200 hover:border-amber-400 text-amber-700 cursor-pointer flex items-center justify-center shrink-0"
@@ -443,6 +444,7 @@ async function onTaskUnclaim(task: ClaimableItem) {
           class="w-12 h-12 rounded-full object-cover border-2 border-amber-200"
         />
         <h1 class="heading-page">{{ child?.name || 'Loading…' }}</h1>
+        <BankAccounts v-if="child" :child="child" class="w-full sm:w-auto sm:ml-auto" />
       </div>
 
       <div class="grid gap-6 lg:grid-cols-2">

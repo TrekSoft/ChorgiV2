@@ -168,6 +168,19 @@ export function playCoin(): void {
   playTone(1319, 0.12, 'square', 0.08, 0.07)
 }
 
+/** Bright ascending coin "cha-ching" for depositing into a bank account. */
+export function playDeposit(): void {
+  playCoin()
+  playTone(1760, 0.16, 'sine', 0.05, 0.16)
+}
+
+/** Soft descending coin cue for withdrawing from a bank account. */
+export function playWithdrawal(): void {
+  playTone(1319, 0.09, 'square', 0.08, 0)
+  playTone(988, 0.11, 'square', 0.08, 0.09)
+  playTone(659, 0.18, 'square', 0.06, 0.2)
+}
+
 /** Single wheel-pointer click; pitch rises slightly as `progress` (0–1) approaches the stop. */
 export function playSpinTick(progress = 0): void {
   playTone(900 + progress * 300, 0.03, 'square', 0.05, 0, 500)
