@@ -648,6 +648,7 @@ async function onTaskUnclaim(task: ClaimableItem) {
       :child-name="child?.name"
       @done="onBibleDone"
       @wrong="onBibleWrong"
+      @close="bibleModalOpen = false"
     />
     <PhotoLightbox
       :open="!!lightboxSrc || !!lightboxVideoSrc"

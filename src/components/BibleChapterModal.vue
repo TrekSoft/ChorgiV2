@@ -5,7 +5,8 @@ import FullscreenOverlay from './FullscreenOverlay.vue'
 import { questionFor, chapterVideoEmbedUrl } from '../lib/bible'
 
 // Full-screen Bible chapter experience: quiz question (when one exists for the
-// chapter) → optional YouTube video → celebration. Emits `done` when finished.
+// chapter) → optional YouTube video → celebration. Emits `done` when finished,
+// `wrong` after a wrong answer, and `close` when the child backs out.
 
 const props = defineProps<{
   open: boolean
@@ -13,7 +14,7 @@ const props = defineProps<{
   chapter: number
   childName?: string
 }>()
-const emit = defineEmits<{ done: []; wrong: [] }>()
+const emit = defineEmits<{ done: []; wrong: []; close: [] }>()
 
 type Phase = 'question' | 'video' | 'finished'
 const phase = ref<Phase>('question')
@@ -63,7 +64,16 @@ watch(
 <template>
   <FullscreenOverlay :open="open" label="Bible chapter" overlay-class="bible-overlay">
     <div class="flex flex-col items-center gap-6 w-full max-w-2xl px-4 py-8">
-      <div class="text-center">
+      <div class="text-center relative w-full">
+        <button
+          v-if="phase === 'question'"
+          type="button"
+          class="absolute right-0 top-0 text-sky-200 hover:text-white font-bold text-sm flex items-center gap-1 cursor-pointer"
+          @click="emit('close')"
+        >
+          <Icon icon="mdi:arrow-left" class="w-5 h-5" />
+          Back
+        </button>
         <div class="text-amber-300 font-black text-2xl tracking-wide">📖 BIBLE TIME</div>
         <div class="text-white font-bold text-lg mt-1">{{ book }} {{ chapter }}</div>
         <div v-if="childName" class="text-sky-200 text-sm mt-0.5">{{ childName }}</div>
