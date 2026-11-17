@@ -1,0 +1,141 @@
+import { describe, expect, it } from 'vitest'
+import {
+  BIBLE_BOOKS,
+  bibleRetryRemainingMs,
+  bibleSlug,
+  chapterVideoEmbedUrl,
+  completedReading,
+  dueChapter,
+  nextChapter,
+  questionFor,
+} from './bible'
+import type { BibleReading } from '../types/firebase'
+
+const reading: BibleReading = {
+  book: 'Genesis',
+  chapter: 1,
+  completedDate: null,
+  completedBook: null,
+  completedChapter: null,
+  retryAtMs: null,
+}
+
+describe('BIBLE_BOOKS', () => {
+  it('covers the whole canon in order', () => {
+    expect(BIBLE_BOOKS).toHaveLength(66)
+    expect(BIBLE_BOOKS[0].name).toBe('Genesis')
+    expect(BIBLE_BOOKS.at(-1)?.name).toBe('Revelation')
+    expect(BIBLE_BOOKS.reduce((sum, b) => sum + b.chapters, 0)).toBe(1189)
+  })
+})
+
+describe('bibleSlug', () => {
+  it('slugifies book names', () => {
+    expect(bibleSlug('Genesis')).toBe('genesis')
+    expect(bibleSlug('2 Samuel')).toBe('2-samuel')
+    expect(bibleSlug('Song of Solomon')).toBe('song-of-solomon')
+  })
+})
+
+describe('nextChapter', () => {
+  it('advances within a book', () => {
+    expect(nextChapter('Genesis', 1)).toEqual({ book: 'Genesis', chapter: 2 })
+  })
+
+  it('rolls over to the next book', () => {
+    expect(nextChapter('Genesis', 50)).toEqual({ book: 'Exodus', chapter: 1 })
+    expect(nextChapter('Malachi', 4)).toEqual({ book: 'Matthew', chapter: 1 })
+  })
+
+  it('ends after Revelation 22', () => {
+    expect(nextChapter('Revelation', 22)).toBeNull()
+  })
+
+  it('returns null for an unknown book', () => {
+    expect(nextChapter('Enoch', 1)).toBeNull()
+  })
+})
+
+describe('dueChapter', () => {
+  it('returns the next chapter due', () => {
+    expect(dueChapter(reading, '2026-11-17')).toEqual({ book: 'Genesis', chapter: 1, done: false })
+  })
+
+  it('returns the finished chapter on the day it was completed', () => {
+    const done: BibleReading = {
+      book: 'Genesis',
+      chapter: 2,
+      completedDate: '2026-11-17',
+      completedBook: 'Genesis',
+      completedChapter: 1,
+      retryAtMs: null,
+    }
+    expect(dueChapter(done, '2026-11-17')).toEqual({ book: 'Genesis', chapter: 1, done: true })
+    expect(dueChapter(done, '2026-11-18')).toEqual({ book: 'Genesis', chapter: 2, done: false })
+  })
+
+  it('returns null without a plan', () => {
+    expect(dueChapter(null, '2026-11-17')).toBeNull()
+    expect(dueChapter(undefined, '2026-11-17')).toBeNull()
+  })
+})
+
+describe('completedReading', () => {
+  it('advances the plan and records the completion', () => {
+    expect(completedReading(reading, '2026-11-17')).toEqual({
+      book: 'Genesis',
+      chapter: 2,
+      completedDate: '2026-11-17',
+      completedBook: 'Genesis',
+      completedChapter: 1,
+      retryAtMs: null,
+    })
+  })
+
+  it('clears a retry cooldown', () => {
+    const coolingDown = { ...reading, retryAtMs: 123 }
+    expect(completedReading(coolingDown, '2026-11-17')?.retryAtMs).toBeNull()
+  })
+
+  it('returns null at the end of the Bible', () => {
+    const last: BibleReading = { ...reading, book: 'Revelation', chapter: 22 }
+    expect(completedReading(last, '2026-11-17')).toBeNull()
+  })
+})
+
+describe('bibleRetryRemainingMs', () => {
+  it('is 0 without a cooldown', () => {
+    expect(bibleRetryRemainingMs(reading, 1000)).toBe(0)
+    expect(bibleRetryRemainingMs(null, 1000)).toBe(0)
+  })
+
+  it('counts down to 0 and never goes negative', () => {
+    const coolingDown = { ...reading, retryAtMs: 5000 }
+    expect(bibleRetryRemainingMs(coolingDown, 3000)).toBe(2000)
+    expect(bibleRetryRemainingMs(coolingDown, 6000)).toBe(0)
+  })
+})
+
+describe('questionFor', () => {
+  it('finds questions by book and chapter', () => {
+    const q = questionFor('Genesis', 1)
+    expect(q).not.toBeNull()
+    expect(q?.answers[q.correctIndex]).toBeTruthy()
+  })
+
+  it('returns null for books without a question file', () => {
+    expect(questionFor('Exodus', 1)).toBeNull()
+  })
+})
+
+describe('chapterVideoEmbedUrl', () => {
+  it('returns null for chapters without a video', () => {
+    expect(chapterVideoEmbedUrl('Exodus', 1)).toBeNull()
+  })
+
+  it('passes playlist embed URLs through untouched', () => {
+    const url = chapterVideoEmbedUrl('2 Samuel', 1)
+    expect(url).toContain('youtube.com/embed/videoseries')
+    expect(url).toContain('index=1')
+  })
+})

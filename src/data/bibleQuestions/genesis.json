@@ -45,9 +45,9 @@
     "correctIndex": 1
   },
   "10": {
-    "question": "Where did Noah's family live after the flood?",
-    "answers": ["On a boat forever", "In the ark", "On the mountains", "On dry ground"],
-    "correctIndex": 3
+    "question": "Who was the mighty hunter before the LORD who built great cities like Babel and Nineveh?",
+    "answers": ["Nimrod", "Cush", "Asshur", "Shem"],
+    "correctIndex": 0
   },
   "11": {
     "question": "What were the people building in the city of Babel?",
@@ -100,9 +100,9 @@
     "correctIndex": 1
   },
   "21": {
-    "question": "What did God ask Abraham to do with Isaac?",
-    "answers": ["Teach him to read", "Take him on a long trip", "Offer him as a sacrifice on a mountain", "Send him to school"],
-    "correctIndex": 2
+    "question": "When Hagar and Ishmael were thirsty in the desert, what did God show Hagar?",
+    "answers": ["A well of water", "A river full of fish", "A fruit tree", "A friendly shepherd"],
+    "correctIndex": 0
   },
   "22": {
     "question": "What did Abraham see stuck in a bush instead of Isaac?",
@@ -145,13 +145,13 @@
     "correctIndex": 1
   },
   "30": {
-    "question": "What did Rachel give Jacob to carry so he could marry her?",
-    "answers": ["A big bag of gold", "The mandrakes (a special plant)", "Her father's sheep", "A beautiful necklace"],
-    "correctIndex": 1
+    "question": "What did Reuben find in the field and bring to his mother Leah?",
+    "answers": ["Mandrakes", "A bunch of grapes", "A baby lamb", "A gold coin"],
+    "correctIndex": 0
   },
   "31": {
     "question": "Who caught up with Jacob after he ran away from Laban?",
-    "answers": ["Esau", "Pharaoh", "His brother-in-law Laban", "A giant"],
+    "answers": ["Esau", "Pharaoh", "Laban, his father-in-law", "A giant"],
     "correctIndex": 2
   },
   "32": {
@@ -160,9 +160,9 @@
     "correctIndex": 1
   },
   "33": {
-    "question": "How many sons did Jacob give gifts to before meeting Esau?",
-    "answers": ["Two", "Five", "Twelve", "Twenty"],
-    "correctIndex": 2
+    "question": "What did Esau do when he finally met Jacob again?",
+    "answers": ["He ran to meet him and hugged him", "He fought with him", "He ran away from him", "He sent him away angry"],
+    "correctIndex": 0
   },
   "34": {
     "question": "What happened to Dinah in the city of Shechem?",
@@ -205,14 +205,14 @@
     "correctIndex": 0
   },
   "42": {
-    "question": "What did Joseph say Pharaoh's dreams meant?",
-    "answers": ["He would win the lottery", "Seven good years of plenty would come, then seven bad years of hunger", "He should build a bigger palace", "He would have many children"],
-    "correctIndex": 1
+    "question": "When Joseph's brothers came to Egypt to buy grain, what did Joseph accuse them of being?",
+    "answers": ["Spies", "Thieves", "Farmers", "Soldiers"],
+    "correctIndex": 0
   },
   "43": {
-    "question": "How many of Jacob's sons came to Egypt to buy grain?",
-    "answers": ["Two", "Five", "Ten", "All ten (Benjamin stayed home)"],
-    "correctIndex": 3
+    "question": "How much food did Joseph give his brother Benjamin at the feast, compared to the others?",
+    "answers": ["Five times as much", "The same amount", "Twice as much", "Half as much"],
+    "correctIndex": 0
   },
   "44": {
     "question": "What did Judah say he would do instead of Benjamin going to Egypt as a slave?",
@@ -220,9 +220,9 @@
     "correctIndex": 1
   },
   "45": {
-    "question": "What did Joseph say to his brothers when he finally told them who he was?",
-    "answers": ["'I hate you all'", "'You meant evil against me, but God meant it for good to save many lives'", "'I am the king now'", "'Go home forever'"],
-    "correctIndex": 1
+    "question": "What did Joseph tell his brothers about why God had sent him to Egypt?",
+    "answers": ["God sent me here ahead of you to save many lives", "God sent me here to punish you", "God sent me here to make me rich", "God sent me here by accident"],
+    "correctIndex": 0
   },
   "46": {
     "question": "Where did Joseph's family settle in Egypt?",
@@ -230,19 +230,19 @@
     "correctIndex": 1
   },
   "47": {
-    "question": "What did Jacob do with Joseph's two sons Ephraim and Manasseh?",
-    "answers": ["He sent them away", "He blessed them and adopted them as his own sons", "He made them kings", "He forgot about them"],
-    "correctIndex": 1
+    "question": "When Joseph brought his father Jacob to meet Pharaoh, what did Jacob do?",
+    "answers": ["He blessed Pharaoh", "He gave Pharaoh a gift of sheep", "He asked Pharaoh for a house", "He bowed and left quickly"],
+    "correctIndex": 0
   },
   "48": {
-    "question": "How old was Jacob when he died?",
-    "answers": ["One hundred years", "One hundred twenty-seven years", "One hundred forty-seven years", "Two hundred years"],
-    "correctIndex": 2
+    "question": "When Jacob blessed Joseph's sons, which boy did he put his right hand on?",
+    "answers": ["Ephraim, the younger son", "Manasseh, the older son", "Both boys at the same time", "Joseph"],
+    "correctIndex": 0
   },
   "49": {
-    "question": "What did Joseph tell his brothers to do with his bones when they left Egypt?",
-    "answers": ["Throw them in the sea", "Take them up to the land God promised", "Hide them under the floor", "Keep them in a box forever"],
-    "correctIndex": 1
+    "question": "In his blessing, what animal did Jacob compare Judah to?",
+    "answers": ["A lion", "A wolf", "A donkey", "A snake"],
+    "correctIndex": 0
   },
   "50": {
     "question": "How old was Joseph when he died in Egypt?",

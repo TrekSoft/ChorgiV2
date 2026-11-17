@@ -1,14 +1,11 @@
 import type { BibleReading } from '../types/firebase'
+import videoConfig from '../data/bibleVideos.json'
+
+// ── Books ───────────────────────────────────────────────────────────────────
 
 export interface BibleBook {
   name: string
   chapters: number
-}
-
-export interface BibleQuestion {
-  question: string
-  answers: string[]
-  correctIndex: number
 }
 
 /** All 66 books of the Protestant canon with their chapter counts. */
@@ -90,18 +87,31 @@ export function bibleSlug(book: string): string {
   return book.toLowerCase().replace(/[^a-z0-9]+/g, '-')
 }
 
+// ── Progression ─────────────────────────────────────────────────────────────
+
+export interface ChapterRef {
+  book: string
+  chapter: number
+}
+
 /** The chapter after the given one, or null when the Bible is finished. */
-export function nextChapter(book: string, chapter: number): { book: string; chapter: number } | null {
+export function nextChapter(book: string, chapter: number): ChapterRef | null {
   const index = BIBLE_BOOKS.findIndex((b) => b.name === book)
   if (index === -1) return null
-  const current = BIBLE_BOOKS[index]
-  if (chapter < current.chapters) return { book, chapter: chapter + 1 }
-  return index + 1 < BIBLE_BOOKS.length ? { book: BIBLE_BOOKS[index + 1].name, chapter: 1 } : null
+  if (chapter < BIBLE_BOOKS[index].chapters) return { book, chapter: chapter + 1 }
+  const next = BIBLE_BOOKS[index + 1]
+  return next ? { book: next.name, chapter: 1 } : null
 }
 
 // ── Quiz questions ──────────────────────────────────────────────────────────
 // One JSON file per book in src/data/bibleQuestions/<slug>.json, keyed by
 // chapter number as a string. Add new books by dropping in a new file.
+
+export interface BibleQuestion {
+  question: string
+  answers: string[]
+  correctIndex: number
+}
 
 const questionModules = import.meta.glob<{ default: Record<string, BibleQuestion> }>(
   '../data/bibleQuestions/*.json',
@@ -115,20 +125,18 @@ for (const [path, mod] of Object.entries(questionModules)) {
 }
 
 export function questionFor(book: string, chapter: number): BibleQuestion | null {
-  return questionsByBook[bibleSlug(book)]?.[String(chapter)] || null
+  return questionsByBook[bibleSlug(book)]?.[String(chapter)] ?? null
 }
 
 // ── Chapter videos ──────────────────────────────────────────────────────────
-// src/data/bibleVideos.json maps "<slug>.<chapter>" (e.g. "2-samuel.1") to a
-// YouTube URL — either a normal watch/share URL or an embed URL. Chapters
+// bibleVideos.json maps "<slug>.<chapter>" (e.g. "2-samuel.1") to a YouTube
+// URL — a watch/share URL, a bare video id, or an embed URL. Chapters
 // without an entry simply skip the video step.
-
-import videoConfig from '../data/bibleVideos.json'
 
 const videos: Record<string, string> = videoConfig
 
 export function videoFor(book: string, chapter: number): string | null {
-  return videos[`${bibleSlug(book)}.${chapter}`] || null
+  return videos[`${bibleSlug(book)}.${chapter}`] ?? null
 }
 
 /** Convert any supported YouTube URL into an autoplay embed URL. */
@@ -136,16 +144,41 @@ export function chapterVideoEmbedUrl(book: string, chapter: number): string | nu
   const url = videoFor(book, chapter)
   if (!url) return null
   if (url.includes('youtube.com/embed/')) {
-    return url.includes('autoplay=') ? url : url + (url.includes('?') ? '&' : '?') + 'autoplay=1&rel=0'
+    return url.includes('autoplay=') ? url : `${url}${url.includes('?') ? '&' : '?'}autoplay=1&rel=0`
   }
   const match =
-    url.match(/(?:youtube\.com\/watch\?[^#]*v=|youtu\.be\/|youtube\.com\/shorts\/)([\w-]{6,})/) ||
+    url.match(/(?:youtube\.com\/watch\?[^#]*v=|youtu\.be\/|youtube\.com\/shorts\/)([\w-]{6,})/) ??
     url.match(/^([\w-]{6,})$/)
-  if (!match) return null
-  return `https://www.youtube.com/embed/${match[1]}?autoplay=1&rel=0`
+  return match ? `https://www.youtube.com/embed/${match[1]}?autoplay=1&rel=0` : null
 }
 
-/** Advance a reading plan past today's chapter; null when the Bible is finished. */
+// ── Reading plan state ──────────────────────────────────────────────────────
+
+export interface DueChapter extends ChapterRef {
+  /** True when the chapter was already finished today (shown disabled). */
+  done: boolean
+}
+
+/** The chapter due today, or the one already finished today. */
+export function dueChapter(
+  reading: BibleReading | null | undefined,
+  today: string,
+): DueChapter | null {
+  if (!reading?.book || !reading.chapter) return null
+  if (reading.completedDate === today) {
+    return {
+      book: reading.completedBook || reading.book,
+      chapter: reading.completedChapter ?? reading.chapter,
+      done: true,
+    }
+  }
+  return { book: reading.book, chapter: reading.chapter, done: false }
+}
+
+/**
+ * The plan after finishing today's chapter: advanced to the next chapter,
+ * with today's completion recorded. Null when the Bible is finished.
+ */
 export function completedReading(reading: BibleReading, today: string): BibleReading | null {
   const next = nextChapter(reading.book, reading.chapter)
   if (!next) return null
@@ -160,7 +193,10 @@ export function completedReading(reading: BibleReading, today: string): BibleRea
 }
 
 /** Milliseconds left on a wrong-answer retry cooldown (0 when none). */
-export function bibleRetryRemainingMs(reading: BibleReading | null | undefined, nowMs: number): number {
+export function bibleRetryRemainingMs(
+  reading: BibleReading | null | undefined,
+  nowMs: number,
+): number {
   if (!reading?.retryAtMs) return 0
   return Math.max(0, reading.retryAtMs - nowMs)
 }

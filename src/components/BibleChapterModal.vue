@@ -1,12 +1,16 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onUnmounted } from 'vue'
 import { Icon } from '@iconify/vue'
 import FullscreenOverlay from './FullscreenOverlay.vue'
+import ConfettiBurst from './ConfettiBurst.vue'
 import { questionFor, chapterVideoEmbedUrl } from '../lib/bible'
+import { playSafely, playSparkle, playBoing, playChime } from '../lib/sounds'
+import { CONFETTI_MODE, type ConfettiMode } from '../lib/constants'
 
-// Full-screen Bible chapter experience: quiz question (when one exists for the
-// chapter) → optional YouTube video → celebration. Emits `done` when finished,
-// `wrong` after a wrong answer, and `close` when the child backs out.
+// Full-screen Bible chapter experience: quiz question (when one exists for
+// the chapter) → optional chapter video → celebration. Emits `done` when the
+// child collects, `wrong` after a wrong answer (the parent starts the retry
+// cooldown), and `close` when the child backs out of the question.
 
 const props = defineProps<{
   open: boolean
@@ -19,46 +23,69 @@ const emit = defineEmits<{ done: []; wrong: []; close: [] }>()
 type Phase = 'question' | 'video' | 'finished'
 const phase = ref<Phase>('question')
 const picked = ref<number | null>(null)
+const burst = ref<{ fire: (mode?: ConfettiMode) => void } | null>(null)
+
 const question = computed(() => (props.open ? questionFor(props.book, props.chapter) : null))
 const embedUrl = computed(() => (props.open ? chapterVideoEmbedUrl(props.book, props.chapter) : null))
 
-const FEEDBACK_MS = 1100
-const WRONG_MS = 2000
+const CORRECT_FEEDBACK_MS = 1100
+const WRONG_FEEDBACK_MS = 2000
 let feedbackTimer: ReturnType<typeof setTimeout> | null = null
 
+function clearFeedbackTimer() {
+  if (feedbackTimer) clearTimeout(feedbackTimer)
+  feedbackTimer = null
+}
+
+function finish() {
+  phase.value = 'finished'
+  playSafely(playChime)
+  burst.value?.fire(CONFETTI_MODE.CONFETTI)
+}
+
 function advance() {
-  phase.value = embedUrl.value ? 'video' : 'finished'
+  if (embedUrl.value) {
+    phase.value = 'video'
+  } else {
+    finish()
+  }
 }
 
 function pick(index: number) {
   if (picked.value !== null || !question.value) return
   picked.value = index
-  if (feedbackTimer) clearTimeout(feedbackTimer)
   const correct = index === question.value.correctIndex
-  feedbackTimer = setTimeout(correct ? advance : () => emit('wrong'), correct ? FEEDBACK_MS : WRONG_MS)
+  playSafely(correct ? playSparkle : playBoing)
+  clearFeedbackTimer()
+  feedbackTimer = setTimeout(
+    correct ? advance : () => emit('wrong'),
+    correct ? CORRECT_FEEDBACK_MS : WRONG_FEEDBACK_MS,
+  )
 }
 
-function answerClass(index: number) {
-  if (picked.value === null) return 'border-amber-200 bg-white text-amber-900 hover:border-amber-400 hover:bg-amber-50'
-  const chosen = picked.value === index
-  if (chosen) {
-    return question.value?.correctIndex === index
-      ? 'border-green-500 bg-green-100 text-green-900'
-      : 'border-red-400 bg-red-100 text-red-900'
+function answerClass(index: number): string {
+  if (picked.value === null) {
+    return 'border-amber-200 bg-white text-amber-900 hover:border-amber-400 hover:bg-amber-50'
   }
-  return 'border-amber-200 bg-white text-amber-400 opacity-60'
+  if (picked.value !== index) return 'border-amber-200 bg-white text-amber-400 opacity-60'
+  return question.value?.correctIndex === index
+    ? 'border-green-500 bg-green-100 text-green-900'
+    : 'border-red-400 bg-red-100 text-red-900'
 }
 
 watch(
   () => props.open,
   (isOpen) => {
-    if (feedbackTimer) clearTimeout(feedbackTimer)
+    clearFeedbackTimer()
     picked.value = null
     if (!isOpen) return
-    phase.value = questionFor(props.book, props.chapter) ? 'question' : embedUrl.value ? 'video' : 'finished'
+    phase.value = question.value ? 'question' : embedUrl.value ? 'video' : 'finished'
+    if (phase.value === 'finished') finish()
   },
   { immediate: true },
 )
+
+onUnmounted(clearFeedbackTimer)
 </script>
 
 <template>
@@ -68,15 +95,18 @@ watch(
         <button
           v-if="phase === 'question'"
           type="button"
-          class="absolute right-0 top-0 text-sky-200 hover:text-white font-bold text-sm flex items-center gap-1 cursor-pointer"
+          class="absolute right-0 top-0 flex items-center gap-1 text-amber-200 hover:text-white font-bold text-sm cursor-pointer"
           @click="emit('close')"
         >
           <Icon icon="mdi:arrow-left" class="w-5 h-5" />
           Back
         </button>
-        <div class="text-amber-300 font-black text-2xl tracking-wide">📖 BIBLE TIME</div>
+        <div class="flex items-center justify-center gap-2 text-amber-300 font-black text-2xl tracking-wide">
+          <Icon icon="mdi:book-open-variant" class="w-8 h-8" />
+          BIBLE TIME
+        </div>
         <div class="text-white font-bold text-lg mt-1">{{ book }} {{ chapter }}</div>
-        <div v-if="childName" class="text-sky-200 text-sm mt-0.5">{{ childName }}</div>
+        <div v-if="childName" class="text-amber-200/80 text-sm mt-0.5">{{ childName }}</div>
       </div>
 
       <!-- quiz -->
@@ -107,7 +137,7 @@ watch(
             allowfullscreen
           />
         </div>
-        <button type="button" class="btn-primary-lg flex items-center gap-2" @click="phase = 'finished'">
+        <button type="button" class="btn-primary-lg flex items-center gap-2" @click="finish">
           <Icon icon="mdi:check-circle" class="w-7 h-7" />
           I'm done watching!
         </button>
@@ -115,7 +145,7 @@ watch(
 
       <!-- celebration -->
       <div v-else class="flex flex-col items-center gap-6 text-center">
-        <div class="text-6xl">🎉</div>
+        <Icon icon="mdi:party-popper" class="w-20 h-20 text-amber-300" />
         <div class="text-white">
           <div class="text-3xl font-black">Great job, {{ childName || 'friend' }}!</div>
           <div class="text-amber-200 font-semibold mt-2">You read {{ book }} {{ chapter }}!</div>
@@ -126,5 +156,6 @@ watch(
         </button>
       </div>
     </div>
+    <ConfettiBurst ref="burst" />
   </FullscreenOverlay>
 </template>

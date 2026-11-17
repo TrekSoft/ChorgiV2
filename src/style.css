@@ -227,7 +227,7 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 }
 
 .bible-overlay {
-  background: radial-gradient(circle at 50% 30%, #1e3a8a, #0c1445 70%);
+  background: radial-gradient(circle at 50% 30%, rgba(120, 53, 15, 0.96), rgba(23, 12, 4, 0.99) 75%);
   animation: jackpotFadeIn 0.3s ease-out;
   overflow-y: auto;
 }

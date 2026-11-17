@@ -1,7 +1,7 @@
 {
   "1": {
-    "question": "What did Isaiah see in his vision of God?",
-    "answers": ["Angels called seraphim flying around God's throne", "A big boat on the sea", "A mountain made of gold", "A rainbow after rain"],
+    "question": "If the people's sins were like scarlet, what did God say they would become?",
+    "answers": ["White as snow", "Red as blood", "Gone forever and forgotten", "Heavy as stones"],
     "correctIndex": 0
   },
   "2": {
@@ -10,9 +10,9 @@
     "correctIndex": 2
   },
   "3": {
-    "question": "Who did Isaiah say would come like a branch from David's family?",
-    "answers": ["A famous singer", "A mighty warrior", "A special king called the Branch", "A wise teacher"],
-    "correctIndex": 2
+    "question": "What did the proud daughters of Zion do that displeased the LORD?",
+    "answers": ["They walked proudly, showing off their beauty", "They sang songs in the temple", "They gave their food to the poor", "They built a tower"],
+    "correctIndex": 0
   },
   "4": {
     "question": "What did the Branch of the LORD do for his people?",
@@ -21,8 +21,8 @@
   },
   "5": {
     "question": "In God's song about the vineyard, what did the owner do when the grapes were bad?",
-    "answers": ["He made more grapes grow", "He gave the vineyard to someone else", "He planted flowers", "He built a fence"],
-    "correctIndex": 1
+    "answers": ["He made more grapes grow", "He planted flowers in it", "He built a bigger fence", "He took down its hedge and let it be trampled and wasted"],
+    "correctIndex": 3
   },
   "6": {
     "question": "What did the angel touch Isaiah's mouth with?",
@@ -35,9 +35,9 @@
     "correctIndex": 1
   },
   "8": {
-    "question": "What did Isaiah name his baby son as a message to the king?",
-    "answers": ["'God saves'", "'Before the boy is old enough to say mama, the land will be taken'", "'A mighty king'", "'My favorite son'"],
-    "correctIndex": 1
+    "question": "What long name did God tell Isaiah to give his son as a sign?",
+    "answers": ["Maher-shalal-hash-baz", "Immanuel", "Shear-jashub", "Jedidiah"],
+    "correctIndex": 0
   },
   "9": {
     "question": "What did Isaiah say about the baby who would be born to rule?",
@@ -45,9 +45,9 @@
     "correctIndex": 0
   },
   "10": {
-    "question": "What did Isaiah warn people not to trust in?",
-    "answers": ["Their friends", "Their money", "Horses and chariots and armies", "Their toys"],
-    "correctIndex": 2
+    "question": "God said the mighty Assyria was like tools in His hand. Which tools?",
+    "answers": ["A rod and an axe", "A crown and a throne", "A shield and a helmet", "A trumpet and a banner"],
+    "correctIndex": 0
   },
   "11": {
     "question": "From whose family would the promised king come?",
@@ -55,9 +55,9 @@
     "correctIndex": 1
   },
   "12": {
-    "question": "What song did Isaiah tell God's people to sing?",
-    "answers": ["A happy birthday song", "A new song praising the LORD", "A quiet lullaby", "A marching song"],
-    "correctIndex": 1
+    "question": "In Isaiah's song of thanks, what would God's people draw with joy?",
+    "answers": ["Water from the wells of salvation", "Water from the river Jordan", "Gold from the temple", "Songs from a book"],
+    "correctIndex": 0
   },
   "13": {
     "question": "What did Isaiah say would happen to Babylon?",
@@ -85,39 +85,39 @@
     "correctIndex": 1
   },
   "18": {
-    "question": "What did Isaiah say about Ethiopia, Cush, Assyria, and Egypt?",
-    "answers": ["They would all be brought to worship on God's mountain", "They would fight each other forever", "They would disappear", "They would become the richest nations"],
+    "question": "What would the tall people of Cush (Ethiopia) one day bring to the LORD's mountain?",
+    "answers": ["Gifts for the LORD", "Their armies", "Their fastest ships", "Nothing at all"],
     "correctIndex": 0
   },
   "19": {
-    "question": "What did Isaiah say about God's people returning home?",
-    "answers": ["They would never return", "They would ride in gold chariots", "A highway would be made for them to come back to Zion", "They would fly home like birds"],
-    "correctIndex": 2
+    "question": "What surprising blessing did God speak over Egypt in this chapter?",
+    "answers": ["'Blessed be Egypt, My people'", "'Egypt will be destroyed forever'", "'Egypt will rule the whole world'", "'Egypt will be forgotten'"],
+    "correctIndex": 0
   },
   "20": {
-    "question": "What happened to the Assyrian king who bragged about his army?",
-    "answers": ["He became the greatest king ever", "God made him sick and he had to leave Judah", "He joined Israel's army", "He built a bigger city"],
-    "correctIndex": 1
+    "question": "For how many years did Isaiah walk barefoot and stripped as a sign against Egypt and Cush?",
+    "answers": ["Three years", "One year", "Seven years", "Ten years"],
+    "correctIndex": 0
   },
   "21": {
     "question": "What did Isaiah say about Babylon?",
-    "answers": ["She would fall forever and God's people would rise up", "She would rule the whole world", "She would become friends with Israel", "She would move to the desert"],
-    "correctIndex": 0
+    "answers": ["She would rule the whole world", "She would become friends with Israel", "She would move to the desert", "Babylon would fall, and her idols would be broken"],
+    "correctIndex": 3
   },
   "22": {
-    "question": "Who did Isaiah invite to come to God's mountain?",
-    "answers": ["Only kings and queens", "Everyone who was thirsty for God", "Only priests", "Only soldiers"],
-    "correctIndex": 1
+    "question": "God said He would put the key of whose house on Eliakim's shoulder?",
+    "answers": ["The house of David", "The house of Egypt", "The temple storehouse", "The king of Assyria's palace"],
+    "correctIndex": 0
   },
   "23": {
-    "question": "What did Isaiah say about traders from Tyre?",
-    "answers": ["They would become very rich", "Their ships and sailors would be destroyed", "They would move to Jerusalem", "They would teach God's people to sail"],
-    "correctIndex": 1
+    "question": "What did Isaiah say about the trading city of Tyre?",
+    "answers": ["They would become very rich", "They would move to Jerusalem", "They would teach God's people to sail", "Tyre would be laid waste, and her great ships would mourn"],
+    "correctIndex": 3
   },
   "24": {
     "question": "What did Isaiah say would happen to the whole earth?",
-    "answers": ["It would stay the same forever", "It would be laid waste like a wasted vineyard, then God would fix it", "It would turn into a giant garden", "It would become one big city"],
-    "correctIndex": 1
+    "answers": ["It would stay the same forever", "It would turn into a giant garden", "It would become one big city", "It would be laid waste and emptied"],
+    "correctIndex": 3
   },
   "25": {
     "question": "What did Isaiah say God would swallow up forever?",
@@ -140,14 +140,14 @@
     "correctIndex": 2
   },
   "29": {
-    "question": "What mountain did Isaiah talk about where people would gather to worship?",
-    "answers": ["Mount Everest", "Mount Carmel", "Mount Moriah", "Mount Sinai"],
-    "correctIndex": 2
+    "question": "The people honored God with their lips — but what was far from Him?",
+    "answers": ["Their hearts", "Their songs", "Their gifts", "Their dances"],
+    "correctIndex": 0
   },
   "30": {
     "question": "What did Isaiah say about Egypt's help?",
-    "answers": ["It was the best help", "It was worthless — like a paper boat in a storm", "It came with lots of gold", "It lasted for many years"],
-    "correctIndex": 1
+    "answers": ["It was the best help", "It came with lots of gold", "It lasted for many years", "It was worthless — Egypt's help would come to nothing"],
+    "correctIndex": 3
   },
   "31": {
     "question": "What did God tell the people of Judah to do instead of asking Egypt for help?",
@@ -160,14 +160,14 @@
     "correctIndex": 2
   },
   "33": {
-    "question": "What did Isaiah say Assyria would be to the people of God?",
-    "answers": ["A helpful friend", "A wasted, useless thing like a pile of trash", "A mighty general", "A wise counselor"],
-    "correctIndex": 1
+    "question": "What did Isaiah say would happen to Assyria, who had plundered others?",
+    "answers": ["It would be plundered and destroyed itself", "It would become God's friend", "It would rule forever", "It would move to Egypt"],
+    "correctIndex": 0
   },
   "34": {
-    "question": "What did Isaiah say about the day of the LORD's vengeance?",
-    "answers": ["It would be a picnic day", "It would be a day when everyone must listen and tremble", "It would be a birthday party", "It would never come"],
-    "correctIndex": 1
+    "question": "Which land did Isaiah say would become a burning, empty desert where wild animals live?",
+    "answers": ["Edom", "Egypt", "Moab", "Assyria"],
+    "correctIndex": 0
   },
   "35": {
     "question": "What did Isaiah say would happen to the desert?",
@@ -175,14 +175,14 @@
     "correctIndex": 1
   },
   "36": {
-    "question": "What did the Assyrian king send to King Hezekiah to scare him?",
-    "answers": ["A letter threatening him", "A gift of gold", "A friendly message", "An army of elephants"],
+    "question": "Who stood outside Jerusalem's wall and shouted threats to scare God's people?",
+    "answers": ["The Rabshakeh, the Assyrian king's commander", "King Hezekiah", "The prophet Isaiah", "The king of Egypt"],
     "correctIndex": 0
   },
   "37": {
-    "question": "How did God answer King Hezekiah's prayer about his sickness?",
-    "answers": ["He said Hezekiah would die", "He added fifteen more years to his life", "He made Hezekiah a king again", "He sent an angel to fight for him"],
-    "correctIndex": 1
+    "question": "How many Assyrian soldiers did God's angel strike down in one night?",
+    "answers": ["185,000", "1,000", "10,000", "50,000"],
+    "correctIndex": 0
   },
   "38": {
     "question": "What did Hezekiah do after he got better?",
@@ -206,13 +206,13 @@
   },
   "42": {
     "question": "What did God say about His servant?",
-    "answers": ["He would break every stick", "He would be a bruised reed that God would gently care for, not break", "He would fight all the battles", "He would be very loud"],
-    "correctIndex": 1
+    "answers": ["He would break every stick", "He would fight all the battles", "He would be very loud", "He would be gentle — a bruised reed he would not break"],
+    "correctIndex": 3
   },
   "43": {
     "question": "What new thing did God say He was doing?",
-    "answers": ["Making a rainbow", "Creating a garden", "Something new — people would see it and sing about it", "Building a tower"],
-    "correctIndex": 2
+    "answers": ["Making a rainbow", "Creating a garden", "Building a tower", "He would make a way in the wilderness and rivers in the desert"],
+    "correctIndex": 3
   },
   "44": {
     "question": "What did God say about idols made of wood and stone?",
@@ -251,8 +251,8 @@
   },
   "51": {
     "question": "What did God tell His people to do when they felt weak?",
-    "answers": ["Go to sleep", "Give up", "Look to Abraham and wake up — God would comfort them like a mother", "Build a bigger house"],
-    "correctIndex": 2
+    "answers": ["Go to sleep", "Give up", "Build a bigger house", "Look to Abraham, their father — and God would comfort Zion"],
+    "correctIndex": 3
   },
   "52": {
     "question": "What did the watchmen on the walls of Jerusalem shout?",
@@ -290,8 +290,8 @@
     "correctIndex": 1
   },
   "59": {
-    "question": "What did Isaiah say about people's sins?",
-    "answers": ["They were like bright red stains — but God could wash them white as snow", "They did not matter", "Only kings had sins", "God did not notice them"],
+    "question": "What did Isaiah say the people's sins had done between them and God?",
+    "answers": ["They separated the people from God, so He would not hear", "They did not matter", "Only kings had sins", "God did not notice them"],
     "correctIndex": 0
   },
   "60": {
@@ -321,8 +321,8 @@
   },
   "65": {
     "question": "What did God say He was ready to do for people who did not even ask?",
-    "answers": ["Ignore them", "Be found by those who sought Him — like opening a door that was always there", "Give them money", "Make them kings"],
-    "correctIndex": 1
+    "answers": ["Ignore them", "Give them money", "Make them kings", "Be found by people who were not even looking for Him"],
+    "correctIndex": 3
   },
   "66": {
     "question": "What did Isaiah say God would make at the end?",
