@@ -6,6 +6,7 @@ import { children, upsertChild, removeChild } from '../composables/useChildren'
 import { uploadChildPhoto } from '../lib/photo'
 import { dollarsToCents } from '../lib/format'
 import { useDialog } from '../composables/useDialog'
+import { Icon } from '@iconify/vue'
 import PhotoPicker from './PhotoPicker.vue'
 import type { BibleReading, Child } from '../types/firebase'
 
@@ -128,21 +129,27 @@ async function remove() {
         <div class="flex flex-col gap-1">
           <span class="form-label">Bible reading <span class="form-hint">(optional)</span></span>
           <div class="flex gap-2">
-            <select v-model="bibleBookName" class="input-field flex-1 min-w-0" @change="onBibleBookChange">
-              <option value="">No book</option>
-              <option v-for="book in BIBLE_BOOKS" :key="book.name" :value="book.name">
-                {{ book.name }}
-              </option>
-            </select>
-            <select
-              v-model.number="bibleChapter"
-              class="input-field w-28 shrink-0"
-              :disabled="!bibleBookName"
-            >
-              <option v-for="ch in bibleChapterOptions" :key="ch" :value="ch">
-                Ch. {{ ch }}
-              </option>
-            </select>
+            <div class="relative flex-1 min-w-0">
+              <select v-model="bibleBookName" class="input-field w-full appearance-none pr-10" @change="onBibleBookChange">
+                <option value="">No book</option>
+                <option v-for="book in BIBLE_BOOKS" :key="book.name" :value="book.name">
+                  {{ book.name }}
+                </option>
+              </select>
+              <Icon icon="mdi:chevron-down" class="w-5 h-5 text-amber-500 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+            </div>
+            <div class="relative w-28 shrink-0">
+              <select
+                v-model.number="bibleChapter"
+                class="input-field w-full appearance-none pr-10"
+                :disabled="!bibleBookName"
+              >
+                <option v-for="ch in bibleChapterOptions" :key="ch" :value="ch">
+                  Ch. {{ ch }}
+                </option>
+              </select>
+              <Icon icon="mdi:chevron-down" class="w-5 h-5 text-amber-500 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+            </div>
           </div>
         </div>
 
