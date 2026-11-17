@@ -1,0 +1,252 @@
+{
+  "1": {
+    "question": "How many days did God take to make the world?",
+    "answers": ["Three days", "Six days", "Ten days", "One day"],
+    "correctIndex": 1
+  },
+  "2": {
+    "question": "What did God plant in the Garden of Eden?",
+    "answers": ["A big oak tree", "A grapevine", "Every kind of tree that was beautiful and good for food", "A palm tree"],
+    "correctIndex": 2
+  },
+  "3": {
+    "question": "What did the serpent trick Eve into doing?",
+    "answers": ["Picking flowers", "Eating fruit from the tree God said not to eat", "Swimming in a river", "Building a house"],
+    "correctIndex": 1
+  },
+  "4": {
+    "question": "Why was God not pleased with Cain's gift?",
+    "answers": ["It was too small", "It was made of plastic", "It was stolen", "He did not do what was right like his brother Abel"],
+    "correctIndex": 3
+  },
+  "5": {
+    "question": "What was special about Enoch?",
+    "answers": ["He was the strongest man", "He walked with God and God took him to heaven", "He built the first boat", "He was the richest man"],
+    "correctIndex": 1
+  },
+  "6": {
+    "question": "What did God tell Noah to build?",
+    "answers": ["A big house", "A tower", "A boat called an ark", "A temple"],
+    "correctIndex": 2
+  },
+  "7": {
+    "question": "How did the animals get into the ark?",
+    "answers": ["They swam there", "They flew there", "They came to Noah two by two", "Noah caught them"],
+    "correctIndex": 2
+  },
+  "8": {
+    "question": "What did Noah send out to check if the water went down?",
+    "answers": ["A dove", "A kite", "A balloon", "A paper airplane"],
+    "correctIndex": 0
+  },
+  "9": {
+    "question": "What sign did God give as His promise never to flood the whole earth again?",
+    "answers": ["A shooting star", "A rainbow", "A big mountain", "A golden gate"],
+    "correctIndex": 1
+  },
+  "10": {
+    "question": "Where did Noah's family live after the flood?",
+    "answers": ["On a boat forever", "In the ark", "On the mountains", "On dry ground"],
+    "correctIndex": 3
+  },
+  "11": {
+    "question": "What were the people building in the city of Babel?",
+    "answers": ["A bridge", "A big tower to reach the sky", "A palace", "A wall"],
+    "correctIndex": 1
+  },
+  "12": {
+    "question": "What did God tell Abram to do?",
+    "answers": ["Build a tower", "Leave his home and go to a land God would show him", "Fight a giant", "Count all the stars"],
+    "correctIndex": 1
+  },
+  "13": {
+    "question": "Why did Abram and Lot have to separate?",
+    "answers": ["They were fighting", "Their herds were too big for one land", "Lot was sick", "Abram was too old"],
+    "correctIndex": 1
+  },
+  "14": {
+    "question": "How did Abram save Lot when enemies captured him?",
+    "answers": ["He paid a ransom", "He called on the army", "He and 318 of his men chased the enemy and won", "He hid Lot in a cave"],
+    "correctIndex": 2
+  },
+  "15": {
+    "question": "What did God promise Abram about his family?",
+    "answers": ["He would have one son only", "His family would be as many as the stars in the sky", "His family would live in Egypt", "His family would never grow old"],
+    "correctIndex": 1
+  },
+  "16": {
+    "question": "Who ran away into the desert and met an angel by a spring?",
+    "answers": ["Sarah", "Rebekah", "Hagar", "Rachel"],
+    "correctIndex": 2
+  },
+  "17": {
+    "question": "What did God change Abram's name to?",
+    "answers": ["David", "Abraham", "Moses", "Jacob"],
+    "correctIndex": 1
+  },
+  "18": {
+    "question": "Who visited Abraham and told him Sarah would have a baby?",
+    "answers": ["Two angels and the LORD", "A king", "A shepherd", "Moses"],
+    "correctIndex": 0
+  },
+  "19": {
+    "question": "What happened to Lot's wife when she looked back at Sodom?",
+    "answers": ["She flew away", "She turned into a pillar of salt", "She fell asleep", "She found a new home"],
+    "correctIndex": 1
+  },
+  "20": {
+    "question": "What did King Abimelech do when he found out Abraham's wife was really Sarah?",
+    "answers": ["He put Abraham in jail", "He gave her back to Abraham with gifts and said sorry", "He kept her forever", "He made Abraham work for him"],
+    "correctIndex": 1
+  },
+  "21": {
+    "question": "What did God ask Abraham to do with Isaac?",
+    "answers": ["Teach him to read", "Take him on a long trip", "Offer him as a sacrifice on a mountain", "Send him to school"],
+    "correctIndex": 2
+  },
+  "22": {
+    "question": "What did Abraham see stuck in a bush instead of Isaac?",
+    "answers": ["A lamb", "A ram", "A deer", "A dove"],
+    "correctIndex": 1
+  },
+  "23": {
+    "question": "What did Abraham buy after Sarah died?",
+    "answers": ["A house", "A field with a cave called Machpelah for a burial place", "A chariot", "A big farm"],
+    "correctIndex": 1
+  },
+  "24": {
+    "question": "How did Abraham's servant find a wife for Isaac?",
+    "answers": ["He asked at the town square", "He prayed and watched for a kind girl at the well who gave water to his camels", "He chose the prettiest girl he saw", "He flipped a coin"],
+    "correctIndex": 1
+  },
+  "25": {
+    "question": "What did Esau trade his birthright for?",
+    "answers": ["A horse", "A bowl of stew", "A crown", "A sword"],
+    "correctIndex": 1
+  },
+  "26": {
+    "question": "Why did Isaac move away from Abimelech's land?",
+    "answers": ["He got a new job", "He was too rich", "He was scared of lions", "He dug wells and the people argued with him over the water"],
+    "correctIndex": 3
+  },
+  "27": {
+    "question": "How did Jacob trick Isaac into giving him the special blessing?",
+    "answers": ["He shouted louder", "He pretended to be Esau and wore Esau's clothes with goat skins on his hands", "He gave Isaac money", "He wrote a letter"],
+    "correctIndex": 1
+  },
+  "28": {
+    "question": "What did Jacob dream about at Bethel?",
+    "answers": ["A big party", "A ladder reaching from earth to heaven with angels going up and down", "A treasure chest", "A flying ship"],
+    "correctIndex": 1
+  },
+  "29": {
+    "question": "How many years did Jacob work for Rachel?",
+    "answers": ["Two years", "Seven years", "Ten years", "Twenty years"],
+    "correctIndex": 1
+  },
+  "30": {
+    "question": "What did Rachel give Jacob to carry so he could marry her?",
+    "answers": ["A big bag of gold", "The mandrakes (a special plant)", "Her father's sheep", "A beautiful necklace"],
+    "correctIndex": 1
+  },
+  "31": {
+    "question": "Who caught up with Jacob after he ran away from Laban?",
+    "answers": ["Esau", "Pharaoh", "His brother-in-law Laban", "A giant"],
+    "correctIndex": 2
+  },
+  "32": {
+    "question": "What did Jacob's name get changed to after he wrestled with God?",
+    "answers": ["David", "Israel — which means 'one who wrestles with God'", "Moses", "Benjamin"],
+    "correctIndex": 1
+  },
+  "33": {
+    "question": "How many sons did Jacob give gifts to before meeting Esau?",
+    "answers": ["Two", "Five", "Twelve", "Twenty"],
+    "correctIndex": 2
+  },
+  "34": {
+    "question": "What happened to Dinah in the city of Shechem?",
+    "answers": ["She got lost and was found", "She was hurt badly by a man named Shechem", "She won a race", "She became a queen"],
+    "correctIndex": 1
+  },
+  "35": {
+    "question": "Where did God tell Jacob to go build an altar?",
+    "answers": ["Egypt", "Bethel", "Jerusalem", "The desert"],
+    "correctIndex": 1
+  },
+  "36": {
+    "question": "This chapter lists the family tree of…",
+    "answers": ["Jacob's sons", "Esau's family", "Abraham's servants", "The Philistines"],
+    "correctIndex": 1
+  },
+  "37": {
+    "question": "What did Jacob's son Joseph have that made his brothers jealous?",
+    "answers": ["A fast horse", "A special robe with many colors", "A big house", "A pet lion"],
+    "correctIndex": 1
+  },
+  "38": {
+    "question": "What did Judah do that was wrong with his daughter-in-law Tamar?",
+    "answers": ["He gave her a big gift", "He thought she was a prostitute and did a bad thing", "He taught her to cook", "He built her a house"],
+    "correctIndex": 1
+  },
+  "39": {
+    "question": "What did Potiphar's wife try to make Joseph do?",
+    "answers": ["Run away", "Do something wrong with her", "Become a guard", "Bake bread"],
+    "correctIndex": 1
+  },
+  "40": {
+    "question": "What did Joseph do for the cupbearer and the baker in prison?",
+    "answers": ["He told them stories", "He interpreted their dreams", "He taught them to read", "He played games with them"],
+    "correctIndex": 1
+  },
+  "41": {
+    "question": "What did Pharaoh dream about?",
+    "answers": ["Seven fat cows eaten by seven thin cows, and seven fat ears of grain eaten by thin ones", "A golden throne", "A flood of milk", "Flying birds"],
+    "correctIndex": 0
+  },
+  "42": {
+    "question": "What did Joseph say Pharaoh's dreams meant?",
+    "answers": ["He would win the lottery", "Seven good years of plenty would come, then seven bad years of hunger", "He should build a bigger palace", "He would have many children"],
+    "correctIndex": 1
+  },
+  "43": {
+    "question": "How many of Jacob's sons came to Egypt to buy grain?",
+    "answers": ["Two", "Five", "Ten", "All ten (Benjamin stayed home)"],
+    "correctIndex": 3
+  },
+  "44": {
+    "question": "What did Judah say he would do instead of Benjamin going to Egypt as a slave?",
+    "answers": ["Run away", "Stay in Egypt forever as a slave himself", "Become a farmer", "Fight the Egyptians"],
+    "correctIndex": 1
+  },
+  "45": {
+    "question": "What did Joseph say to his brothers when he finally told them who he was?",
+    "answers": ["'I hate you all'", "'You meant evil against me, but God meant it for good to save many lives'", "'I am the king now'", "'Go home forever'"],
+    "correctIndex": 1
+  },
+  "46": {
+    "question": "Where did Joseph's family settle in Egypt?",
+    "answers": ["In a big city", "In the land of Goshen, the best part", "On a boat", "In the desert"],
+    "correctIndex": 1
+  },
+  "47": {
+    "question": "What did Jacob do with Joseph's two sons Ephraim and Manasseh?",
+    "answers": ["He sent them away", "He blessed them and adopted them as his own sons", "He made them kings", "He forgot about them"],
+    "correctIndex": 1
+  },
+  "48": {
+    "question": "How old was Jacob when he died?",
+    "answers": ["One hundred years", "One hundred twenty-seven years", "One hundred forty-seven years", "Two hundred years"],
+    "correctIndex": 2
+  },
+  "49": {
+    "question": "What did Joseph tell his brothers to do with his bones when they left Egypt?",
+    "answers": ["Throw them in the sea", "Take them up to the land God promised", "Hide them under the floor", "Keep them in a box forever"],
+    "correctIndex": 1
+  },
+  "50": {
+    "question": "How old was Joseph when he died in Egypt?",
+    "answers": ["Seventy years", "One hundred years", "One hundred ten years", "One hundred twenty years"],
+    "correctIndex": 2
+  }
+}

@@ -49,6 +49,8 @@ export interface BibleReading {
   completedDate: DateString | null
   completedBook: string | null
   completedChapter: number | null
+  /** Epoch ms before which today's chapter can't be retried (after a wrong answer) */
+  retryAtMs?: number | null
 }
 
 export interface ChildDoc {

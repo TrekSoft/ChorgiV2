@@ -64,6 +64,7 @@ async function save() {
           completedDate: existing?.completedDate ?? null,
           completedBook: existing?.completedBook ?? null,
           completedChapter: existing?.completedChapter ?? null,
+          retryAtMs: existing?.retryAtMs ?? null,
         }
       : null
     await upsertChild(childId, {

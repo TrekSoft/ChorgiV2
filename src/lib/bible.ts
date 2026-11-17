@@ -155,5 +155,12 @@ export function completedReading(reading: BibleReading, today: string): BibleRea
     completedDate: today,
     completedBook: reading.book,
     completedChapter: reading.chapter,
+    retryAtMs: null,
   }
+}
+
+/** Milliseconds left on a wrong-answer retry cooldown (0 when none). */
+export function bibleRetryRemainingMs(reading: BibleReading | null | undefined, nowMs: number): number {
+  if (!reading?.retryAtMs) return 0
+  return Math.max(0, reading.retryAtMs - nowMs)
 }

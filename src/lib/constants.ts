@@ -100,3 +100,4 @@ export const TOAST_DURATION_MS = 3000
 // Firestore queues writes offline instead of rejecting, so give an ack a deadline
 export const WRITE_ACK_TIMEOUT_MS = 8000
 export const OFFLINE_MESSAGE = 'No internet, try again later'
+export const BIBLE_RETRY_COOLDOWN_MS = 60_000

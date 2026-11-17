@@ -5,7 +5,7 @@ import { format } from 'date-fns'
 import { Icon } from '@iconify/vue'
 import { occursOn, deadlineFor, startsAt } from '../lib/recurrence'
 import { timePeriods } from '../composables/useTimePeriods'
-import { CHORE_KIND, CARD_VARIANT, CONFETTI_MODE, FORM_KIND, NOW_TICK_INTERVAL_MS, OFFLINE_MESSAGE, PARENT_ASSIGNEE_PREFIX, TOAST_DURATION_MS, WEEK_START_SUNDAY, type ConfettiMode, type FormKind } from '../lib/constants'
+import { CHORE_KIND, CARD_VARIANT, CONFETTI_MODE, FORM_KIND, NOW_TICK_INTERVAL_MS, OFFLINE_MESSAGE, PARENT_ASSIGNEE_PREFIX, TOAST_DURATION_MS, WEEK_START_SUNDAY, BIBLE_RETRY_COOLDOWN_MS, type ConfettiMode, type FormKind } from '../lib/constants'
 import { DATE_FORMAT, formatCents } from '../lib/format'
 import { isParentAssignee, parentAssigneeDisplay, cleaningSectionsForDate, taskCategory, claimKeyFor, isClaimableOn } from '../lib/chore-utils'
 import { currentUser } from '../composables/useAuth'
@@ -34,7 +34,7 @@ import { isAdminMode } from '../composables/useAdminMode'
 import { isBirthdayToday } from '../lib/birthday'
 import { playSafely, playClaim, playUnclaim } from '../lib/sounds'
 import { isJackpot, jackpotForItem, type Jackpot } from '../lib/jackpot'
-import { completedReading } from '../lib/bible'
+import { completedReading, bibleRetryRemainingMs } from '../lib/bible'
 import { useDialog } from '../composables/useDialog'
 import { useIdleTimeout } from '../composables/useIdleTimeout'
 import AppHeader from '../components/AppHeader.vue'
@@ -63,12 +63,20 @@ const meAssigneeId = computed(() => PARENT_ASSIGNEE_PREFIX + (currentUser.value?
 const now = ref(new Date())
 const birthdayToday = computed(() => !!child.value?.birthdate && isBirthdayToday(child.value.birthdate, now.value))
 let nowTimer: ReturnType<typeof setInterval> | null = null
+const retryNowMs = ref(Date.now())
+let retryTimer: ReturnType<typeof setInterval> | null = null
 onMounted(() => {
   nowTimer = setInterval(() => {
     now.value = new Date()
   }, NOW_TICK_INTERVAL_MS)
+  retryTimer = setInterval(() => {
+    retryNowMs.value = Date.now()
+  }, 1000)
 })
-onUnmounted(() => { if (nowTimer) clearInterval(nowTimer) })
+onUnmounted(() => {
+  if (nowTimer) clearInterval(nowTimer)
+  if (retryTimer) clearInterval(retryTimer)
+})
 
 watch(() => route.params.id, () => {
   initialOrder = []
@@ -139,6 +147,24 @@ const bibleDue = computed(() => {
   }
   return { book: r.book, chapter: r.chapter, done: false }
 })
+
+/** Milliseconds left before a wrong answer's retry cooldown ends. */
+const bibleRetryMs = computed(() => bibleRetryRemainingMs(child.value?.bibleReading, retryNowMs.value))
+const bibleLocked = computed(() => !!bibleDue.value && (bibleDue.value.done || bibleRetryMs.value > 0))
+const bibleRetrySeconds = computed(() => Math.ceil(bibleRetryMs.value / 1000))
+
+async function onBibleWrong() {
+  bibleModalOpen.value = false
+  const reading = child.value?.bibleReading
+  if (!child.value || !reading) return
+  try {
+    await upsertChild(child.value.id, {
+      bibleReading: { ...reading, retryAtMs: Date.now() + BIBLE_RETRY_COOLDOWN_MS },
+    })
+  } catch {
+    showToast(OFFLINE_MESSAGE, true)
+  }
+}
 
 async function onBibleDone() {
   bibleModalOpen.value = false
@@ -473,15 +499,18 @@ async function onTaskUnclaim(task: ClaimableItem) {
         <button
           v-if="bibleDue"
           type="button"
-          :disabled="bibleDue.done"
+          :disabled="bibleLocked"
           @click="bibleModalOpen = true"
           class="flex items-center gap-2 px-4 py-2 rounded-full font-bold text-sm border-2 transition-colors"
-          :class="bibleDue.done
+          :class="bibleDue.done || bibleRetryMs > 0
             ? 'bg-stone-100 text-stone-400 border-stone-200 cursor-default'
             : 'bg-gradient-to-r from-blue-500 to-indigo-500 text-white border-blue-300 hover:from-blue-600 hover:to-indigo-600 cursor-pointer shadow-md'"
         >
           <Icon :icon="bibleDue.done ? 'mdi:check-circle' : 'mdi:book-open-variant'" class="w-5 h-5" />
           {{ bibleDue.book }} {{ bibleDue.chapter }}
+          <span v-if="!bibleDue.done && bibleRetryMs > 0" class="text-xs font-semibold">
+            · {{ bibleRetrySeconds }}s
+          </span>
         </button>
         <BankAccounts v-if="child" :child="child" class="w-full sm:w-auto sm:ml-auto" />
       </div>
@@ -618,6 +647,7 @@ async function onTaskUnclaim(task: ClaimableItem) {
       :chapter="bibleDue?.chapter || 1"
       :child-name="child?.name"
       @done="onBibleDone"
+      @wrong="onBibleWrong"
     />
     <PhotoLightbox
       :open="!!lightboxSrc || !!lightboxVideoSrc"

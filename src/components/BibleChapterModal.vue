@@ -13,7 +13,7 @@ const props = defineProps<{
   chapter: number
   childName?: string
 }>()
-const emit = defineEmits<{ done: [] }>()
+const emit = defineEmits<{ done: []; wrong: [] }>()
 
 type Phase = 'question' | 'video' | 'finished'
 const phase = ref<Phase>('question')
@@ -22,6 +22,7 @@ const question = computed(() => (props.open ? questionFor(props.book, props.chap
 const embedUrl = computed(() => (props.open ? chapterVideoEmbedUrl(props.book, props.chapter) : null))
 
 const FEEDBACK_MS = 1100
+const WRONG_MS = 2000
 let feedbackTimer: ReturnType<typeof setTimeout> | null = null
 
 function advance() {
@@ -32,15 +33,18 @@ function pick(index: number) {
   if (picked.value !== null || !question.value) return
   picked.value = index
   if (feedbackTimer) clearTimeout(feedbackTimer)
-  feedbackTimer = setTimeout(advance, FEEDBACK_MS)
+  const correct = index === question.value.correctIndex
+  feedbackTimer = setTimeout(correct ? advance : () => emit('wrong'), correct ? FEEDBACK_MS : WRONG_MS)
 }
 
 function answerClass(index: number) {
   if (picked.value === null) return 'border-amber-200 bg-white text-amber-900 hover:border-amber-400 hover:bg-amber-50'
-  const correct = question.value?.correctIndex === index
   const chosen = picked.value === index
-  if (correct) return 'border-green-500 bg-green-100 text-green-900'
-  if (chosen) return 'border-red-400 bg-red-100 text-red-900'
+  if (chosen) {
+    return question.value?.correctIndex === index
+      ? 'border-green-500 bg-green-100 text-green-900'
+      : 'border-red-400 bg-red-100 text-red-900'
+  }
   return 'border-amber-200 bg-white text-amber-400 opacity-60'
 }
 
