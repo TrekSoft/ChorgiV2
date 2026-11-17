@@ -11,7 +11,7 @@ import { isParentAssignee, parentAssigneeDisplay, cleaningSectionsForDate, taskC
 import { currentUser } from '../composables/useAuth'
 import { family } from '../composables/useFamily'
 import { familyMembers } from '../composables/useFamilyMembers'
-import { children } from '../composables/useChildren'
+import { children, upsertChild } from '../composables/useChildren'
 import { chores, choresLoading } from '../composables/useChores'
 import { tasks, tasksLoading } from '../composables/useTasks'
 import { rooms, cleaningDays } from '../composables/useCleaning'
@@ -34,6 +34,7 @@ import { isAdminMode } from '../composables/useAdminMode'
 import { isBirthdayToday } from '../lib/birthday'
 import { playSafely, playClaim, playUnclaim } from '../lib/sounds'
 import { isJackpot, jackpotForItem, type Jackpot } from '../lib/jackpot'
+import { completedReading } from '../lib/bible'
 import { useDialog } from '../composables/useDialog'
 import { useIdleTimeout } from '../composables/useIdleTimeout'
 import AppHeader from '../components/AppHeader.vue'
@@ -42,6 +43,7 @@ import ChoreCard from '../components/ChoreCard.vue'
 import EmptyState from '../components/EmptyState.vue'
 import ConfettiBurst from '../components/ConfettiBurst.vue'
 import JackpotWheel from '../components/JackpotWheel.vue'
+import BibleChapterModal from '../components/BibleChapterModal.vue'
 import PhotoLightbox from '../components/PhotoLightbox.vue'
 import ChoreFormDialog from '../components/ChoreFormDialog.vue'
 import type { Chore, Task, Claim, Child, ClaimableItem, AssignedEntry } from '../types/firebase'
@@ -124,6 +126,31 @@ function celebrateBonus(item: ClaimableItem, bonusCents: number, seed: string) {
 function onWheelDone() {
   if (wheel.value) showToast(`+ $${formatCents(wheel.value.jackpot.amountCents)} bonus!`)
   wheel.value = null
+}
+
+// --- daily Bible reading ---
+const bibleModalOpen = ref(false)
+
+/** The chapter due today, or the one already finished today (shown disabled). */
+const bibleDue = computed(() => {
+  const r = child.value?.bibleReading
+  if (!r?.book || !r?.chapter) return null
+  if (r.completedDate === todayStr.value) {
+    return { book: r.completedBook || r.book, chapter: r.completedChapter ?? r.chapter, done: true }
+  }
+  return { book: r.book, chapter: r.chapter, done: false }
+})
+
+async function onBibleDone() {
+  bibleModalOpen.value = false
+  const reading = child.value?.bibleReading
+  if (!child.value || !reading) return
+  try {
+    // advances to the next chapter; null clears the plan at the end of the Bible
+    await upsertChild(child.value.id, { bibleReading: completedReading(reading, todayStr.value) })
+  } catch {
+    showToast(OFFLINE_MESSAGE, true)
+  }
 }
 
 /** Bonus shown on an assigned chore card: the won amount once done, otherwise the base bonus. */
@@ -444,6 +471,19 @@ async function onTaskUnclaim(task: ClaimableItem) {
           class="w-12 h-12 rounded-full object-cover border-2 border-amber-200"
         />
         <h1 class="heading-page">{{ child?.name || 'Loading…' }}</h1>
+        <button
+          v-if="bibleDue"
+          type="button"
+          :disabled="bibleDue.done"
+          @click="bibleModalOpen = true"
+          class="flex items-center gap-2 px-4 py-2 rounded-full font-bold text-sm border-2 transition-colors"
+          :class="bibleDue.done
+            ? 'bg-stone-100 text-stone-400 border-stone-200 cursor-default'
+            : 'bg-gradient-to-r from-blue-500 to-indigo-500 text-white border-blue-300 hover:from-blue-600 hover:to-indigo-600 cursor-pointer shadow-md'"
+        >
+          <Icon :icon="bibleDue.done ? 'mdi:check-circle' : 'mdi:book-open-variant'" class="w-5 h-5" />
+          {{ bibleDue.book }} {{ bibleDue.chapter }}
+        </button>
         <BankAccounts v-if="child" :child="child" class="w-full sm:w-auto sm:ml-auto" />
       </div>
 
@@ -572,6 +612,13 @@ async function onTaskUnclaim(task: ClaimableItem) {
       :max-cents="wheel?.maxCents ?? 0"
       :chore-name="wheel?.name"
       @done="onWheelDone"
+    />
+    <BibleChapterModal
+      :open="bibleModalOpen"
+      :book="bibleDue?.book || ''"
+      :chapter="bibleDue?.chapter || 1"
+      :child-name="child?.name"
+      @done="onBibleDone"
     />
     <PhotoLightbox
       :open="!!lightboxSrc || !!lightboxVideoSrc"

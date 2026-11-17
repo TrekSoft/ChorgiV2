@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { familyId } from '../composables/useFamily'
+import { BIBLE_BOOKS, bibleBook } from '../lib/bible'
 import { children, upsertChild, removeChild } from '../composables/useChildren'
 import { uploadChildPhoto } from '../lib/photo'
 import { dollarsToCents } from '../lib/format'
@@ -21,6 +22,17 @@ const birthdate = ref('')
 const weeklyAllowance = ref('0')
 const photoFile = ref<Blob | null>(null)
 const saving = ref(false)
+const bibleBookName = ref('')
+const bibleChapter = ref(1)
+
+const bibleChapterOptions = computed(() => {
+  const count = bibleBook(bibleBookName.value)?.chapters ?? 0
+  return Array.from({ length: count }, (_, i) => i + 1)
+})
+
+watch(bibleBookName, () => {
+  bibleChapter.value = 1
+})
 
 watch(
   () => props.open,
@@ -30,6 +42,8 @@ watch(
       birthdate.value = props.child?.birthdate || ''
       weeklyAllowance.value = props.child ? String((props.child.weeklyAllowanceCents || 0) / 100) : '0'
       photoFile.value = null
+      bibleBookName.value = props.child?.bibleReading?.book || ''
+      bibleChapter.value = props.child?.bibleReading?.chapter || 1
     }
   },
 )
@@ -42,9 +56,20 @@ async function save() {
     if (photoFile.value && familyId.value) {
       photoURL = await uploadChildPhoto(familyId.value, childId, photoFile.value)
     }
+    const existing = props.child?.bibleReading
+    const bibleReading = bibleBookName.value
+      ? {
+          book: bibleBookName.value,
+          chapter: bibleChapter.value,
+          completedDate: existing?.completedDate ?? null,
+          completedBook: existing?.completedBook ?? null,
+          completedChapter: existing?.completedChapter ?? null,
+        }
+      : null
     await upsertChild(childId, {
       name: name.value.trim(),
       birthdate: birthdate.value,
+      bibleReading,
       photoURL,
       weeklyAllowanceCents: dollarsToCents(weeklyAllowance.value),
       allowanceBalanceCents: props.child?.allowanceBalanceCents || 0,
@@ -96,6 +121,27 @@ async function remove() {
           <span class="form-label">Weekly allowance ($)</span>
           <input v-model="weeklyAllowance" type="number" min="0" step="0.25" class="input-field" />
         </label>
+
+        <div class="flex flex-col gap-1">
+          <span class="form-label">Bible reading <span class="form-hint">(optional)</span></span>
+          <div class="flex gap-2">
+            <select v-model="bibleBookName" class="input-field flex-1 min-w-0">
+              <option value="">No book</option>
+              <option v-for="book in BIBLE_BOOKS" :key="book.name" :value="book.name">
+                {{ book.name }}
+              </option>
+            </select>
+            <select
+              v-model.number="bibleChapter"
+              class="input-field w-28 shrink-0"
+              :disabled="!bibleBookName"
+            >
+              <option v-for="ch in bibleChapterOptions" :key="ch" :value="ch">
+                Ch. {{ ch }}
+              </option>
+            </select>
+          </div>
+        </div>
 
         <div class="flex justify-between items-center pt-2">
           <button v-if="child" @click="remove" class="btn-danger-text">

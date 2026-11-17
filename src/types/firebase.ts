@@ -41,9 +41,20 @@ export interface MemberDoc {
   createdAt: MaybeTimestamp
 }
 
+/** A child's daily Bible reading assignment. `book`/`chapter` is the next chapter due;
+ *  `completed*` records what was finished today so the button can show it disabled. */
+export interface BibleReading {
+  book: string
+  chapter: number
+  completedDate: DateString | null
+  completedBook: string | null
+  completedChapter: number | null
+}
+
 export interface ChildDoc {
   name: string
   birthdate: DateString
+  bibleReading?: BibleReading | null
   photoURL?: string | null
   weeklyAllowanceCents: number
   allowanceBalanceCents: number

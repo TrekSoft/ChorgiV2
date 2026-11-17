@@ -1,0 +1,122 @@
+{
+  "1": {
+    "question": "How did David find out that King Saul and Jonathan had died?",
+    "answers": ["A messenger brought him the bad news", "He saw it in a dream", "His friend told him", "He read it in a letter"],
+    "correctIndex": 0
+  },
+  "2": {
+    "question": "What did David capture from the Jebusites to make it his city?",
+    "answers": ["The city of Hebron", "The city of Jerusalem", "The city of Bethlehem", "The city of Samaria"],
+    "correctIndex": 1
+  },
+  "3": {
+    "question": "Who was the mighty warrior who killed 300 men with his spear?",
+    "answers": ["David", "Abishai", "Joab", "Eleazar"],
+    "correctIndex": 1
+  },
+  "4": {
+    "question": "What did David do for Mephibosheth, Jonathan's son?",
+    "answers": ["He gave him a horse and chariot", "He made him a general", "He invited him to live at the king's table", "He sent him away to another country"],
+    "correctIndex": 2
+  },
+  "5": {
+    "question": "What did the Ammonite king do to David's envoys that started a war?",
+    "answers": ["He stole their gifts", "He shaved off half their beards and cut off their robes", "He locked them in a tower", "He made them carry heavy stones"],
+    "correctIndex": 1
+  },
+  "6": {
+    "question": "What did David's son Solomon's name mean?",
+    "answers": ["'Brave warrior'", "'Peace' — because God gave him peace from his enemies", "'Wise king'", "'Firstborn son'"],
+    "correctIndex": 1
+  },
+  "7": {
+    "question": "What did God promise David about his family?",
+    "answers": ["His family would be rich", "His family would never fight wars", "Someone from his family would rule forever", "His family would live in the biggest house"],
+    "correctIndex": 2
+  },
+  "8": {
+    "question": "Where did David defeat the Philistines and take their city?",
+    "answers": ["In the valley", "In Gath", "In the mountains", "In the desert"],
+    "correctIndex": 1
+  },
+  "9": {
+    "question": "What did Ziba do that angered David?",
+    "answers": ["He lied to the king about Mephibosheth", "He stole David's crown", "He refused to feed David's army", "He hid David's arrows"],
+    "correctIndex": 0
+  },
+  "10": {
+    "question": "What did David take from the Ammonite king after defeating him?",
+    "answers": ["His crown and gold sword", "His horse", "His throne", "His castle keys"],
+    "correctIndex": 0
+  },
+  "11": {
+    "question": "Whose wife did David see bathing on the roof?",
+    "answers": ["Bathsheba's", "Michal's", "Abigail's", "Maacah's"],
+    "correctIndex": 0
+  },
+  "12": {
+    "question": "What did King David say when Nathan told him he had sinned?",
+    "answers": ["'I am sorry, but it was not my fault'", "'I have sinned against the LORD'", "'Everyone does it'", "'I did not know it was wrong'"],
+    "correctIndex": 1
+  },
+  "13": {
+    "question": "What did Amnon do to his half-sister Tamar?",
+    "answers": ["He gave her a gift", "He helped her cross a river", "He hurt her very badly", "He taught her to read"],
+    "correctIndex": 2
+  },
+  "14": {
+    "question": "Who told David a made-up story about a son who killed his brother?",
+    "answers": ["Nathan", "Joab", "A woman from Tekoa", "Ziba"],
+    "correctIndex": 2
+  },
+  "15": {
+    "question": "Why did David's friend Ittai the Gittite stay with David?",
+    "answers": ["He was ordered to", "He said he would go wherever David went", "He wanted to be king", "He was lost and could not find his way"],
+    "correctIndex": 1
+  },
+  "16": {
+    "question": "What did Shimei do as David was leaving Jerusalem?",
+    "answers": ["He threw stones and cursed David", "He gave David food", "He sang him a song", "He held his horse"],
+    "correctIndex": 0
+  },
+  "17": {
+    "question": "Who was David's spy inside Absalom's camp who told him Ahithophel's plan?",
+    "answers": ["Hushai", "Ziba", "Ittai", "Barzillai"],
+    "correctIndex": 0
+  },
+  "18": {
+    "question": "How did Absalom die?",
+    "answers": ["He was killed in battle by a spear", "His horse threw him", "His hair got caught in a tree and Joab killed him", "He was poisoned"],
+    "correctIndex": 2
+  },
+  "19": {
+    "question": "Why was David very sad after Absalom died?",
+    "answers": ["He lost his crown", "He missed his son very much", "He had no friends", "He was too tired to walk"],
+    "correctIndex": 1
+  },
+  "20": {
+    "question": "What did Joab say to David when David was sad about Absalom?",
+    "answers": ["'Cheer up, you are the king!'", "'You love your enemies and hate your friends'", "'Stop crying and eat some food'", "'Absalom was a bad person anyway'"],
+    "correctIndex": 1
+  },
+  "21": {
+    "question": "Why was there a three-year famine in Israel?",
+    "answers": ["It did not rain", "Saul had killed some Gibeonites", "The Philistines blocked the grain ships", "The locusts ate all the crops"],
+    "correctIndex": 1
+  },
+  "22": {
+    "question": "What was David's last song about?",
+    "answers": ["His victories in battle", "How the LORD saved him and made him strong", "His many sheep", "Building the temple"],
+    "correctIndex": 1
+  },
+  "23": {
+    "question": "How many men were named in David's list of mighty warriors?",
+    "answers": ["About 30", "About 60", "About 100", "About 300"],
+    "correctIndex": 0
+  },
+  "24": {
+    "question": "Why did God send a plague on Israel?",
+    "answers": ["Because David counted the people and did not ask God first", "Because it did not rain", "Because the people worshiped idols", "Because David built a big house"],
+    "correctIndex": 0
+  }
+}

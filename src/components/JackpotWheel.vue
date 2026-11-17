@@ -5,6 +5,7 @@ import { JACKPOT_SEGMENTS, segmentColor, type Jackpot } from '../lib/jackpot'
 import { formatCents } from '../lib/format'
 import { playSafely, playSpinTick } from '../lib/sounds'
 import { celebrateCoins } from '../lib/coin-celebration'
+import FullscreenOverlay from './FullscreenOverlay.vue'
 
 // Full-screen arcade wheel. Pass a resolved `jackpot` to open it; the wheel spins, lands on the
 // predetermined winner, celebrates, and emits `done` when the kid collects their prize.
@@ -136,8 +137,7 @@ onUnmounted(cancel)
 </script>
 
 <template>
-  <Teleport to="body">
-    <div v-if="jackpot" class="jackpot-overlay" role="dialog" aria-modal="true" aria-label="Mystery bonus wheel">
+  <FullscreenOverlay :open="!!jackpot" label="Mystery bonus wheel" overlay-class="jackpot-overlay">
       <div class="flex flex-col items-center gap-5 w-full max-w-md px-4">
         <div class="text-center">
           <div class="jackpot-title">MYSTERY BONUS</div>
@@ -218,6 +218,5 @@ onUnmounted(cancel)
           <span v-else class="text-amber-200 font-bold text-lg animate-pulse">Spinning…</span>
         </div>
       </div>
-    </div>
-  </Teleport>
+  </FullscreenOverlay>
 </template>
