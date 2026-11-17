@@ -137,8 +137,8 @@ onUnmounted(clearFeedbackTimer)
             allowfullscreen
           />
         </div>
-        <button type="button" class="btn-primary-lg flex items-center gap-2" @click="finish">
-          <Icon icon="mdi:check-circle" class="w-7 h-7" />
+        <button type="button" class="btn-primary px-8 py-3 text-lg flex items-center gap-2" @click="finish">
+          <Icon icon="mdi:check-circle" class="w-6 h-6" />
           I'm done watching!
         </button>
       </div>
@@ -150,8 +150,8 @@ onUnmounted(clearFeedbackTimer)
           <div class="text-3xl font-black">Great job, {{ childName || 'friend' }}!</div>
           <div class="text-amber-200 font-semibold mt-2">You read {{ book }} {{ chapter }}!</div>
         </div>
-        <button type="button" class="btn-primary-lg px-10 text-xl flex items-center gap-2" @click="emit('done')">
-          <Icon icon="mdi:star" class="w-7 h-7" />
+        <button type="button" class="btn-primary px-8 py-3 text-lg flex items-center gap-2" @click="emit('done')">
+          <Icon icon="mdi:star" class="w-6 h-6" />
           Collect
         </button>
       </div>
