@@ -54,7 +54,8 @@ const child = computed(() => children.value.find((c) => c.id === route.params.id
 
 const { confirm } = useDialog()
 
-useIdleTimeout()
+const bibleModalOpen = ref(false)
+useIdleTimeout(bibleModalOpen)
 
 const weekStartsOn = computed(() => family.value?.weekStartsOn ?? WEEK_START_SUNDAY)
 const meAssigneeId = computed(() => PARENT_ASSIGNEE_PREFIX + (currentUser.value?.uid || ''))
@@ -129,8 +130,6 @@ function onWheelDone() {
 }
 
 // --- daily Bible reading ---
-const bibleModalOpen = ref(false)
-
 /** The chapter due today, or the one already finished today (shown disabled). */
 const bibleDue = computed(() => {
   const r = child.value?.bibleReading
