@@ -6,6 +6,7 @@ import { formatCents } from '../lib/format'
 import { playSafely, playSpinTick } from '../lib/sounds'
 import { celebrateCoins } from '../lib/coin-celebration'
 import FullscreenOverlay from './FullscreenOverlay.vue'
+import PrimaryButton from './PrimaryButton.vue'
 
 // Full-screen arcade wheel. Pass a resolved `jackpot` to open it; the wheel spins, lands on the
 // predetermined winner, celebrates, and emits `done` when the kid collects their prize.
@@ -210,10 +211,7 @@ onUnmounted(cancel)
               <span class="text-amber-100 text-lg font-bold block">{{ isMaxWin ? 'JACKPOT!!!' : 'You earned' }}</span>
               <span class="jackpot-amount">+{{ wonAmount }}</span>
             </div>
-            <button type="button" @click="emit('done')" class="btn-primary px-8 py-3 text-lg flex items-center gap-2">
-              <Icon icon="mdi:cash-multiple" class="w-6 h-6" />
-              Collect
-            </button>
+            <PrimaryButton icon="mdi:cash-multiple" @click="emit('done')">Collect</PrimaryButton>
           </template>
           <span v-else class="text-amber-200 font-bold text-lg animate-pulse">Spinning…</span>
         </div>

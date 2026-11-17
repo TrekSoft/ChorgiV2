@@ -3,6 +3,7 @@ import { ref, computed, watch, onUnmounted } from 'vue'
 import { Icon } from '@iconify/vue'
 import FullscreenOverlay from './FullscreenOverlay.vue'
 import ConfettiBurst from './ConfettiBurst.vue'
+import PrimaryButton from './PrimaryButton.vue'
 import { questionFor, chapterVideoEmbedUrl } from '../lib/bible'
 import { playSafely, playSparkle, playBoing, playChime } from '../lib/sounds'
 import { CONFETTI_MODE, type ConfettiMode } from '../lib/constants'
@@ -91,16 +92,7 @@ onUnmounted(clearFeedbackTimer)
 <template>
   <FullscreenOverlay :open="open" label="Bible chapter" overlay-class="bible-overlay">
     <div class="flex flex-col items-center gap-6 w-full max-w-2xl px-4 py-8">
-      <div class="text-center relative w-full">
-        <button
-          v-if="phase === 'question'"
-          type="button"
-          class="absolute right-0 top-0 flex items-center gap-1 text-amber-200 hover:text-white font-bold text-sm cursor-pointer"
-          @click="emit('close')"
-        >
-          <Icon icon="mdi:arrow-left" class="w-5 h-5" />
-          Back
-        </button>
+      <div class="text-center w-full">
         <div class="flex items-center justify-center gap-2 text-amber-300 font-black text-2xl tracking-wide">
           <Icon icon="mdi:book-open-variant" class="w-8 h-8" />
           BIBLE TIME
@@ -110,22 +102,25 @@ onUnmounted(clearFeedbackTimer)
       </div>
 
       <!-- quiz -->
-      <div v-if="phase === 'question' && question" class="card w-full p-6 flex flex-col gap-4">
-        <h2 class="text-xl font-bold text-amber-900 text-center">{{ question.question }}</h2>
-        <div class="grid gap-3">
-          <button
-            v-for="(answer, i) in question.answers"
-            :key="i"
-            type="button"
-            :disabled="picked !== null"
-            class="text-left px-5 py-4 rounded-2xl border-2 font-bold text-lg cursor-pointer transition-colors"
-            :class="answerClass(i)"
-            @click="pick(i)"
-          >
-            {{ answer }}
-          </button>
+      <template v-if="phase === 'question' && question">
+        <div class="card w-full p-6 flex flex-col gap-4">
+          <h2 class="text-xl font-bold text-amber-900 text-center">{{ question.question }}</h2>
+          <div class="grid gap-3">
+            <button
+              v-for="(answer, i) in question.answers"
+              :key="i"
+              type="button"
+              :disabled="picked !== null"
+              class="text-left px-5 py-4 rounded-2xl border-2 font-bold text-lg cursor-pointer transition-colors"
+              :class="answerClass(i)"
+              @click="pick(i)"
+            >
+              {{ answer }}
+            </button>
+          </div>
         </div>
-      </div>
+        <PrimaryButton icon="mdi:arrow-left" @click="emit('close')">Back</PrimaryButton>
+      </template>
 
       <!-- video -->
       <div v-else-if="phase === 'video' && embedUrl" class="w-full flex flex-col items-center gap-4">
@@ -137,10 +132,7 @@ onUnmounted(clearFeedbackTimer)
             allowfullscreen
           />
         </div>
-        <button type="button" class="btn-primary px-8 py-3 text-lg flex items-center gap-2" @click="finish">
-          <Icon icon="mdi:check-circle" class="w-6 h-6" />
-          I'm done watching!
-        </button>
+        <PrimaryButton icon="mdi:check-circle" @click="finish">I'm done watching!</PrimaryButton>
       </div>
 
       <!-- celebration -->
@@ -150,10 +142,7 @@ onUnmounted(clearFeedbackTimer)
           <div class="text-3xl font-black">Great job, {{ childName || 'friend' }}!</div>
           <div class="text-amber-200 font-semibold mt-2">You read {{ book }} {{ chapter }}!</div>
         </div>
-        <button type="button" class="btn-primary px-8 py-3 text-lg flex items-center gap-2" @click="emit('done')">
-          <Icon icon="mdi:star" class="w-6 h-6" />
-          Collect
-        </button>
+        <PrimaryButton icon="mdi:star" @click="emit('done')">Collect</PrimaryButton>
       </div>
     </div>
     <ConfettiBurst ref="burst" />
