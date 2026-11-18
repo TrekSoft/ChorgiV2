@@ -226,6 +226,20 @@ input[type="time"]::-webkit-calendar-picker-indicator {
   background: radial-gradient(circle at 50% 30%, rgba(120, 53, 15, 0.96), rgba(23, 12, 4, 0.99) 75%);
   animation: jackpotFadeIn 0.3s ease-out;
   overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.bible-overlay::-webkit-scrollbar {
+  display: none;
+}
+
+/* While the Bible modal is open, the page's own scrollbar stays hidden too. */
+body.bible-modal-open {
+  scrollbar-width: none;
+}
+
+body.bible-modal-open::-webkit-scrollbar {
+  display: none;
 }
 
 .jackpot-title {

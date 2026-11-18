@@ -79,6 +79,7 @@ function answerClass(index: number): string {
 watch(
   () => props.open,
   (isOpen) => {
+    document.body.classList.toggle('bible-modal-open', isOpen)
     clearFeedbackTimer()
     picked.value = null
     if (!isOpen) return
@@ -88,7 +89,10 @@ watch(
   { immediate: true },
 )
 
-onUnmounted(clearFeedbackTimer)
+onUnmounted(() => {
+  document.body.classList.remove('bible-modal-open')
+  clearFeedbackTimer()
+})
 </script>
 
 <template>
