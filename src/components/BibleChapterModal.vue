@@ -100,7 +100,7 @@ onUnmounted(() => {
     <div
       :class="
         phase === 'video'
-          ? 'relative flex items-center justify-center w-full h-full'
+          ? 'relative w-full h-full'
           : 'flex flex-col items-center gap-6 w-full max-w-2xl px-4 py-8'
       "
     >
@@ -134,22 +134,29 @@ onUnmounted(() => {
         <PrimaryButton icon="mdi:arrow-left" @click="emit('close')">Back</PrimaryButton>
       </template>
 
-      <!-- video: fills the screen at 16:9, done button floats over it -->
+      <!-- video: largest 16:9 box in the space above the button zone.
+           The zone is 116px: a 32px gap above the button and 32px below
+           it, so the video-to-button gap is always >= the bottom margin
+           (exactly equal when the screen's height is the limit). -->
       <template v-else-if="phase === 'video' && videoId">
-        <div
-          class="relative"
-          :style="{ width: 'min(100vw, calc(100dvh * 16 / 9))', height: 'min(100dvh, calc(100vw * 9 / 16))' }"
-        >
-          <ChapterVideo :video-id="videoId" :fallback-url="embedUrl" @ended="finish" />
+        <div class="absolute inset-x-0 top-0 flex items-center justify-center" style="height: calc(100dvh - 116px)">
+          <div
+            class="relative"
+            :style="{ width: 'min(100%, calc((100dvh - 116px) * 16 / 9))', aspectRatio: '16 / 9' }"
+          >
+            <ChapterVideo :video-id="videoId" :fallback-url="embedUrl" @ended="finish" />
+          </div>
         </div>
-        <button
-          type="button"
-          aria-label="I'm done watching"
-          class="absolute top-5 right-5 z-20 flex items-center justify-center w-16 h-16 rounded-full bg-white/25 backdrop-blur-sm text-stone-500 shadow-lg cursor-pointer transition-colors hover:bg-white/40"
-          @click="finish"
-        >
-          <Icon icon="mdi:check" class="w-9 h-9" />
-        </button>
+        <div class="absolute inset-x-0 bottom-0 flex justify-center" style="height: 116px; padding-top: 32px">
+          <button
+            type="button"
+            class="flex items-center gap-2 h-[52px] px-8 rounded-full bg-white/25 backdrop-blur-sm text-stone-600 font-bold text-lg shadow-lg cursor-pointer transition-colors hover:bg-white/40"
+            @click="finish"
+          >
+            <Icon icon="mdi:check-circle" class="w-6 h-6" />
+            I'm done watching!
+          </button>
+        </div>
       </template>
 
       <!-- celebration -->
