@@ -25,6 +25,32 @@ interface YtPlayer {
   loadVideoById: (id: string) => void
   destroy: () => void
   unloadModule?: (module: string) => void
+  setOption?: (module: string, option: string, value: unknown) => void
+}
+
+/**
+ * Force captions off. There is no player parameter that does this —
+ * cc_load_policy only has a force-ON value; "off" defers to the viewer's
+ * own YouTube preference. The captions module also loads only once
+ * playback starts, so this runs on ready, on apiChange, and on every
+ * state change, not just once.
+ */
+function forceCaptionsOff(target: YtPlayer) {
+  try {
+    target.unloadModule?.('captions')
+  } catch {
+    // The module API isn't present on every client.
+  }
+  try {
+    target.unloadModule?.('cc')
+  } catch {
+    // Same.
+  }
+  try {
+    target.setOption?.('captions', 'track', {})
+  } catch {
+    // Same.
+  }
 }
 interface YtNamespace {
   Player: new (
@@ -37,6 +63,7 @@ interface YtNamespace {
       events: {
         onReady: (e: { target: YtPlayer }) => void
         onStateChange: (e: { data: number; target: YtPlayer }) => void
+        onApiChange: (e: { target: YtPlayer }) => void
       }
     },
   ) => YtPlayer
@@ -111,23 +138,19 @@ onMounted(async () => {
         rel: 0,
         playsinline: 1,
         iv_load_policy: 3,
-        // Captions off: don't load them even when the viewer's YouTube
-        // preference would turn them on.
         cc_load_policy: 0,
       },
       events: {
         onReady: (e) => {
-          // Belt and suspenders: drop the captions module entirely.
-          try {
-            e.target.unloadModule?.('captions')
-          } catch {
-            // The module API isn't present on every client; the
-            // cc_load_policy above still keeps captions off.
-          }
+          forceCaptionsOff(e.target)
           e.target.playVideo()
           startTapWatch()
         },
+        onApiChange: (e) => {
+          forceCaptionsOff(e.target)
+        },
         onStateChange: (e) => {
+          forceCaptionsOff(e.target)
           if (e.data === YT.PlayerState.PLAYING) {
             mode.value = 'playing'
             if (tapTimer) clearTimeout(tapTimer)
