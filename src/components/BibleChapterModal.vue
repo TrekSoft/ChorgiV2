@@ -173,7 +173,7 @@ onUnmounted(() => {
         <!-- verse pick (10+): which verse of the chapter has the answer? -->
         <div v-if="verseStep" class="card w-full p-6 flex flex-col gap-4">
           <h3 class="text-lg font-bold text-amber-900 text-center">
-            You got it! Which verse in {{ book }} {{ chapter }} has the answer?
+            You got it! Pick one of the verses in {{ book }} {{ chapter }} that contains the answer.
           </h3>
           <div class="relative">
             <select v-model="versePick" class="input-field w-full appearance-none pr-10">
