@@ -37,7 +37,7 @@ const question = computed(() => (props.open ? questionFor(props.book, props.chap
 // Verse-pick step (10+): shown after a correct multiple-choice answer.
 const verseStep = ref(false)
 const versePick = ref<number | null>(null)
-const verseWrong = ref(false)
+const verseResult = ref<null | 'correct' | 'wrong'>(null)
 const verseCount = computed(() => {
   if (!props.open) return 0
   return verseCountFor(props.book, props.chapter) ?? (question.value ? Math.max(...question.value.verses) : 0)
@@ -90,10 +90,10 @@ function pick(index: number) {
 }
 
 function checkVerse() {
-  if (versePick.value === null || !question.value || verseWrong.value) return
+  if (versePick.value === null || !question.value || verseResult.value !== null) return
   const correct = question.value.verses.includes(versePick.value)
+  verseResult.value = correct ? 'correct' : 'wrong'
   playSafely(correct ? playSparkle : playBoing)
-  if (!correct) verseWrong.value = true
   clearFeedbackTimer()
   feedbackTimer = setTimeout(
     correct ? advance : () => emit('wrong'),
@@ -119,7 +119,7 @@ watch(
     picked.value = null
     verseStep.value = false
     versePick.value = null
-    verseWrong.value = false
+    verseResult.value = null
     if (!isOpen) return
     phase.value = question.value ? 'question' : videoId.value ? 'video' : 'finished'
     if (phase.value === 'finished') finish()
@@ -176,11 +176,7 @@ onUnmounted(() => {
             You got it! Which verse in {{ book }} {{ chapter }} has the answer?
           </h3>
           <div class="relative">
-            <select
-              v-model="versePick"
-              class="input-field w-full appearance-none pr-10"
-              :class="verseWrong ? 'border-red-400 bg-red-50' : ''"
-            >
+            <select v-model="versePick" class="input-field w-full appearance-none pr-10">
               <option :value="null" disabled>Choose a verse…</option>
               <option v-for="v in verseOptions" :key="v" :value="v">Verse {{ v }}</option>
             </select>
@@ -189,14 +185,29 @@ onUnmounted(() => {
               class="w-5 h-5 text-amber-500 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none"
             />
           </div>
-          <div class="flex justify-center">
-            <PrimaryButton icon="mdi:check" :disabled="versePick === null" @click="checkVerse">
-              Check my verse
-            </PrimaryButton>
-          </div>
         </div>
 
-        <PrimaryButton icon="mdi:arrow-left" @click="emit('close')">Back</PrimaryButton>
+        <div class="flex items-center gap-4">
+          <PrimaryButton icon="mdi:arrow-left" @click="emit('close')">Back</PrimaryButton>
+          <button
+            v-if="verseStep"
+            type="button"
+            :disabled="versePick === null || verseResult !== null"
+            class="px-8 py-3 text-lg font-bold text-white rounded-xl flex items-center gap-2 cursor-pointer disabled:opacity-50"
+            :class="
+              verseResult === 'correct'
+                ? 'bg-green-500'
+                : verseResult === 'wrong'
+                  ? 'bg-red-500'
+                  : 'bg-amber-500 hover:bg-amber-600'
+            "
+            @click="checkVerse"
+          >
+            <Icon v-if="verseResult === 'correct'" icon="mdi:check-circle" class="w-6 h-6" />
+            <Icon v-else-if="verseResult === 'wrong'" icon="mdi:close-circle" class="w-6 h-6" />
+            {{ verseResult === 'correct' ? 'Correct' : verseResult === 'wrong' ? 'Incorrect' : 'Submit' }}
+          </button>
+        </div>
       </template>
 
       <!-- video: largest 16:9 box above the button, bottom-aligned in its
