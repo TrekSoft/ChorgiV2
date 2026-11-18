@@ -2,331 +2,397 @@
   "1": {
     "question": "If the people's sins were like scarlet, what did God say they would become?",
     "answers": ["White as snow", "Red as blood", "Gone forever and forgotten", "Heavy as stones"],
-    "correctIndex": 0
+    "correctIndex": 0,
+    "verses": [18]
   },
   "2": {
     "question": "What did God say people would do with their swords one day?",
     "answers": ["Hide them under the bed at home", "Throw them into the deep sea", "Beat them into plowshares to farm with", "Give them away to their neighbors"],
-    "correctIndex": 2
+    "correctIndex": 2,
+    "verses": [4]
   },
   "3": {
     "question": "What did the proud daughters of Zion do that displeased the LORD?",
     "answers": ["They walked proudly, showing off their beauty", "They sang happy songs in the temple all day long", "They gave their food to the poor", "They stole bread from hungry people"],
-    "correctIndex": 0
+    "correctIndex": 0,
+    "verses": [16]
   },
   "4": {
     "question": "What did the Branch of the LORD do for his people?",
     "answers": ["He made them rich with gold", "He washed them and made them clean", "He gave them horses to ride", "He built them castles to live in"],
-    "correctIndex": 1
+    "correctIndex": 1,
+    "verses": [4]
   },
   "5": {
     "question": "In God's song about the vineyard, what did the owner do when the grapes were bad?",
     "answers": ["He made even more grapes grow in it", "He planted pretty flowers all through it in rows", "He built a bigger and stronger fence", "He took down its hedge and let it be trampled"],
-    "correctIndex": 3
+    "correctIndex": 3,
+    "verses": [5]
   },
   "6": {
     "question": "What did the angel touch Isaiah's mouth with?",
     "answers": ["A soft feather", "A burning coal", "A pretty flower", "A bright star"],
-    "correctIndex": 1
+    "correctIndex": 1,
+    "verses": [6, 7]
   },
   "7": {
     "question": "What was the sign God gave King Ahaz?",
     "answers": ["A star would fall", "A virgin would have a baby boy", "It would rain for 40 days", "A giant would appear"],
-    "correctIndex": 1
+    "correctIndex": 1,
+    "verses": [14]
   },
   "8": {
     "question": "What long name did God tell Isaiah to give his son as a sign?",
     "answers": ["Maher-shalal-hash-baz", "Immanuel, God with us", "Shear-jashub, his son", "Jedidiah, a king's son"],
-    "correctIndex": 0
+    "correctIndex": 0,
+    "verses": [1, 3]
   },
   "9": {
     "question": "What did Isaiah say about the baby who would be born to rule?",
     "answers": ["He would be called 'Mighty God, Everlasting Father'", "He would be the strongest man who ever lived on earth", "He would never cry, not even once", "He would speak every language on earth"],
-    "correctIndex": 0
+    "correctIndex": 0,
+    "verses": [6]
   },
   "10": {
     "question": "God said the mighty Assyria was like tools in His hand. Which tools?",
     "answers": ["A rod and an axe", "A crown and a throne", "A shield and a helmet", "A trumpet and a banner"],
-    "correctIndex": 0
+    "correctIndex": 0,
+    "verses": [5, 15]
   },
   "11": {
     "question": "From whose family would the promised king come?",
     "answers": ["Saul's — the very first king", "David's — a shoot from Jesse's stump", "Moses' — the great leader of Israel's people", "Solomon's — the wise king"],
-    "correctIndex": 1
+    "correctIndex": 1,
+    "verses": [1, 10]
   },
   "12": {
     "question": "In Isaiah's song of thanks, what would God's people draw with joy?",
     "answers": ["Water from the wells of salvation", "Water from the wide river Jordan", "Gold from the temple of God", "Songs from a book of hymns"],
-    "correctIndex": 0
+    "correctIndex": 0,
+    "verses": [3]
   },
   "13": {
     "question": "What did Isaiah say would happen to Babylon?",
     "answers": ["It would become the biggest city", "It would be the friendliest place in the world", "It would fall forever and never rise again", "It would move to Egypt"],
-    "correctIndex": 2
+    "correctIndex": 2,
+    "verses": [19, 20]
   },
   "14": {
     "question": "Who was called 'the morning star' who fell from heaven?",
     "answers": ["An angel named Lucifer", "A shooting star", "The king of Egypt", "A wise teacher"],
-    "correctIndex": 0
+    "correctIndex": 0,
+    "verses": [12]
   },
   "15": {
     "question": "Whose cry of sadness did Isaiah write about?",
     "answers": ["Israel's", "Moab's", "Egypt's", "Philistia's"],
-    "correctIndex": 1
+    "correctIndex": 1,
+    "verses": [2, 5, 8]
   },
   "16": {
     "question": "How long did God say Moab would be like a servant counting the years?",
     "answers": ["One year", "Three years", "Ten years", "One hundred years"],
-    "correctIndex": 1
+    "correctIndex": 1,
+    "verses": [14]
   },
   "17": {
-    "question": "What would happen to Israel and Syria (Ephraim and Damascus)?",
-    "answers": ["They would become the best of friends", "Both judged and scattered, but some would return", "They would build a great big temple", "Nothing at all — they would stay strong forever and ever"],
-    "correctIndex": 1
+    "question": "What did God say would happen to the city of Damascus?",
+    "answers": ["It would grow into the richest city in all the land", "It would stop being a city and become a ruinous heap", "It would be left empty, with only a few people remaining", "It would stand strong and safe for many long years"],
+    "correctIndex": 1,
+    "verses": [1]
   },
   "18": {
     "question": "What would the tall people of Cush (Ethiopia) one day bring to the LORD's mountain?",
     "answers": ["Gifts for the LORD", "Their armies", "Their fastest ships", "Nothing at all"],
-    "correctIndex": 0
+    "correctIndex": 0,
+    "verses": [7]
   },
   "19": {
     "question": "What surprising blessing did God speak over Egypt in this chapter?",
     "answers": ["'Blessed be Egypt, My people'", "'Egypt will be destroyed forever'", "'Egypt will rule the whole world'", "'Egypt will be forgotten'"],
-    "correctIndex": 0
+    "correctIndex": 0,
+    "verses": [25]
   },
   "20": {
     "question": "For how many years did Isaiah walk barefoot and stripped as a sign against Egypt and Cush?",
     "answers": ["Three years", "One year", "Seven years", "Ten years"],
-    "correctIndex": 0
+    "correctIndex": 0,
+    "verses": [3]
   },
   "21": {
     "question": "What did Isaiah say about Babylon?",
     "answers": ["She would rule the whole wide world", "She would become good friends with Israel for ever and ever", "She would move away to the desert", "Babylon would fall, and her idols would be broken"],
-    "correctIndex": 3
+    "correctIndex": 3,
+    "verses": [9]
   },
   "22": {
     "question": "God said He would put the key of whose house on Eliakim's shoulder?",
     "answers": ["The house of David", "The house of Egypt", "The temple storehouse", "The king of Assyria's palace"],
-    "correctIndex": 0
+    "correctIndex": 0,
+    "verses": [22]
   },
   "23": {
     "question": "What did Isaiah say about the trading city of Tyre?",
     "answers": ["They would become richer than ever", "They would move to live in Jerusalem", "They would teach God's people to sail ships on the sea", "Tyre would be laid waste, and her ships would mourn"],
-    "correctIndex": 3
+    "correctIndex": 3,
+    "verses": [1, 14]
   },
   "24": {
     "question": "What did Isaiah say would happen to the whole earth?",
     "answers": ["It would stay the same forever", "It would turn into a giant garden", "It would become one big city", "It would be laid waste and emptied"],
-    "correctIndex": 3
+    "correctIndex": 3,
+    "verses": [1, 3]
   },
   "25": {
     "question": "What did Isaiah say God would swallow up forever?",
     "answers": ["Mountains", "Oceans", "Death", "Stars"],
-    "correctIndex": 2
+    "correctIndex": 2,
+    "verses": [8]
   },
   "26": {
     "question": "What did Isaiah say about trusting God?",
     "answers": ["God keeps in perfect peace those who trust in him", "God gives great riches and gold to those who trust in him", "Only grown-ups can really trust God", "God helps only people who never worry"],
-    "correctIndex": 0
+    "correctIndex": 0,
+    "verses": [3]
   },
   "27": {
     "question": "What big sea creature did Isaiah mention that God would punish?",
     "answers": ["A whale", "Leviathan", "An octopus", "A shark"],
-    "correctIndex": 1
+    "correctIndex": 1,
+    "verses": [1]
   },
   "28": {
     "question": "What did Isaiah say the leaders of Ephraim were like?",
     "answers": ["Wise teachers of the law", "Brave soldiers in battle", "Drunkards who stumbled and fell", "Kind shepherds of the flock"],
-    "correctIndex": 2
+    "correctIndex": 2,
+    "verses": [1, 7]
   },
   "29": {
     "question": "The people honored God with their lips — but what was far from Him?",
     "answers": ["Their hearts", "Their songs", "Their gifts", "Their dances"],
-    "correctIndex": 0
+    "correctIndex": 0,
+    "verses": [13]
   },
   "30": {
     "question": "What did Isaiah say about Egypt's help?",
     "answers": ["It was the very best help of all", "It came with lots of gold, gifts, and camels", "It lasted for many, many years", "It was worthless — it would come to nothing"],
-    "correctIndex": 3
+    "correctIndex": 3,
+    "verses": [5, 7]
   },
   "31": {
     "question": "What did God tell the people of Judah to do instead of asking Egypt for help?",
     "answers": ["Build a taller wall around the city", "Look to the Holy One of Israel who made them", "Run away and hide in the desert", "Fight Egypt's army all by themselves"],
-    "correctIndex": 1
+    "correctIndex": 1,
+    "verses": [1, 6]
   },
   "32": {
     "question": "What did Isaiah sing about a king who would rule in righteousness?",
     "answers": ["He would be mean to everyone he met", "He would make everyone rich, happy, and safe forever", "He would be a hiding place from the wind and storm", "He would live in a big, grand palace"],
-    "correctIndex": 2
+    "correctIndex": 2,
+    "verses": [2]
   },
   "33": {
     "question": "What did Isaiah say would happen to Assyria, who had plundered others?",
     "answers": ["It would be plundered and destroyed itself", "It would become God's special friend", "It would rule the world forever", "It would move far away to Egypt"],
-    "correctIndex": 0
+    "correctIndex": 0,
+    "verses": [1]
   },
   "34": {
     "question": "Which land did Isaiah say would become a burning, empty desert where wild animals live?",
     "answers": ["Edom", "Egypt", "Moab", "Assyria"],
-    "correctIndex": 0
+    "correctIndex": 0,
+    "verses": [5, 6]
   },
   "35": {
     "question": "What did Isaiah say would happen to the desert?",
     "answers": ["It would stay dry, dusty, and empty forever", "It would bloom like a garden with streams", "It would turn into a busy city", "It would freeze over with ice"],
-    "correctIndex": 1
+    "correctIndex": 1,
+    "verses": [1, 6]
   },
   "36": {
     "question": "Who stood outside Jerusalem's wall and shouted threats to scare God's people?",
     "answers": ["The Rabshakeh, the Assyrian king's commander", "King Hezekiah, ruler of Judah", "The prophet Isaiah, God's own faithful messenger", "The king of Egypt, far away"],
-    "correctIndex": 0
+    "correctIndex": 0,
+    "verses": [2, 13]
   },
   "37": {
     "question": "How many Assyrian soldiers did God's angel strike down in one night?",
     "answers": ["185,000", "1,000", "10,000", "50,000"],
-    "correctIndex": 0
+    "correctIndex": 0,
+    "verses": [36]
   },
   "38": {
     "question": "What did Hezekiah do after he got better?",
     "answers": ["He wrote a song thanking God", "He became a fisherman", "He moved to Egypt", "He built a bigger palace"],
-    "correctIndex": 0
+    "correctIndex": 0,
+    "verses": [9, 20]
   },
   "39": {
     "question": "What did God tell Isaiah would happen to God's people someday?",
     "answers": ["They would live happily for ever and ever, with no troubles", "They would be carried away to Babylon as captives", "They would become the biggest army ever", "They would never be sad ever again"],
-    "correctIndex": 1
+    "correctIndex": 1,
+    "verses": [6, 7]
   },
   "40": {
     "question": "What did God say about the grass and flowers?",
     "answers": ["They never die — they live forever", "They wither and fall — God's word stands forever", "They grow bigger and taller and greener every day", "They sing sweet songs to the warm sun"],
-    "correctIndex": 1
+    "correctIndex": 1,
+    "verses": [7, 8]
   },
   "41": {
     "question": "What did God tell His people not to be afraid of?",
     "answers": ["Their enemies, because 'I am with you'", "The dark night and its shadows", "Spiders and creepy-crawly things", "Loud noises that frighten them"],
-    "correctIndex": 0
+    "correctIndex": 0,
+    "verses": [10, 11]
   },
   "42": {
     "question": "What did God say about His servant?",
     "answers": ["He would break every stick he found", "He would fight all the battles alone and win them", "He would be very loud and shout", "He would be gentle and not break a bruised reed"],
-    "correctIndex": 3
+    "correctIndex": 3,
+    "verses": [3]
   },
   "43": {
     "question": "What new thing did God say He was doing?",
     "answers": ["Making a rainbow in the sky", "Creating a beautiful garden", "Building a tower to heaven", "Making a way and rivers in the desert"],
-    "correctIndex": 3
+    "correctIndex": 3,
+    "verses": [19]
   },
   "44": {
     "question": "What did God say about idols made of wood and stone?",
     "answers": ["They were the very best gods of all the lands around", "They could hear and see everything", "They were nothing — only the LORD is the true God", "They lived in the trees and rivers"],
-    "correctIndex": 2
+    "correctIndex": 2,
+    "verses": [6, 9]
   },
   "45": {
     "question": "What did God say about King Cyrus before he was even born?",
     "answers": ["He would be God's shepherd and set His people free", "He would be the richest man on earth", "He would be a very famous painter", "He would live to be two hundred years old and more"],
-    "correctIndex": 0
+    "correctIndex": 0,
+    "verses": [13]
   },
   "46": {
     "question": "What did God say about the idols that people carried around?",
     "answers": ["They could move around by themselves", "They were heavy burdens that could not save anyone", "They were made of gold and silver", "They talked to the people who carried them on their shoulders"],
-    "correctIndex": 1
+    "correctIndex": 1,
+    "verses": [1, 2, 7]
   },
   "47": {
     "question": "What did Isaiah say about Babylon the queen?",
     "answers": ["She would be kind to everyone she ruled", "She would live forever as a great queen", "She would sit in the dust and never be queen again", "She would become a simple shepherdess in the fields"],
-    "correctIndex": 2
+    "correctIndex": 2,
+    "verses": [1, 5]
   },
   "48": {
     "question": "What did God say He had done for His people even though they were stubborn?",
     "answers": ["He announced things before they happened", "He had given them lots of fun toys", "He had made them the tallest of all people", "He had taught them how to fly"],
-    "correctIndex": 0
+    "correctIndex": 0,
+    "verses": [3, 5]
   },
   "49": {
     "question": "What did God say His servant would be to the nations?",
     "answers": ["A soldier in a mighty army", "A light bringing salvation to the nations", "A merchant who sells fine cloth and jewels", "A builder of houses and walls"],
-    "correctIndex": 1
+    "correctIndex": 1,
+    "verses": [6]
   },
   "50": {
     "question": "What did God say He gave His servant's back to?",
     "answers": ["Those who beat him", "Those who gave him gold", "Those who praised him", "Those who mocked him"],
-    "correctIndex": 0
+    "correctIndex": 0,
+    "verses": [6]
   },
   "51": {
     "question": "What did God tell His people to do when they felt weak?",
     "answers": ["Go to sleep and forget their troubles", "Give up and stop trying at all", "Build a bigger house to live in", "Look to Abraham, their father"],
-    "correctIndex": 3
+    "correctIndex": 3,
+    "verses": [2]
   },
   "52": {
     "question": "What did the watchmen on the walls of Jerusalem shout?",
     "answers": ["'Your God reigns!'", "'Dinner is ready!'", "'Watch out for dragons!'", "'Go back to bed!'"],
-    "correctIndex": 0
+    "correctIndex": 0,
+    "verses": [7, 8]
   },
   "53": {
     "question": "What did Isaiah say about the servant who suffered for others?",
     "answers": ["He was pierced for our sins, like a lamb", "He ran away from all his enemies", "He was the richest man in his whole town, by far", "He never got hurt, not even once"],
-    "correctIndex": 0
+    "correctIndex": 0,
+    "verses": [5, 7]
   },
   "54": {
     "question": "What did God tell the 'barren' woman to do?",
     "answers": ["Never laugh or sing again, ever, in her life", "Sing for joy — her children would be many", "Stop singing and stay quiet", "Move far away into the desert"],
-    "correctIndex": 1
+    "correctIndex": 1,
+    "verses": [1]
   },
   "55": {
     "question": "Who did God invite to come and drink freely?",
     "answers": ["Only kings in their palaces", "Everyone who was thirsty", "Only grown-ups, not children", "Only rich people with money"],
-    "correctIndex": 1
+    "correctIndex": 1,
+    "verses": [1]
   },
   "56": {
     "question": "What did God say about foreigners who loved Him?",
     "answers": ["They should go away to their own lands", "They could not be part of God's people", "They were welcome in God's house of prayer", "They had to become kings first"],
-    "correctIndex": 2
+    "correctIndex": 2,
+    "verses": [7]
   },
   "57": {
     "question": "Who did God say He comforts?",
     "answers": ["Only the rich and famous", "The humble and contrite in spirit", "Only soldiers in the king's great army", "Nobody at all, ever"],
-    "correctIndex": 1
+    "correctIndex": 1,
+    "verses": [15]
   },
   "58": {
     "question": "What kind of fasting did God really want?",
     "answers": ["Not eating any food for a day", "Sharing bread with the hungry and the poor", "Eating only vegetables, fruit, and nothing else", "Not drinking water all day long"],
-    "correctIndex": 1
+    "correctIndex": 1,
+    "verses": [7]
   },
   "59": {
     "question": "What did Isaiah say the people's sins had done between them and God?",
     "answers": ["They kept God from hearing their prayers", "They did not matter to God at all, not one bit", "Only kings and queens had sins", "God did not notice them one bit"],
-    "correctIndex": 0
+    "correctIndex": 0,
+    "verses": [2]
   },
   "60": {
     "question": "What did Isaiah tell God's people to do when God's light came?",
     "answers": ["Hide under a blanket all day", "Stay asleep in their beds", "Arise and shine — their light had come", "Run away and hide from it"],
-    "correctIndex": 2
+    "correctIndex": 2,
+    "verses": [1]
   },
   "61": {
     "question": "Who did God say His Spirit was upon?",
     "answers": ["The king only, sitting in his palace", "The rich merchants in the marketplace of the city", "The one anointed to bring good news to the poor", "The soldiers guarding the city walls"],
-    "correctIndex": 2
+    "correctIndex": 2,
+    "verses": [1]
   },
   "62": {
     "question": "What did God promise never to keep silent about?",
     "answers": ["The weather over the hills", "Zion — until her salvation shone", "His very favorite food", "The price of bread in town"],
-    "correctIndex": 1
+    "correctIndex": 1,
+    "verses": [1]
   },
   "63": {
     "question": "What color were God's garments when He came back from fighting for His people?",
     "answers": ["Red — like grapes stomped in a winepress", "Blue — like the deep blue sea", "Green — like the fresh green grass in spring", "Yellow — like the bright sun"],
-    "correctIndex": 0
+    "correctIndex": 0,
+    "verses": [2, 3]
   },
   "64": {
     "question": "What did Isaiah pray God would do like a potter with clay?",
     "answers": ["Break it into tiny pieces", "Remember their sins for ever and ever", "Remember them and not stay angry forever", "Turn it into gold and silver"],
-    "correctIndex": 2
+    "correctIndex": 2,
+    "verses": [8, 9]
   },
   "65": {
     "question": "What did God say He was ready to do for people who did not even ask?",
     "answers": ["Ignore them and turn away from them", "Give them money and fine gifts", "Make them kings over all the nations of the earth", "Be found by those who were not looking for Him"],
-    "correctIndex": 3
+    "correctIndex": 3,
+    "verses": [1]
   },
   "66": {
     "question": "What did Isaiah say God would make at the end?",
     "answers": ["A bigger temple in Jerusalem than ever before", "A brand new heaven and a brand new earth", "A taller mountain than ever", "A faster horse for the king"],
-    "correctIndex": 1
+    "correctIndex": 1,
+    "verses": [22]
   }
 }

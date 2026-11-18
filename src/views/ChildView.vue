@@ -31,7 +31,7 @@ import {
   unclaimTask,
 } from '../composables/useCompletions'
 import { isAdminMode } from '../composables/useAdminMode'
-import { isBirthdayToday } from '../lib/birthday'
+import { currentAge, isBirthdayToday } from '../lib/birthday'
 import { playSafely, playClaim, playUnclaim } from '../lib/sounds'
 import { isJackpot, jackpotForItem, type Jackpot } from '../lib/jackpot'
 import { completedReading, bibleRetryRemainingMs, dueChapter } from '../lib/bible'
@@ -132,6 +132,8 @@ function onWheelDone() {
 // --- daily Bible reading ---
 /** The chapter due today, or the one already finished today (shown disabled). */
 const bibleDue = computed(() => dueChapter(child.value?.bibleReading, todayStr.value))
+/** Kids 10 and older also have to pick a verse that contains the answer. */
+const bibleVerseCheck = computed(() => (child.value ? currentAge(child.value.birthdate) >= 10 : false))
 
 /** A 1s clock that only runs while a wrong-answer retry cooldown is ticking. */
 const retryNowMs = ref(Date.now())
@@ -654,6 +656,7 @@ async function onTaskUnclaim(task: ClaimableItem) {
       :book="bibleDue?.book || ''"
       :chapter="bibleDue?.chapter || 1"
       :child-name="child?.name"
+      :verse-check="bibleVerseCheck"
       @done="onBibleDone"
       @wrong="onBibleWrong"
       @close="bibleModalOpen = false"

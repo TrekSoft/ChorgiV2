@@ -1,5 +1,6 @@
 import type { BibleReading } from '../types/firebase'
 import videoConfig from '../data/bibleVideos.json'
+import verseCountConfig from '../data/bibleVerseCounts.json'
 
 // ── Books ───────────────────────────────────────────────────────────────────
 
@@ -111,6 +112,8 @@ export interface BibleQuestion {
   question: string
   answers: string[]
   correctIndex: number
+  /** Verses of the chapter that contain (at least part of) the correct answer. */
+  verses: number[]
 }
 
 const questionModules = import.meta.glob<{ default: Record<string, BibleQuestion> }>(
@@ -159,6 +162,17 @@ export function chapterVideoId(book: string, chapter: number): string | null {
     url.match(/(?:youtube\.com\/watch\?[^#]*v=|youtu\.be\/|youtube\.com\/shorts\/)([\w-]{6,})/) ??
     url.match(/^([\w-]{6,})$/)
   return match ? match[1] : null
+}
+
+// ── Verse counts ────────────────────────────────────────────────────────────
+// bibleVerseCounts.json maps "<slug>.<chapter>" to the chapter's verse
+// count, recorded for the books that have quiz questions.
+
+const verseCounts: Record<string, number> = verseCountConfig
+
+/** How many verses the chapter has, or null when it isn't recorded. */
+export function verseCountFor(book: string, chapter: number): number | null {
+  return verseCounts[`${bibleSlug(book)}.${chapter}`] ?? null
 }
 
 // ── Reading plan state ──────────────────────────────────────────────────────

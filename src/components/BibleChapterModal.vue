@@ -5,12 +5,13 @@ import FullscreenOverlay from './FullscreenOverlay.vue'
 import ConfettiBurst from './ConfettiBurst.vue'
 import PrimaryButton from './PrimaryButton.vue'
 import ChapterVideo from './ChapterVideo.vue'
-import { questionFor, chapterVideoEmbedUrl, chapterVideoId } from '../lib/bible'
+import { questionFor, chapterVideoEmbedUrl, chapterVideoId, verseCountFor } from '../lib/bible'
 import { playSafely, playSparkle, playBoing, playChime } from '../lib/sounds'
 import { CONFETTI_MODE, type ConfettiMode } from '../lib/constants'
 
 // Full-screen Bible chapter experience: quiz question (when one exists for
-// the chapter) → optional chapter video → celebration. Emits `done` when the
+// the chapter) → for kids 10+, picking a verse that contains the answer →
+// optional chapter video → celebration. Emits `done` when the
 // child collects, `wrong` after a wrong answer (the parent starts the retry
 // cooldown), and `close` when the child backs out of the question.
 
@@ -19,6 +20,10 @@ const props = defineProps<{
   book: string
   chapter: number
   childName?: string
+  /** When true (kids 10+), a correct answer must be followed by picking
+   *  one of the chapter's verses that contains the answer. A wrong verse
+   *  counts as a wrong answer: the parent starts the retry cooldown. */
+  verseCheck?: boolean
 }>()
 const emit = defineEmits<{ done: []; wrong: []; close: [] }>()
 
@@ -28,6 +33,16 @@ const picked = ref<number | null>(null)
 const burst = ref<{ fire: (mode?: ConfettiMode) => void } | null>(null)
 
 const question = computed(() => (props.open ? questionFor(props.book, props.chapter) : null))
+
+// Verse-pick step (10+): shown after a correct multiple-choice answer.
+const verseStep = ref(false)
+const versePick = ref<number | null>(null)
+const verseWrong = ref(false)
+const verseCount = computed(() => {
+  if (!props.open) return 0
+  return verseCountFor(props.book, props.chapter) ?? (question.value ? Math.max(...question.value.verses) : 0)
+})
+const verseOptions = computed(() => Array.from({ length: verseCount.value }, (_, i) => i + 1))
 const embedUrl = computed(() => (props.open ? chapterVideoEmbedUrl(props.book, props.chapter) : null))
 const videoId = computed(() => (props.open ? chapterVideoId(props.book, props.chapter) : null))
 
@@ -61,6 +76,26 @@ function pick(index: number) {
   playSafely(correct ? playSparkle : playBoing)
   clearFeedbackTimer()
   feedbackTimer = setTimeout(
+    correct
+      ? () => {
+          if (props.verseCheck && question.value && question.value.verses.length > 0) {
+            verseStep.value = true
+          } else {
+            advance()
+          }
+        }
+      : () => emit('wrong'),
+    correct ? CORRECT_FEEDBACK_MS : WRONG_FEEDBACK_MS,
+  )
+}
+
+function checkVerse() {
+  if (versePick.value === null || !question.value || verseWrong.value) return
+  const correct = question.value.verses.includes(versePick.value)
+  playSafely(correct ? playSparkle : playBoing)
+  if (!correct) verseWrong.value = true
+  clearFeedbackTimer()
+  feedbackTimer = setTimeout(
     correct ? advance : () => emit('wrong'),
     correct ? CORRECT_FEEDBACK_MS : WRONG_FEEDBACK_MS,
   )
@@ -82,6 +117,9 @@ watch(
     document.body.classList.toggle('bible-modal-open', isOpen)
     clearFeedbackTimer()
     picked.value = null
+    verseStep.value = false
+    versePick.value = null
+    verseWrong.value = false
     if (!isOpen) return
     phase.value = question.value ? 'question' : videoId.value ? 'video' : 'finished'
     if (phase.value === 'finished') finish()
@@ -131,6 +169,33 @@ onUnmounted(() => {
             </button>
           </div>
         </div>
+
+        <!-- verse pick (10+): which verse of the chapter has the answer? -->
+        <div v-if="verseStep" class="card w-full p-6 flex flex-col gap-4">
+          <h3 class="text-lg font-bold text-amber-900 text-center">
+            You got it! Which verse in {{ book }} {{ chapter }} has the answer?
+          </h3>
+          <div class="relative">
+            <select
+              v-model="versePick"
+              class="input-field w-full appearance-none pr-10"
+              :class="verseWrong ? 'border-red-400 bg-red-50' : ''"
+            >
+              <option :value="null" disabled>Choose a verse…</option>
+              <option v-for="v in verseOptions" :key="v" :value="v">Verse {{ v }}</option>
+            </select>
+            <Icon
+              icon="mdi:chevron-down"
+              class="w-5 h-5 text-amber-500 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none"
+            />
+          </div>
+          <div class="flex justify-center">
+            <PrimaryButton icon="mdi:check" :disabled="versePick === null" @click="checkVerse">
+              Check my verse
+            </PrimaryButton>
+          </div>
+        </div>
+
         <PrimaryButton icon="mdi:arrow-left" @click="emit('close')">Back</PrimaryButton>
       </template>
 

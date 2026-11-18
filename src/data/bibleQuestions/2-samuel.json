@@ -2,121 +2,145 @@
   "1": {
     "question": "How did David find out that King Saul and Jonathan had died?",
     "answers": ["A messenger brought him the bad news", "He saw it all in a dream", "His best friend told him", "He read it in a letter from the battlefield"],
-    "correctIndex": 0
+    "correctIndex": 0,
+    "verses": [2, 4]
   },
   "2": {
     "question": "Who ran after Abner and would not stop chasing him, even when Abner warned him?",
     "answers": ["Asahel", "Joab", "Abishai", "Ishbosheth"],
-    "correctIndex": 0
+    "correctIndex": 0,
+    "verses": [19, 21, 22, 23]
   },
   "3": {
     "question": "What did Joab do to Abner at the gate of Hebron?",
     "answers": ["He stabbed him to avenge his brother Asahel", "He welcomed him warmly with a feast", "He arrested him and threw him into a dark prison", "He challenged him to a duel at the gate"],
-    "correctIndex": 0
+    "correctIndex": 0,
+    "verses": [27, 30]
   },
   "4": {
     "question": "Two men murdered King Ishbosheth and brought his head to David, expecting a reward. What did David do?",
     "answers": ["He punished them for killing an innocent man", "He gave them gold and silver", "He made them captains in his army", "He banished them from the land of Israel forever"],
-    "correctIndex": 0
+    "correctIndex": 0,
+    "verses": [11, 12]
   },
   "5": {
     "question": "What city did David capture and make his capital?",
     "answers": ["Jerusalem", "Hebron", "Bethlehem", "Gath"],
-    "correctIndex": 0
+    "correctIndex": 0,
+    "verses": [6, 7, 9]
   },
   "6": {
     "question": "Why was Michal angry with David on the day the ark came into the city?",
     "answers": ["He danced joyfully before the LORD before everyone", "He forgot to invite her to the feast", "He gave her special seat away to another at the feast", "He came home much too late that night"],
-    "correctIndex": 0
+    "correctIndex": 0,
+    "verses": [14, 16, 20]
   },
   "7": {
     "question": "What did God promise David about his family?",
     "answers": ["His family would be rich", "His family would never fight wars", "Someone from his family would rule forever", "His family would live in the biggest house"],
-    "correctIndex": 2
+    "correctIndex": 2,
+    "verses": [12, 13, 16]
   },
   "8": {
-    "question": "Where did David defeat the Philistines and take their city?",
-    "answers": ["In a valley", "In Gath", "In the hills", "In a desert"],
-    "correctIndex": 1
+    "question": "How many chariots did David keep from the ones he captured from King Hadadezer?",
+    "answers": ["He kept one thousand chariots", "He kept one hundred chariots", "He kept seven hundred chariots", "He kept twenty thousand chariots"],
+    "correctIndex": 1,
+    "verses": [4]
   },
   "9": {
     "question": "What did David do for Mephibosheth, Jonathan's son?",
     "answers": ["He gave him a horse and chariot", "He made him a general", "He invited him to live at the king's table", "He sent him far away to live in another country"],
-    "correctIndex": 2
+    "correctIndex": 2,
+    "verses": [7, 10, 11, 13]
   },
   "10": {
     "question": "What did the Ammonite king do to David's envoys that started a war?",
     "answers": ["He stole all the gifts they brought", "He shaved off half their beards and cut their robes", "He locked them in a dark tower", "He made them carry heavy stones on their backs all day"],
-    "correctIndex": 1
+    "correctIndex": 1,
+    "verses": [4]
   },
   "11": {
     "question": "Who did David see bathing from the roof of his palace?",
     "answers": ["Michal", "Bathsheba", "Abigail", "Maacah"],
-    "correctIndex": 1
+    "correctIndex": 1,
+    "verses": [2, 3]
   },
   "12": {
     "question": "What did King David say when Nathan told him he had sinned?",
     "answers": ["'I am sorry, but it was not my fault'", "'I have sinned against the LORD'", "'Everyone does it'", "'I did not know it was wrong'"],
-    "correctIndex": 1
+    "correctIndex": 1,
+    "verses": [13]
   },
   "13": {
     "question": "What did Amnon do to his half-sister Tamar?",
     "answers": ["He gave her a gift", "He helped her cross a river", "He hurt her very badly", "He shouted at her in anger"],
-    "correctIndex": 2
+    "correctIndex": 2,
+    "verses": [14, 22, 32]
   },
   "14": {
     "question": "Who told David a made-up story about a son who killed his brother?",
     "answers": ["Nathan, the prophet", "Joab, the commander", "A woman from Tekoa", "Ziba, the servant"],
-    "correctIndex": 2
+    "correctIndex": 2,
+    "verses": [2, 4]
   },
   "15": {
     "question": "Why did David's friend Ittai the Gittite stay with David?",
     "answers": ["He was ordered to by the king", "He said he would go wherever David went", "He wanted to become king himself", "He was lost and could not find his way"],
-    "correctIndex": 1
+    "correctIndex": 1,
+    "verses": [21]
   },
   "16": {
     "question": "What did Shimei do as David was leaving Jerusalem?",
     "answers": ["He threw stones and cursed David", "He gave David food and water", "He sang him a song of praise", "He blocked the road against him"],
-    "correctIndex": 0
+    "correctIndex": 0,
+    "verses": [5, 6, 13]
   },
   "17": {
     "question": "Who was David's spy inside Absalom's camp who told him Ahithophel's plan?",
     "answers": ["Hushai", "Ziba", "Ittai", "Barzillai"],
-    "correctIndex": 0
+    "correctIndex": 0,
+    "verses": [15, 16]
   },
   "18": {
     "question": "How did Absalom die?",
     "answers": ["He was killed by a spear in the heat of battle", "His horse threw him to the ground", "His hair caught in a tree and Joab killed him", "He was poisoned by his servants"],
-    "correctIndex": 2
+    "correctIndex": 2,
+    "verses": [9, 14, 15]
   },
   "19": {
     "question": "What did Joab say to David, who kept crying over Absalom instead of greeting his soldiers?",
     "answers": ["'You love your enemies and hate your friends'", "'Cheer up, you are the king!'", "'Stop crying, get up, and eat some good food now'", "'Absalom was a bad person anyway'"],
-    "correctIndex": 0
+    "correctIndex": 0,
+    "verses": [6]
   },
   "20": {
     "question": "Who led a new revolt against David after Absalom?",
     "answers": ["Sheba son of Bichri", "Ahithophel, the counselor", "Shimei, the stone-thrower", "Adonijah, David's son"],
-    "correctIndex": 0
+    "correctIndex": 0,
+    "verses": [1, 2]
   },
   "21": {
     "question": "Why was there a three-year famine in Israel?",
     "answers": ["It did not rain", "Saul had killed some Gibeonites", "The Philistines blocked the grain ships", "The locusts ate all the crops"],
-    "correctIndex": 1
+    "correctIndex": 1,
+    "verses": [1]
   },
   "22": {
     "question": "What was David's last song about?",
     "answers": ["His many victories in battle", "How the LORD saved him and made him strong", "His flocks of sheep and goats", "Building the temple in the city of Jerusalem"],
-    "correctIndex": 1
+    "correctIndex": 1,
+    "verses": [1, 3, 33]
   },
   "23": {
     "question": "How many men were named in David's list of mighty warriors?",
     "answers": ["About 30", "About 60", "About 100", "About 300"],
-    "correctIndex": 0
+    "correctIndex": 0,
+    "verses": [23, 39]
   },
   "24": {
     "question": "Why did God send a plague on Israel?",
     "answers": ["Because David sinned by counting Israel's people", "Because it did not rain for many days", "Because the people worshiped idols of gold and silver", "Because David built himself a big house"],
-    "correctIndex": 0
+    "correctIndex": 0,
+    "verses": [10, 15]
   }
 }

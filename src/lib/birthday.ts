@@ -1,4 +1,4 @@
-import { differenceInCalendarDays, addYears, startOfDay, parseISO } from 'date-fns'
+import { differenceInCalendarDays, differenceInYears, addYears, startOfDay, parseISO } from 'date-fns'
 
 export function nextBirthday(birthdateStr: string, today: Date = new Date()): Date {
   const birth = parseISO(birthdateStr)
@@ -19,4 +19,9 @@ export function isBirthdayToday(birthdateStr: string, today: Date = new Date()):
 export function ageTurning(birthdateStr: string, today: Date = new Date()): number {
   const birth = parseISO(birthdateStr)
   return nextBirthday(birthdateStr, today).getFullYear() - birth.getFullYear()
+}
+
+/** The child's current age in whole years. */
+export function currentAge(birthdateStr: string, today: Date = new Date()): number {
+  return differenceInYears(startOfDay(today), parseISO(birthdateStr))
 }

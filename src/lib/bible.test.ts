@@ -9,6 +9,7 @@ import {
   dueChapter,
   nextChapter,
   questionFor,
+  verseCountFor,
 } from './bible'
 import type { BibleReading } from '../types/firebase'
 
@@ -142,6 +143,37 @@ describe('chapterVideoEmbedUrl', () => {
 
   it('returns null for chapters past the end of a book\'s videos', () => {
     expect(chapterVideoEmbedUrl('Isaiah', 5)).toBeNull()
+  })
+})
+
+describe('verseCountFor', () => {
+  it('returns the recorded verse counts', () => {
+    expect(verseCountFor('Genesis', 1)).toBe(31)
+    expect(verseCountFor('Genesis', 50)).toBe(26)
+    expect(verseCountFor('2 Samuel', 24)).toBe(25)
+    expect(verseCountFor('Isaiah', 66)).toBe(24)
+  })
+
+  it('returns null for books without recorded counts', () => {
+    expect(verseCountFor('Exodus', 1)).toBeNull()
+  })
+})
+
+describe('question answer verses', () => {
+  it('every question names at least one verse of its own chapter that contains the answer', () => {
+    for (const name of ['Genesis', '2 Samuel', 'Isaiah']) {
+      const book = BIBLE_BOOKS.find((b) => b.name === name)!
+      for (let chapter = 1; chapter <= book.chapters; chapter++) {
+        const q = questionFor(name, chapter)
+        expect(q, `${name} ${chapter}`).not.toBeNull()
+        expect(q!.verses.length, `${name} ${chapter}`).toBeGreaterThan(0)
+        const count = verseCountFor(name, chapter)!
+        for (const verse of q!.verses) {
+          expect(verse, `${name} ${chapter}:${verse}`).toBeGreaterThanOrEqual(1)
+          expect(verse, `${name} ${chapter}:${verse}`).toBeLessThanOrEqual(count)
+        }
+      }
+    }
   })
 })
 
