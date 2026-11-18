@@ -18,10 +18,10 @@
     "verses": [16]
   },
   "4": {
-    "question": "What did the Branch of the LORD do for his people?",
-    "answers": ["He made them rich with gold", "He washed them and made them clean", "He gave them horses to ride", "He built them castles to live in"],
-    "correctIndex": 1,
-    "verses": [4]
+    "question": "What did the LORD say He would create over every dwelling on Mount Zion?",
+    "answers": ["A bright rainbow by day and a ring of stars by night", "A strong wind by day and a heavy rain by night", "A cloud and smoke by day and a flaming fire by night", "A pillar of dust by day and a shining moon by night"],
+    "correctIndex": 2,
+    "verses": [5]
   },
   "5": {
     "question": "In God's song about the vineyard, what did the owner do when the grapes were bad?",
