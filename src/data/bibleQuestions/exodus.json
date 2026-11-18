@@ -1,0 +1,242 @@
+{
+  "1": {
+    "question": "What were the names of the two Hebrew midwives?",
+    "answers": ["Shiphrah and Puah", "Miriam and Jochebed", "Leah and Rachel", "Hagar and Sarah"],
+    "correctIndex": 0,
+    "verses": [15]
+  },
+  "2": {
+    "question": "Why did Pharaoh's daughter name the baby Moses?",
+    "answers": ["It was her father's name", "She drew him out of the water", "It meant prince of Egypt", "A servant suggested it"],
+    "correctIndex": 1,
+    "verses": [10]
+  },
+  "3": {
+    "question": "What did God tell Moses to take off because the ground was holy?",
+    "answers": ["His robe", "His hat", "His shoes", "His belt"],
+    "correctIndex": 2,
+    "verses": [5]
+  },
+  "4": {
+    "question": "What happened when Moses threw his rod on the ground?",
+    "answers": ["It became a flower", "It became a stone", "It became a bird", "It became a serpent"],
+    "correctIndex": 3,
+    "verses": [3]
+  },
+  "5": {
+    "question": "What did Pharaoh stop giving the Israelites to make bricks?",
+    "answers": ["The straw", "The clay", "The water", "The wood"],
+    "correctIndex": 0,
+    "verses": [7]
+  },
+  "6": {
+    "question": "Which name did God say Abraham, Isaac, and Jacob had not known Him by?",
+    "answers": ["God Almighty", "JEHOVAH", "The Creator", "Most High"],
+    "correctIndex": 1,
+    "verses": [3]
+  },
+  "7": {
+    "question": "What did Aaron's rod do to the magicians' rods?",
+    "answers": ["It chased them away", "It broke them in two", "It swallowed them up", "It turned them to dust"],
+    "correctIndex": 2,
+    "verses": [12]
+  },
+  "8": {
+    "question": "What did the magicians tell Pharaoh when they could not make lice?",
+    "answers": ["This is a trick of Moses", "This is the work of Aaron", "This is a dream of Pharaoh", "This is the finger of God"],
+    "correctIndex": 3,
+    "verses": [19]
+  },
+  "9": {
+    "question": "In which land was there no hail at all?",
+    "answers": ["The land of Goshen", "The land of Egypt", "The land of Midian", "The land of Canaan"],
+    "correctIndex": 0,
+    "verses": [26]
+  },
+  "10": {
+    "question": "For how many days was there thick darkness in Egypt?",
+    "answers": ["Two days", "Three days", "Five days", "Seven days"],
+    "correctIndex": 1,
+    "verses": [22]
+  },
+  "11": {
+    "question": "When did God say He would go out into Egypt?",
+    "answers": ["Early in the morning", "About midnight", "In the middle of the day", "Late in the evening"],
+    "correctIndex": 1,
+    "verses": [4]
+  },
+  "12": {
+    "question": "What did the people put on the door posts of their houses at the Passover?",
+    "answers": ["Oil from the olives", "Water from the well", "Blood from the lamb", "Milk from the goats"],
+    "correctIndex": 2,
+    "verses": [7]
+  },
+  "13": {
+    "question": "What did Moses take with him when Israel left Egypt?",
+    "answers": ["The bones of Joseph", "The staff of Aaron", "The tablets of stone", "The tent of Moses"],
+    "correctIndex": 0,
+    "verses": [19]
+  },
+  "14": {
+    "question": "How did the children of Israel cross the Red Sea?",
+    "answers": ["In wooden boats", "By swimming across", "On a stone bridge", "On dry ground"],
+    "correctIndex": 3,
+    "verses": [22]
+  },
+  "15": {
+    "question": "What did Miriam take in her hand when she led the women in singing?",
+    "answers": ["A trumpet", "A cymbal", "A timbrel", "A harp"],
+    "correctIndex": 2,
+    "verses": [20]
+  },
+  "16": {
+    "question": "What did the people call the bread that God gave them in the wilderness?",
+    "answers": ["Manna", "Quails", "Honey", "Wafers"],
+    "correctIndex": 0,
+    "verses": [15, 31]
+  },
+  "17": {
+    "question": "Who held up Moses' hands during the battle with Amalek?",
+    "answers": ["Joshua and Caleb", "Miriam and Aaron", "Jethro and Joshua", "Aaron and Hur"],
+    "correctIndex": 3,
+    "verses": [12]
+  },
+  "18": {
+    "question": "Who was Moses' father in law who came to visit him in the wilderness?",
+    "answers": ["Pharaoh", "Jethro", "Joshua", "Amalek"],
+    "correctIndex": 1,
+    "verses": [1]
+  },
+  "19": {
+    "question": "What covered Mount Sinai when the LORD came down on it?",
+    "answers": ["Snow", "Rain", "Smoke", "Sand"],
+    "correctIndex": 2,
+    "verses": [18]
+  },
+  "20": {
+    "question": "What did God say we should do on the seventh day, the sabbath?",
+    "answers": ["Work in the fields", "Rest from all our work", "Travel to the market", "Build a stone altar"],
+    "correctIndex": 1,
+    "verses": [8, 10]
+  },
+  "21": {
+    "question": "A Hebrew servant worked for his master for six years. In which year did he go out free?",
+    "answers": ["The fifth year", "The sixth year", "The seventh year", "The eighth year"],
+    "correctIndex": 2,
+    "verses": [2]
+  },
+  "22": {
+    "question": "If a man stole an ox and killed it or sold it, how many oxen did he have to give back?",
+    "answers": ["Two oxen", "Three oxen", "Four oxen", "Five oxen"],
+    "correctIndex": 3,
+    "verses": [1]
+  },
+  "23": {
+    "question": "What should you do if you find your enemy's ox or donkey wandering away from home?",
+    "answers": ["Keep it for yourself", "Bring it back to him", "Leave it where it is", "Give it to a friend"],
+    "correctIndex": 1,
+    "verses": [4]
+  },
+  "24": {
+    "question": "How long was Moses up on the mountain with God?",
+    "answers": ["Ten days and ten nights", "Seven days and seven nights", "Forty days and forty nights", "Three days and three nights"],
+    "correctIndex": 2,
+    "verses": [18]
+  },
+  "25": {
+    "question": "The ark was made of wood. What was it covered with, inside and out?",
+    "answers": ["Pure gold", "Pure silver", "Fine linen", "Pure brass"],
+    "correctIndex": 0,
+    "verses": [11]
+  },
+  "26": {
+    "question": "The curtains of the tabernacle were joined together with fifty clasps. What were the clasps made of?",
+    "answers": ["Of silver", "Of brass", "Of wood", "Of gold"],
+    "correctIndex": 3,
+    "verses": [6]
+  },
+  "27": {
+    "question": "What did the people bring so the lamp in the tabernacle would burn always?",
+    "answers": ["Sweet incense", "Pure olive oil", "Fine flour", "Fresh water"],
+    "correctIndex": 1,
+    "verses": [20]
+  },
+  "28": {
+    "question": "What words were carved on the gold plate that Aaron wore on his forehead?",
+    "answers": ["GLORY AND BEAUTY", "BLESSING TO THE PEOPLE", "HOLINESS TO THE LORD", "STRENGTH TO THE LORD"],
+    "correctIndex": 2,
+    "verses": [36]
+  },
+  "29": {
+    "question": "How many lambs were offered on the altar every day, one in the morning and one in the evening?",
+    "answers": ["One lamb", "Two lambs", "Three lambs", "Four lambs"],
+    "correctIndex": 1,
+    "verses": [38]
+  },
+  "30": {
+    "question": "The priests washed their hands and feet at the laver, a big washbasin. What was the laver made of?",
+    "answers": ["Gold", "Silver", "Brass", "Wood"],
+    "correctIndex": 2,
+    "verses": [18]
+  },
+  "31": {
+    "question": "Who did God call by name to lead the work of making the tabernacle and its furniture?",
+    "answers": ["Moses the leader", "Bezaleel the craftsman", "Aaron the priest", "Joshua the servant"],
+    "correctIndex": 1,
+    "verses": [2]
+  },
+  "32": {
+    "question": "What did Aaron use to make the golden calf?",
+    "answers": ["The people's golden earrings", "The people's silver coins", "The people's brass pots", "The people's wooden idols"],
+    "correctIndex": 0,
+    "verses": [2, 4]
+  },
+  "33": {
+    "question": "Where did God place Moses so he could see God's glory pass by?",
+    "answers": ["On top of the mountain", "Inside the tabernacle tent", "In a cleft of the rock", "Behind a large pillar"],
+    "correctIndex": 2,
+    "verses": [22]
+  },
+  "34": {
+    "question": "What happened to the skin of Moses' face after he talked with God on the mountain?",
+    "answers": ["It was covered with dust", "It turned very red", "It was hidden by his hair", "It shone brightly"],
+    "correctIndex": 3,
+    "verses": [29]
+  },
+  "35": {
+    "question": "What did God say the people must not kindle on the Sabbath day?",
+    "answers": ["A fire in their homes", "Lamps in the tabernacle", "Torches for the camp", "Candles for their tents"],
+    "correctIndex": 0,
+    "verses": [3]
+  },
+  "36": {
+    "question": "Why did Moses tell the people to stop bringing offerings for the tabernacle?",
+    "answers": ["The workers had finished early", "The gold had all run out", "They already had more than enough", "The camp was leaving that day"],
+    "correctIndex": 2,
+    "verses": [5]
+  },
+  "37": {
+    "question": "What did Bezaleel make on the two ends of the mercy seat?",
+    "answers": ["Two golden lampstands", "Two silver trumpets", "Two stone tablets", "Two golden cherubims"],
+    "correctIndex": 3,
+    "verses": [7]
+  },
+  "38": {
+    "question": "What was the brass laver made from?",
+    "answers": ["The soldiers' brass shields", "The women's brass mirrors", "The priests' brass trumpets", "The people's brass coins"],
+    "correctIndex": 1,
+    "verses": [8]
+  },
+  "39": {
+    "question": "What words were written on the golden plate of the holy crown?",
+    "answers": ["KING OF ALL ISRAEL", "PRIEST OF THE MOST HIGH", "HOLINESS TO THE LORD", "SERVANT OF THE LORD GOD"],
+    "correctIndex": 2,
+    "verses": [30]
+  },
+  "40": {
+    "question": "What filled the tabernacle when Moses had finished all the work?",
+    "answers": ["A bright shining light", "The glory of the LORD", "A crowd of all the people", "Sweet-smelling incense smoke"],
+    "correctIndex": 1,
+    "verses": [34]
+  }
+}

@@ -10,6 +10,7 @@ import {
   nextChapter,
   questionFor,
   verseCountFor,
+  videoFor,
 } from './bible'
 import type { BibleReading } from '../types/firebase'
 
@@ -126,13 +127,13 @@ describe('questionFor', () => {
   })
 
   it('returns null for books without a question file', () => {
-    expect(questionFor('Exodus', 1)).toBeNull()
+    expect(questionFor('Leviticus', 1)).toBeNull()
   })
 })
 
 describe('chapterVideoEmbedUrl', () => {
   it('returns null for chapters without a video', () => {
-    expect(chapterVideoEmbedUrl('Exodus', 1)).toBeNull()
+    expect(chapterVideoEmbedUrl('Leviticus', 1)).toBeNull()
   })
 
   it('returns the chapter\'s own video embed URL, with no playlist attached', () => {
@@ -152,16 +153,26 @@ describe('verseCountFor', () => {
     expect(verseCountFor('Genesis', 50)).toBe(26)
     expect(verseCountFor('2 Samuel', 24)).toBe(25)
     expect(verseCountFor('Isaiah', 66)).toBe(24)
+    expect(verseCountFor('Exodus', 20)).toBe(26)
+    expect(verseCountFor('Exodus', 40)).toBe(38)
   })
 
   it('returns null for books without recorded counts', () => {
-    expect(verseCountFor('Exodus', 1)).toBeNull()
+    expect(verseCountFor('Leviticus', 1)).toBeNull()
+  })
+})
+
+describe('Exodus content', () => {
+  it('has the playlist videos for chapters 1-8 and none yet past that', () => {
+    expect(videoFor('Exodus', 1)).toBe('https://www.youtube.com/embed/A8WK9D4XbSM?autoplay=1&rel=0')
+    expect(videoFor('Exodus', 8)).toBe('https://www.youtube.com/embed/wbURufSRgok?autoplay=1&rel=0')
+    expect(videoFor('Exodus', 9)).toBeNull()
   })
 })
 
 describe('question answer verses', () => {
   it('every question names at least one verse of its own chapter that contains the answer', () => {
-    for (const name of ['Genesis', '2 Samuel', 'Isaiah']) {
+    for (const name of ['Genesis', '2 Samuel', 'Isaiah', 'Exodus']) {
       const book = BIBLE_BOOKS.find((b) => b.name === name)!
       for (let chapter = 1; chapter <= book.chapters; chapter++) {
         const q = questionFor(name, chapter)
@@ -184,7 +195,7 @@ describe('chapterVideoId', () => {
   })
 
   it('returns null for chapters without a video', () => {
-    expect(chapterVideoId('Exodus', 1)).toBeNull()
+    expect(chapterVideoId('Leviticus', 1)).toBeNull()
     expect(chapterVideoId('Isaiah', 5)).toBeNull()
   })
 })
