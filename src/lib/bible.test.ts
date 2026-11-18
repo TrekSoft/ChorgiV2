@@ -133,9 +133,13 @@ describe('chapterVideoEmbedUrl', () => {
     expect(chapterVideoEmbedUrl('Exodus', 1)).toBeNull()
   })
 
-  it('passes playlist embed URLs through untouched', () => {
+  it('returns the chapter\'s own video embed URL', () => {
     const url = chapterVideoEmbedUrl('2 Samuel', 1)
-    expect(url).toContain('youtube.com/embed/videoseries')
-    expect(url).toContain('index=1')
+    expect(url).toContain('youtube.com/embed/LbIFvCayQ9A')
+    expect(url).toContain('list=PLVOlFVsqhTq0')
+  })
+
+  it('returns null for chapters past the end of a book\'s videos', () => {
+    expect(chapterVideoEmbedUrl('Isaiah', 5)).toBeNull()
   })
 })
