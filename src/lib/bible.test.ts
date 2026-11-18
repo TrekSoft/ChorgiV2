@@ -4,6 +4,7 @@ import {
   bibleRetryRemainingMs,
   bibleSlug,
   chapterVideoEmbedUrl,
+  chapterVideoId,
   completedReading,
   dueChapter,
   nextChapter,
@@ -141,5 +142,17 @@ describe('chapterVideoEmbedUrl', () => {
 
   it('returns null for chapters past the end of a book\'s videos', () => {
     expect(chapterVideoEmbedUrl('Isaiah', 5)).toBeNull()
+  })
+})
+
+describe('chapterVideoId', () => {
+  it('extracts the video id from a chapter\'s stored URL', () => {
+    expect(chapterVideoId('Genesis', 3)).toBe('zgEOLQpkCCs')
+    expect(chapterVideoId('2 Samuel', 1)).toBe('LbIFvCayQ9A')
+  })
+
+  it('returns null for chapters without a video', () => {
+    expect(chapterVideoId('Exodus', 1)).toBeNull()
+    expect(chapterVideoId('Isaiah', 5)).toBeNull()
   })
 })

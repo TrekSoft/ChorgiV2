@@ -4,7 +4,8 @@ import { Icon } from '@iconify/vue'
 import FullscreenOverlay from './FullscreenOverlay.vue'
 import ConfettiBurst from './ConfettiBurst.vue'
 import PrimaryButton from './PrimaryButton.vue'
-import { questionFor, chapterVideoEmbedUrl } from '../lib/bible'
+import ChapterVideo from './ChapterVideo.vue'
+import { questionFor, chapterVideoEmbedUrl, chapterVideoId } from '../lib/bible'
 import { playSafely, playSparkle, playBoing, playChime } from '../lib/sounds'
 import { CONFETTI_MODE, type ConfettiMode } from '../lib/constants'
 
@@ -28,6 +29,7 @@ const burst = ref<{ fire: (mode?: ConfettiMode) => void } | null>(null)
 
 const question = computed(() => (props.open ? questionFor(props.book, props.chapter) : null))
 const embedUrl = computed(() => (props.open ? chapterVideoEmbedUrl(props.book, props.chapter) : null))
+const videoId = computed(() => (props.open ? chapterVideoId(props.book, props.chapter) : null))
 
 const CORRECT_FEEDBACK_MS = 1100
 const WRONG_FEEDBACK_MS = 2000
@@ -45,7 +47,7 @@ function finish() {
 }
 
 function advance() {
-  if (embedUrl.value) {
+  if (videoId.value) {
     phase.value = 'video'
   } else {
     finish()
@@ -80,7 +82,7 @@ watch(
     clearFeedbackTimer()
     picked.value = null
     if (!isOpen) return
-    phase.value = question.value ? 'question' : embedUrl.value ? 'video' : 'finished'
+    phase.value = question.value ? 'question' : videoId.value ? 'video' : 'finished'
     if (phase.value === 'finished') finish()
   },
   { immediate: true },
@@ -123,15 +125,8 @@ onUnmounted(clearFeedbackTimer)
       </template>
 
       <!-- video -->
-      <div v-else-if="phase === 'video' && embedUrl" class="w-full flex flex-col items-center gap-4">
-        <div class="w-full aspect-video rounded-2xl overflow-hidden shadow-2xl bg-black">
-          <iframe
-            :src="embedUrl"
-            class="w-full h-full"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowfullscreen
-          />
-        </div>
+      <div v-else-if="phase === 'video' && videoId" class="w-full flex flex-col items-center gap-4">
+        <ChapterVideo :video-id="videoId" :fallback-url="embedUrl" @ended="finish" />
         <PrimaryButton icon="mdi:check-circle" @click="finish">I'm done watching!</PrimaryButton>
       </div>
 

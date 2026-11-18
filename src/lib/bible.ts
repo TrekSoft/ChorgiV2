@@ -146,10 +146,19 @@ export function chapterVideoEmbedUrl(book: string, chapter: number): string | nu
   if (url.includes('youtube.com/embed/')) {
     return url.includes('autoplay=') ? url : `${url}${url.includes('?') ? '&' : '?'}autoplay=1&rel=0`
   }
+  const id = chapterVideoId(book, chapter)
+  return id ? `https://www.youtube.com/embed/${id}?autoplay=1&rel=0` : null
+}
+
+/** The bare YouTube video id for a chapter's video, from any supported URL form. */
+export function chapterVideoId(book: string, chapter: number): string | null {
+  const url = videoFor(book, chapter)
+  if (!url) return null
   const match =
+    url.match(/youtube\.com\/embed\/([\w-]{6,})/) ??
     url.match(/(?:youtube\.com\/watch\?[^#]*v=|youtu\.be\/|youtube\.com\/shorts\/)([\w-]{6,})/) ??
     url.match(/^([\w-]{6,})$/)
-  return match ? `https://www.youtube.com/embed/${match[1]}?autoplay=1&rel=0` : null
+  return match ? match[1] : null
 }
 
 // ── Reading plan state ──────────────────────────────────────────────────────
