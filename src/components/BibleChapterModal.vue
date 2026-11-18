@@ -138,9 +138,14 @@ onUnmounted(clearFeedbackTimer)
         >
           <ChapterVideo :video-id="videoId" :fallback-url="embedUrl" @ended="finish" />
         </div>
-        <div class="absolute bottom-5 left-1/2 -translate-x-1/2 z-20 opacity-90 hover:opacity-100 transition-opacity drop-shadow-2xl">
-          <PrimaryButton icon="mdi:check-circle" @click="finish">I'm done watching!</PrimaryButton>
-        </div>
+        <button
+          type="button"
+          aria-label="I'm done watching"
+          class="absolute top-5 right-5 z-20 flex items-center justify-center w-16 h-16 rounded-full bg-white/25 backdrop-blur-sm text-stone-500 shadow-lg cursor-pointer transition-colors hover:bg-white/40"
+          @click="finish"
+        >
+          <Icon icon="mdi:check" class="w-9 h-9" />
+        </button>
       </template>
 
       <!-- celebration -->
