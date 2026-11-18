@@ -144,16 +144,18 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="relative w-full aspect-video rounded-2xl overflow-hidden shadow-2xl bg-black">
+  <div class="relative w-full h-full bg-black">
     <!-- plain-embed fallback (API unavailable) -->
     <iframe
       v-if="mode === 'fallback' && fallbackUrl"
       :src="fallbackUrl"
-      class="w-full h-full"
+      class="absolute inset-0 w-full h-full"
       allow="accelerometer; autoplay; encrypted-media; gyroscope"
       allowfullscreen
     />
-    <div v-show="mode !== 'fallback'" ref="host" class="w-full h-full" />
+    <div v-show="mode !== 'fallback'" class="absolute inset-0">
+      <div ref="host" class="w-full h-full" />
+    </div>
 
     <!-- input shield: once playing, nothing reaches the player -->
     <div v-if="mode === 'playing'" class="absolute inset-0 z-10 cursor-default" />

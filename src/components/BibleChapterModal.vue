@@ -93,8 +93,14 @@ onUnmounted(clearFeedbackTimer)
 
 <template>
   <FullscreenOverlay :open="open" label="Bible chapter" overlay-class="bible-overlay">
-    <div class="flex flex-col items-center gap-6 w-full max-w-2xl px-4 py-8">
-      <div class="text-center w-full">
+    <div
+      :class="
+        phase === 'video'
+          ? 'relative flex items-center justify-center w-full h-full'
+          : 'flex flex-col items-center gap-6 w-full max-w-2xl px-4 py-8'
+      "
+    >
+      <div v-if="phase !== 'video'" class="text-center w-full">
         <div class="flex items-center justify-center gap-2 text-amber-300 font-black text-2xl tracking-wide">
           <Icon icon="mdi:book-open-variant" class="w-8 h-8" />
           BIBLE TIME
@@ -124,11 +130,18 @@ onUnmounted(clearFeedbackTimer)
         <PrimaryButton icon="mdi:arrow-left" @click="emit('close')">Back</PrimaryButton>
       </template>
 
-      <!-- video -->
-      <div v-else-if="phase === 'video' && videoId" class="w-full flex flex-col items-center gap-4">
-        <ChapterVideo :video-id="videoId" :fallback-url="embedUrl" @ended="finish" />
-        <PrimaryButton icon="mdi:check-circle" @click="finish">I'm done watching!</PrimaryButton>
-      </div>
+      <!-- video: fills the screen at 16:9, done button floats over it -->
+      <template v-else-if="phase === 'video' && videoId">
+        <div
+          class="relative"
+          :style="{ width: 'min(100vw, calc(100dvh * 16 / 9))', height: 'min(100dvh, calc(100vw * 9 / 16))' }"
+        >
+          <ChapterVideo :video-id="videoId" :fallback-url="embedUrl" @ended="finish" />
+        </div>
+        <div class="absolute bottom-5 left-1/2 -translate-x-1/2 z-20 opacity-90 hover:opacity-100 transition-opacity drop-shadow-2xl">
+          <PrimaryButton icon="mdi:check-circle" @click="finish">I'm done watching!</PrimaryButton>
+        </div>
+      </template>
 
       <!-- celebration -->
       <div v-else class="flex flex-col items-center gap-6 text-center">
