@@ -24,6 +24,7 @@ interface YtPlayer {
   playVideo: () => void
   loadVideoById: (id: string) => void
   destroy: () => void
+  unloadModule?: (module: string) => void
 }
 interface YtNamespace {
   Player: new (
@@ -110,9 +111,19 @@ onMounted(async () => {
         rel: 0,
         playsinline: 1,
         iv_load_policy: 3,
+        // Captions off: don't load them even when the viewer's YouTube
+        // preference would turn them on.
+        cc_load_policy: 0,
       },
       events: {
         onReady: (e) => {
+          // Belt and suspenders: drop the captions module entirely.
+          try {
+            e.target.unloadModule?.('captions')
+          } catch {
+            // The module API isn't present on every client; the
+            // cc_load_policy above still keeps captions off.
+          }
           e.target.playVideo()
           startTapWatch()
         },
