@@ -100,7 +100,7 @@ onUnmounted(() => {
     <div
       :class="
         phase === 'video'
-          ? 'relative w-full h-full'
+          ? 'flex flex-col w-full h-full'
           : 'flex flex-col items-center gap-6 w-full max-w-2xl px-4 py-8'
       "
     >
@@ -134,12 +134,12 @@ onUnmounted(() => {
         <PrimaryButton icon="mdi:arrow-left" @click="emit('close')">Back</PrimaryButton>
       </template>
 
-      <!-- video: largest 16:9 box in the space above the button zone.
-           The zone is 116px: a 32px gap above the button and 32px below
-           it, so the video-to-button gap is always >= the bottom margin
-           (exactly equal when the screen's height is the limit). -->
+      <!-- video: largest 16:9 box above the button, bottom-aligned in its
+           region so any leftover space collects above the video and the
+           gap under the video always equals the margin below the button
+           (the button row pads 32px above and below itself). -->
       <template v-else-if="phase === 'video' && videoId">
-        <div class="absolute inset-x-0 top-0 flex items-center justify-center" style="height: calc(100dvh - 116px)">
+        <div class="flex-1 min-h-0 w-full flex items-end justify-center">
           <div
             class="relative"
             :style="{ width: 'min(100%, calc((100dvh - 116px) * 16 / 9))', aspectRatio: '16 / 9' }"
@@ -147,15 +147,8 @@ onUnmounted(() => {
             <ChapterVideo :video-id="videoId" :fallback-url="embedUrl" @ended="finish" />
           </div>
         </div>
-        <div class="absolute inset-x-0 bottom-0 flex justify-center" style="height: 116px; padding-top: 32px">
-          <button
-            type="button"
-            class="flex items-center gap-2 h-[52px] px-8 rounded-full bg-white/25 backdrop-blur-sm text-stone-600 font-bold text-lg shadow-lg cursor-pointer transition-colors hover:bg-white/40"
-            @click="finish"
-          >
-            <Icon icon="mdi:check-circle" class="w-6 h-6" />
-            I'm done watching!
-          </button>
+        <div class="flex justify-center py-8">
+          <PrimaryButton icon="mdi:check-circle" @click="finish">I'm done watching!</PrimaryButton>
         </div>
       </template>
 
