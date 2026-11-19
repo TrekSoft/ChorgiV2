@@ -143,7 +143,7 @@ describe('chapterVideoEmbedUrl', () => {
   })
 
   it('returns null for chapters past the end of a book\'s videos', () => {
-    expect(chapterVideoEmbedUrl('Isaiah', 5)).toBeNull()
+    expect(chapterVideoEmbedUrl('Isaiah', 6)).toBeNull()
   })
 })
 
@@ -196,6 +196,6 @@ describe('chapterVideoId', () => {
 
   it('returns null for chapters without a video', () => {
     expect(chapterVideoId('Leviticus', 1)).toBeNull()
-    expect(chapterVideoId('Isaiah', 5)).toBeNull()
+    expect(chapterVideoId('Isaiah', 6)).toBeNull()
   })
 })
