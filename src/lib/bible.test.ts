@@ -163,10 +163,11 @@ describe('verseCountFor', () => {
 })
 
 describe('Exodus content', () => {
-  it('has the playlist videos for chapters 1-8 and none yet past that', () => {
+  it('has the playlist videos for chapters 1-9 and none yet past that', () => {
     expect(videoFor('Exodus', 1)).toBe('https://www.youtube.com/embed/A8WK9D4XbSM?autoplay=1&rel=0')
     expect(videoFor('Exodus', 8)).toBe('https://www.youtube.com/embed/wbURufSRgok?autoplay=1&rel=0')
-    expect(videoFor('Exodus', 9)).toBeNull()
+    expect(videoFor('Exodus', 9)).toBe('https://www.youtube.com/embed/PAbbTjyuKfs?autoplay=1&rel=0')
+    expect(videoFor('Exodus', 10)).toBeNull()
   })
 })
 
