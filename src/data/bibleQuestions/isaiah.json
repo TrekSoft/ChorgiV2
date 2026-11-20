@@ -24,7 +24,7 @@
     "verses": [5]
   },
   "5": {
-    "question": "In God's song about the vineyard, what did the owner do when the grapes were bad?",
+    "question": "In God's song about the vineyard, what did the owner say he would do when the grapes were bad?",
     "answers": ["He made even more grapes grow in it", "He planted pretty flowers all through it in rows", "He built a bigger and stronger fence", "He took down its hedge and let it be trampled"],
     "correctIndex": 3,
     "verses": [5]
@@ -61,7 +61,7 @@
   },
   "11": {
     "question": "From whose family would the promised king come?",
-    "answers": ["Saul's — the very first king", "David's — a shoot from Jesse's stump", "Moses' — the great leader of Israel's people", "Solomon's — the wise king"],
+    "answers": ["Saul's — the very first king", "Jesse's, a shoot from his stump", "Moses' — the great leader of Israel's people", "Solomon's — the wise king"],
     "correctIndex": 1,
     "verses": [1, 10]
   },
@@ -78,10 +78,10 @@
     "verses": [19, 20]
   },
   "14": {
-    "question": "Who was called 'the morning star' who fell from heaven?",
-    "answers": ["An angel named Lucifer", "A shooting star", "The king of Egypt", "A wise teacher"],
-    "correctIndex": 0,
-    "verses": [12]
+    "question": "Against which king was the saying about the one who fell from heaven spoken?",
+    "answers": ["The king of Egypt", "The king of Babylon", "The king of Moab", "The king of Assyria"],
+    "correctIndex": 1,
+    "verses": [4, 12]
   },
   "15": {
     "question": "Whose cry of sadness did Isaiah write about?",
@@ -102,7 +102,7 @@
     "verses": [1]
   },
   "18": {
-    "question": "What would the tall people of Cush (Ethiopia) one day bring to the LORD's mountain?",
+    "question": "What would the people of Cush (Ethiopia) one day bring to the LORD's mountain?",
     "answers": ["Gifts for the LORD", "Their armies", "Their fastest ships", "Nothing at all"],
     "correctIndex": 0,
     "verses": [7]
@@ -133,7 +133,7 @@
   },
   "23": {
     "question": "What did Isaiah say about the trading city of Tyre?",
-    "answers": ["They would become richer than ever", "They would move to live in Jerusalem", "They would teach God's people to sail ships on the sea", "Tyre would be laid waste, and her ships would mourn"],
+    "answers": ["They would become richer than ever", "They would move to live in Jerusalem", "They would teach God's people to sail ships on the sea", "Tyre laid waste; Tarshish's ships would howl"],
     "correctIndex": 3,
     "verses": [1, 14]
   },
@@ -186,15 +186,15 @@
     "verses": [1, 6]
   },
   "32": {
-    "question": "What did Isaiah sing about a king who would rule in righteousness?",
+    "question": "What did Isaiah say about a king who would rule in righteousness?",
     "answers": ["He would be mean to everyone he met", "He would make everyone rich, happy, and safe forever", "He would be a hiding place from the wind and storm", "He would live in a big, grand palace"],
     "correctIndex": 2,
     "verses": [2]
   },
   "33": {
-    "question": "What did Isaiah say would happen to Assyria, who had plundered others?",
-    "answers": ["It would be plundered and destroyed itself", "It would become God's special friend", "It would rule the world forever", "It would move far away to Egypt"],
-    "correctIndex": 0,
+    "question": "What did Isaiah say would happen to the one who spoiled others?",
+    "answers": ["He would keep on spoiling others for ever", "He would be spoiled himself in the end", "He would become ruler over all the nations", "He would run away and hide in Egypt"],
+    "correctIndex": 1,
     "verses": [1]
   },
   "34": {
@@ -258,22 +258,22 @@
     "verses": [19]
   },
   "44": {
-    "question": "What did God say about idols made of wood and stone?",
+    "question": "What did God say about the idols men made?",
     "answers": ["They were the very best gods of all the lands around", "They could hear and see everything", "They were nothing — only the LORD is the true God", "They lived in the trees and rivers"],
     "correctIndex": 2,
     "verses": [6, 9]
   },
   "45": {
-    "question": "What did God say about King Cyrus before he was even born?",
-    "answers": ["He would be God's shepherd and set His people free", "He would be the richest man on earth", "He would be a very famous painter", "He would live to be two hundred years old and more"],
+    "question": "What did God say Cyrus would do for His people?",
+    "answers": ["He would build God's city and set the captives free", "He would build a palace and make himself a great king", "He would lead his army to conquer the land of Egypt", "He would teach the people to worship gods of gold"],
     "correctIndex": 0,
     "verses": [13]
   },
   "46": {
-    "question": "What did God say about the idols that people carried around?",
-    "answers": ["They could move around by themselves", "They were heavy burdens that could not save anyone", "They were made of gold and silver", "They talked to the people who carried them on their shoulders"],
-    "correctIndex": 1,
-    "verses": [1, 2, 7]
+    "question": "What did God say about the idols people carried on their shoulders?",
+    "answers": ["They could not answer or save anyone", "They walked along beside the people", "They spoke kind words to the people", "They carried the people on their backs"],
+    "correctIndex": 0,
+    "verses": [2, 7]
   },
   "47": {
     "question": "What did Isaiah say about Babylon the queen?",
@@ -300,13 +300,13 @@
     "verses": [6]
   },
   "51": {
-    "question": "What did God tell His people to do when they felt weak?",
+    "question": "What did God tell the people who seek the LORD to do?",
     "answers": ["Go to sleep and forget their troubles", "Give up and stop trying at all", "Build a bigger house to live in", "Look to Abraham, their father"],
     "correctIndex": 3,
     "verses": [2]
   },
   "52": {
-    "question": "What did the watchmen on the walls of Jerusalem shout?",
+    "question": "What joyful words were said to Zion in this chapter?",
     "answers": ["'Your God reigns!'", "'Dinner is ready!'", "'Watch out for dragons!'", "'Go back to bed!'"],
     "correctIndex": 0,
     "verses": [7, 8]
@@ -366,7 +366,7 @@
     "verses": [1]
   },
   "62": {
-    "question": "What did God promise never to keep silent about?",
+    "question": "For whose sake did the speaker say, 'I will not hold my peace'?",
     "answers": ["The weather over the hills", "Zion — until her salvation shone", "His very favorite food", "The price of bread in town"],
     "correctIndex": 1,
     "verses": [1]
@@ -378,8 +378,8 @@
     "verses": [2, 3]
   },
   "64": {
-    "question": "What did Isaiah pray God would do like a potter with clay?",
-    "answers": ["Break it into tiny pieces", "Remember their sins for ever and ever", "Remember them and not stay angry forever", "Turn it into gold and silver"],
+    "question": "Isaiah said God is the potter and His people are the clay. What did he plead with God about?",
+    "answers": ["Break it into tiny pieces", "Remember their sins for ever and ever", "Not stay angry or remember sins for ever", "Turn it into gold and silver"],
     "correctIndex": 2,
     "verses": [8, 9]
   },

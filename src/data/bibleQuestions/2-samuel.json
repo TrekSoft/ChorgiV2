@@ -18,7 +18,7 @@
     "verses": [27, 30]
   },
   "4": {
-    "question": "Two men murdered King Ishbosheth and brought his head to David, expecting a reward. What did David do?",
+    "question": "Two men murdered King Ishbosheth in his bed and brought his head to David. What did David do?",
     "answers": ["He punished them for killing an innocent man", "He gave them gold and silver", "He made them captains in his army", "He banished them from the land of Israel forever"],
     "correctIndex": 0,
     "verses": [11, 12]
@@ -30,8 +30,8 @@
     "verses": [6, 7, 9]
   },
   "6": {
-    "question": "Why was Michal angry with David on the day the ark came into the city?",
-    "answers": ["He danced joyfully before the LORD before everyone", "He forgot to invite her to the feast", "He gave her special seat away to another at the feast", "He came home much too late that night"],
+    "question": "Why did Michal despise David on the day the ark came into the city?",
+    "answers": ["He danced before the LORD in front of everyone", "He forgot to invite her to the feast", "He gave her special seat away to another at the feast", "He came home much too late that night"],
     "correctIndex": 0,
     "verses": [14, 16, 20]
   },
@@ -84,7 +84,7 @@
     "verses": [2, 4]
   },
   "15": {
-    "question": "Why did David's friend Ittai the Gittite stay with David?",
+    "question": "Why did Ittai the Gittite stay with David?",
     "answers": ["He was ordered to by the king", "He said he would go wherever David went", "He wanted to become king himself", "He was lost and could not find his way"],
     "correctIndex": 1,
     "verses": [21]
@@ -103,7 +103,7 @@
   },
   "18": {
     "question": "How did Absalom die?",
-    "answers": ["He was killed by a spear in the heat of battle", "His horse threw him to the ground", "His hair caught in a tree and Joab killed him", "He was poisoned by his servants"],
+    "answers": ["He was killed by a spear in the heat of battle", "His horse threw him down and trampled him", "His head caught in a tree and Joab killed him", "He was poisoned by his own servants at supper"],
     "correctIndex": 2,
     "verses": [9, 14, 15]
   },
@@ -126,16 +126,16 @@
     "verses": [1]
   },
   "22": {
-    "question": "What was David's last song about?",
+    "question": "What was David's song about, the one he sang when the LORD delivered him from all his enemies?",
     "answers": ["His many victories in battle", "How the LORD saved him and made him strong", "His flocks of sheep and goats", "Building the temple in the city of Jerusalem"],
     "correctIndex": 1,
     "verses": [1, 3, 33]
   },
   "23": {
     "question": "How many men were named in David's list of mighty warriors?",
-    "answers": ["About 30", "About 60", "About 100", "About 300"],
+    "answers": ["37 in all", "About 60", "About 100", "About 300"],
     "correctIndex": 0,
-    "verses": [23, 39]
+    "verses": [39]
   },
   "24": {
     "question": "Why did God send a plague on Israel?",

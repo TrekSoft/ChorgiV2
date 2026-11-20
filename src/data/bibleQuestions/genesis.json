@@ -25,7 +25,7 @@
   },
   "5": {
     "question": "What was special about Enoch?",
-    "answers": ["He was the strongest man in the whole wide world", "He walked with God and God took him to heaven", "He built the first boat ever made", "He was the richest man in the world"],
+    "answers": ["He was the strongest man in the whole wide world", "He walked with God, and God took him", "He built the first boat ever made", "He was the richest man in the world"],
     "correctIndex": 1,
     "verses": [22, 24]
   },
@@ -54,10 +54,10 @@
     "verses": [13, 14, 16]
   },
   "10": {
-    "question": "Who was the mighty hunter before the LORD who built great cities like Babel and Nineveh?",
-    "answers": ["Nimrod", "Cush", "Asshur", "Shem"],
+    "question": "Who was the mighty hunter before the LORD, whose kingdom began with Babel?",
+    "answers": ["Nimrod, a son of Cush", "Asshur, who built Nineveh", "Shem, the eldest son of Noah", "Cush, a son of Ham"],
     "correctIndex": 0,
-    "verses": [9, 10]
+    "verses": [8, 9, 10]
   },
   "11": {
     "question": "What were the people building in the city of Babel?",
@@ -103,7 +103,7 @@
   },
   "18": {
     "question": "Who visited Abraham and told him Sarah would have a baby?",
-    "answers": ["Two angels and the LORD", "A king from a faraway land", "A shepherd with his sheep", "Moses, the leader of Israel"],
+    "answers": ["The LORD and two men with Him", "A king from a faraway land", "A shepherd with his sheep", "Moses, the leader of Israel"],
     "correctIndex": 0,
     "verses": [1, 2, 10]
   },
@@ -114,7 +114,7 @@
     "verses": [26]
   },
   "20": {
-    "question": "What did King Abimelech do when he found out Abraham's wife was really Sarah?",
+    "question": "What did King Abimelech do when he found out Sarah was Abraham's wife, not his sister?",
     "answers": ["He put Abraham in jail for a year", "He gave her back to Abraham with many gifts", "He kept her in his palace forever", "He made Abraham work in his fields for many years"],
     "correctIndex": 1,
     "verses": [14, 16]
@@ -150,10 +150,10 @@
     "verses": [30, 33, 34]
   },
   "26": {
-    "question": "Why did Isaac move away from Abimelech's land?",
-    "answers": ["He got a new job herding sheep far away", "He was too rich", "He was scared of the lions in the land", "The people argued with him over his wells"],
-    "correctIndex": 3,
-    "verses": [20, 21, 22]
+    "question": "Why did Abimelech tell Isaac to go away from him?",
+    "answers": ["Isaac had grown much mightier than they were", "Isaac had stolen Abimelech's wells and flocks", "Isaac had built a great city inside Gerar", "Isaac had refused to speak with Abimelech"],
+    "correctIndex": 0,
+    "verses": [13, 16]
   },
   "27": {
     "question": "How did Jacob trick Isaac into giving him the special blessing?",
@@ -187,7 +187,7 @@
   },
   "32": {
     "question": "What did Jacob's name get changed to after he wrestled with God?",
-    "answers": ["David, the young shepherd king", "Israel, which means 'wrestles with God'", "Moses, the great leader of Israel long ago", "Benjamin, his youngest brother"],
+    "answers": ["David, the young shepherd king", "Israel, who had power with God and prevailed", "Moses, the great leader of Israel long ago", "Benjamin, his youngest brother"],
     "correctIndex": 1,
     "verses": [28]
   },
@@ -259,7 +259,7 @@
   },
   "44": {
     "question": "What did Judah say he would do instead of Benjamin going to Egypt as a slave?",
-    "answers": ["Run away back to his father and never return", "Stay in Egypt forever as a slave himself", "Become a farmer in the land", "Fight the Egyptians bravely"],
+    "answers": ["Run away back to his father and never return", "Stay in Egypt as a slave in Benjamin's place", "Become a farmer in the land", "Fight the Egyptians bravely"],
     "correctIndex": 1,
     "verses": [33]
   },
@@ -271,7 +271,7 @@
   },
   "46": {
     "question": "Where did Joseph's family settle in Egypt?",
-    "answers": ["In a big city by the river", "In the land of Goshen, the best part", "On a boat on the great river", "In the desert near the hills"],
+    "answers": ["In a big city by the river", "In the land of Goshen in Egypt", "On a boat on the great river", "In the desert near the hills"],
     "correctIndex": 1,
     "verses": [28, 34]
   },
