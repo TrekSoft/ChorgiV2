@@ -10,7 +10,7 @@ import { playSafely, playSparkle, playBoing, playChime } from '../lib/sounds'
 import { CONFETTI_MODE, type ConfettiMode } from '../lib/constants'
 
 // Full-screen Bible chapter experience: quiz question (when one exists for
-// the chapter) → for kids 10+, picking a verse that contains the answer →
+// the chapter) → for kids 8+, picking a verse that contains the answer →
 // optional chapter video → celebration. Emits `done` when the
 // child collects, `wrong` after a wrong answer (the parent starts the retry
 // cooldown), and `close` when the child backs out of the question.
@@ -170,8 +170,8 @@ onUnmounted(() => {
           </div>
         </div>
 
-        <!-- verse pick (10+): which verse of the chapter has the answer? -->
-        <div v-if="verseStep" class="card w-full p-6 flex flex-col gap-4">
+        <!-- verse pick (8+): which verse of the chapter has the answer? -->
+        <div v-if="verseStep" class="card w-full max-w-md mx-auto p-6 flex flex-col gap-4">
           <h3 class="text-lg font-bold text-amber-900 text-center">
             You got it! Pick one of the verses in {{ book }} {{ chapter }} that contains the answer.
           </h3>
