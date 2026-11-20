@@ -18,10 +18,10 @@
     "verses": [6, 13]
   },
   "4": {
-    "question": "Why was God not pleased with Cain's gift?",
-    "answers": ["He gave a gift that was far too small", "He gave a gift made out of plastic", "He stole the whole gift from his brother Abel's flock", "He did not do what was right like his brother Abel"],
-    "correctIndex": 3,
-    "verses": [4, 5, 7]
+    "question": "What did Abel bring as his offering to the LORD?",
+    "answers": ["The fruit of the ground from his fields", "Grain and oil from his father's storehouse", "The firstborn of his flock and their fat", "Two young doves he caught near the river"],
+    "correctIndex": 2,
+    "verses": [4]
   },
   "5": {
     "question": "What was special about Enoch?",
