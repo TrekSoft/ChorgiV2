@@ -102,10 +102,10 @@
     "verses": [5]
   },
   "18": {
-    "question": "Who visited Abraham and told him Sarah would have a baby?",
-    "answers": ["The LORD and two men with Him", "A king from a faraway land", "A shepherd with his sheep", "Moses, the leader of Israel"],
-    "correctIndex": 0,
-    "verses": [1, 2, 10]
+    "question": "Abraham begged God to spare Sodom if righteous people were found there. What was the smallest number he asked about?",
+    "answers": ["Fifty righteous people", "Forty righteous people", "Twenty righteous people", "Ten righteous people"],
+    "correctIndex": 3,
+    "verses": [32]
   },
   "19": {
     "question": "What happened to Lot's wife when she looked back at Sodom?",
