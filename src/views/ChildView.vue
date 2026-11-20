@@ -132,8 +132,8 @@ function onWheelDone() {
 // --- daily Bible reading ---
 /** The chapter due today, or the one already finished today (shown disabled). */
 const bibleDue = computed(() => dueChapter(child.value?.bibleReading, todayStr.value))
-/** Kids 10 and older also have to pick a verse that contains the answer. */
-const bibleVerseCheck = computed(() => (child.value ? currentAge(child.value.birthdate) >= 10 : false))
+/** Kids 8 and older also have to pick a verse that contains the answer. */
+const bibleVerseCheck = computed(() => (child.value ? currentAge(child.value.birthdate) >= 8 : false))
 
 /** A 1s clock that only runs while a wrong-answer retry cooldown is ticking. */
 const retryNowMs = ref(Date.now())
